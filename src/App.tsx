@@ -1,13 +1,20 @@
-import './App.css';
-import ProfilePage from '@pages/ProfilePage/ProfilePage';
+import Home from '@pages/HomePage/Home';
+import { BrowserRouter, Route, Routes } from 'react-router';
+import { ThemeContextProvider } from './features/theme/ThemeProvider';
+import SignupPage from '@pages/Auth/SignupPage';
+import LoginPage from '@pages/Auth/LoginPage';
 
 function App() {
   return (
-    <>
-      <section id="center">
-        <ProfilePage />
-      </section>
-    </>
+    <ThemeContextProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeContextProvider>
   );
 }
 
