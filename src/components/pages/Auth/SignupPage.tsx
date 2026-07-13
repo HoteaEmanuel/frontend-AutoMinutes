@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router';
 import z from 'zod';
 import { useSignUp } from '@/features/auth/hooks/useSignUp';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
+import { Card } from '@/components/ui/card';
 
 const SignupPage = () => {
   const {
@@ -39,69 +40,70 @@ const SignupPage = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="flex w-full max-w-md flex-col gap-4 rounded-lg border border-accent p-6 shadow-md"
-      >
-        <div>
-          <h2 className="text-gradient text-4xl text-center font-bold">Sign up</h2>
-          {/* <p className="text-xs font-semibold italic">Create your account</p> */}
-        </div>
+      <Card className="shadow-md">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex w-full max-w-md flex-col gap-4 rounded-lg p-6 "
+        >
+          <div>
+            <h2 className="text-gradient text-4xl text-center font-bold">Sign up</h2>
+          </div>
 
-        <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3">
+            <FormField
+              label="First name"
+              id="firstName"
+              register={register}
+              placeholder="First Name"
+              error={errors.firstName?.message}
+            />
+            <FormField
+              label="Last Name"
+              id="lastName"
+              register={register}
+              placeholder="Last Name"
+              error={errors.lastName?.message}
+            />
+          </div>
+
           <FormField
-            label="First name"
-            id="firstName"
+            label="Email"
+            id="email"
+            type="email"
+            placeholder="Email"
             register={register}
-            placeholder="First Name"
-            error={errors.firstName?.message}
+            error={errors.email?.message}
           />
           <FormField
-            label="Last Name"
-            id="lastName"
+            label="Password"
+            id="password"
+            type="password"
             register={register}
-            placeholder="Last Name"
-            error={errors.lastName?.message}
+            placeholder="Password"
+            error={errors.password?.message}
           />
-        </div>
-
-        <FormField
-          label="Email"
-          id="email"
-          type="email"
-          placeholder="Email"
-          register={register}
-          error={errors.email?.message}
-        />
-        <FormField
-          label="Password"
-          id="password"
-          type="password"
-          register={register}
-          placeholder="Password"
-          error={errors.password?.message}
-        />
-        <FormField
-          label="Confirm Password"
-          id="confirmPassword"
-          type="password"
-          placeholder="Confirm Password"
-          register={register}
-          error={errors.confirmPassword?.message}
-        />
-        <Button type="submit" disabled={isPending}>
-          {isPending ? 'Creating account...' : 'Sign up'}
-        </Button>
-
-        <Divider text={'Or'} />
-        <GoogleButton />
-        <div className="flex gap-1 w-full justify-center items-center">
-          <span className="text-xxs font-semibold">Already have an account? </span>
-          <Button variant={'link'} className="text-xs">
-            <Link to={'/login'}>Login</Link>
+          <FormField
+            label="Confirm Password"
+            id="confirmPassword"
+            type="password"
+            placeholder="Confirm Password"
+            register={register}
+            error={errors.confirmPassword?.message}
+          />
+          <Button type="submit" disabled={isPending}>
+            {isPending ? 'Creating account...' : 'Sign up'}
           </Button>
-        </div>
-      </form>
+
+          <Divider text={'Or'} />
+          <GoogleButton />
+          <div className="flex gap-1 w-full justify-center items-center">
+            <span className="text-xxs font-semibold">Already have an account? </span>
+            <Button variant={'link'} className="text-xs">
+              <Link to={'/auth/login'}>Login</Link>
+            </Button>
+          </div>
+        </form>
+      </Card>
     </div>
   );
 };

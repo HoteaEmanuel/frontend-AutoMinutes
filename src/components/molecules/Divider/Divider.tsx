@@ -6,7 +6,7 @@ const Divider = ({ text }: { text: string }) => {
         <Separator className="w-full h-px"/>
       </div>
       <div className="relative flex justify-center z-50">
-        <span className="bg-background px-5 text-sm text-muted-foreground">{text}</span>
+        <span className="bg-card px-5 text-sm text-muted-foreground">{text}</span>
       </div>
     </div>
   );

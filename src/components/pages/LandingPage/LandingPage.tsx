@@ -11,7 +11,7 @@ const Home = () => {
       </Button>
       <h1 className="text-2xl">Homepage</h1>
       <Button asChild>
-        <Link to={'/signup'}>Get started </Link>
+        <Link to={'/auth/signup'}>Get started </Link>
       </Button>
     </div>
   );
