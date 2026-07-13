@@ -5,19 +5,36 @@ import { Button } from '@/components/ui/button';
 import FormField from '@/components/molecules/FormField/FormField';
 import Divider from '@molecules/Divider/Divider';
 import GoogleButton from '@molecules/GoogleButton/GoogleButton';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import z from 'zod';
+import { useSignUp } from '@/features/auth/hooks/useSignUp';
+import { useAuthStore } from '@/features/auth/stores/auth.store';
 
 const SignupPage = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(signupSchema),
   });
 
-  const onSubmit = (data: any) => {
-    console.log(data);
+  const { mutateAsync: signUp, isPending } = useSignUp();
+  const user = useAuthStore((auth) => auth.user);
+  const navigate = useNavigate();
+
+  const onSubmit = async (data: z.infer<typeof signupSchema>) => {
+    await signUp({
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      password: data.password,
+    });
+
+    console.log('USER: ', user);
+    reset();
+    navigate('/home');
   };
 
   return (
@@ -72,7 +89,9 @@ const SignupPage = () => {
           register={register}
           error={errors.confirmPassword?.message}
         />
-        <Button type="submit">Sign Up</Button>
+        <Button type="submit" disabled={isPending}>
+          {isPending ? 'Creating account...' : 'Sign up'}
+        </Button>
 
         <Divider text={'Or'} />
         <GoogleButton />
