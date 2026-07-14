@@ -17,3 +17,5 @@ export const googleAuth = () => {
 };
 
 export const refresh = () => api.post('/auth/refresh');
+
+export const logout = () => api.post('/auth/logout');

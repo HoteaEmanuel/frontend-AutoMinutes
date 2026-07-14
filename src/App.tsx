@@ -1,4 +1,3 @@
-import Home from '@pages/LandingPage/LandingPage';
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { ThemeContextProvider } from './features/theme/ThemeProvider';
 import SignupPage from '@pages/Auth/SignupPage';
@@ -11,6 +10,11 @@ import UnprotectedRoute from '@pages/Unprotected/UnprotectedRoute';
 import useInitAuth from '@/features/auth/hooks/useInitAuth';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
 import { Loader2 } from 'lucide-react';
+import RootLayout from '@templates/RootLayout/RootLayout';
+import AppLayout from '@templates/AppLayout/AppLayout';
+import HomePage from '@pages/HomePage/Home';
+import ProfilePage from '@pages/ProfilePage/ProfilePage';
+import TodosPage from '@pages/Todos/TodosPage';
 function App() {
   useInitAuth();
   const status = useAuthStore((s) => s.status);
@@ -28,15 +32,21 @@ function App() {
     <ThemeContextProvider>
       <BrowserRouter>
         <Routes>
-          <Route element={<UnprotectedRoute />}>
+          <Route element={<RootLayout />}>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/auth/signup" element={<SignupPage />} />
-            <Route path="/auth/login" element={<LoginPage />} />
-            <Route path="/auth/oauth" element={<Oauth />} />
+            <Route element={<UnprotectedRoute />}>
+              <Route path="/auth/signup" element={<SignupPage />} />
+              <Route path="/auth/login" element={<LoginPage />} />
+              <Route path="/auth/oauth" element={<Oauth />} />
+            </Route>
           </Route>
 
           <Route element={<ProtectedRoute />}>
-            <Route path="/home" element={<Home />} />
+            <Route element={<AppLayout />}>
+              <Route path="/home" element={<HomePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/todos" element={<TodosPage />} />
+            </Route>
           </Route>
         </Routes>
       </BrowserRouter>

@@ -1,20 +1,13 @@
-import { useTheme } from '@/features/theme/useTheme';
-import { Sun, Moon } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Link } from 'react-router';
-const Home = () => {
-  const { theme, setTheme } = useTheme();
+import HeroSection from '@organisms/Hero/HeroSection';
+
+const LandingPage = () => {
   return (
-    <div className="">
-      <Button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} variant={'outline'}>
-        {theme === 'dark' ? <Moon /> : <Sun />}
-      </Button>
-      <h1 className="text-2xl">Homepage</h1>
-      <Button asChild>
-        <Link to={'/auth/signup'}>Get started </Link>
-      </Button>
+    <div className="flex flex-col justify-center w-full">
+      <div className="">
+        <HeroSection />
+      </div>
     </div>
   );
 };
 
-export default Home;
+export default LandingPage;
