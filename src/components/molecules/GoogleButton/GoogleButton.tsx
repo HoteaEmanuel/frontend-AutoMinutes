@@ -19,8 +19,8 @@ const GoogleButton = () => {
       onClick={handleGoogleAuth}
       className="transition-shadow duration-300 hover:bg-accent hover:border-accent-foreground "
     >
-      Continue with Google
       <GoogleIcon />
+      Continue with Google
     </Button>
   );
 };

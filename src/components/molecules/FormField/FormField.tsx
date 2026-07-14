@@ -9,6 +9,7 @@ interface FormFieldProps {
   type?: string;
   register: any;
   error?: string;
+  hasError: boolean;
   placeholder?: string;
 }
 
@@ -18,6 +19,7 @@ const FormField = ({
   type = 'text',
   register,
   error,
+  hasError,
   placeholder = '',
 }: FormFieldProps) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +32,8 @@ const FormField = ({
           id={id}
           type={type === 'password' && showPassword ? 'text' : type}
           placeholder={placeholder}
+          aria-invalid={hasError}
+          className={hasError ? 'border-destructive focus-visible:ring-destructive' : undefined}
           {...register(id)}
         />
         {type === 'password' && (

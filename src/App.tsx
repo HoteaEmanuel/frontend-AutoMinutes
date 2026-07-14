@@ -8,7 +8,22 @@ import Oauth from '@pages/Oauth/Oauth';
 import ProtectedRoute from '@pages/Protected/ProtectedRoute';
 import LandingPage from '@pages/LandingPage/LandingPage';
 import UnprotectedRoute from '@pages/Unprotected/UnprotectedRoute';
+import useInitAuth from '@/features/auth/hooks/useInitAuth';
+import { useAuthStore } from '@/features/auth/stores/auth.store';
+import { Loader2 } from 'lucide-react';
 function App() {
+  useInitAuth();
+  const status = useAuthStore((s) => s.status);
+  if (status === 'pending') {
+    return (
+      <ThemeContextProvider>
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="animate-spin size-10" />
+        </div>
+      </ThemeContextProvider>
+    );
+  }
+
   return (
     <ThemeContextProvider>
       <BrowserRouter>

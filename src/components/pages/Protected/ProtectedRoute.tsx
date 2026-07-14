@@ -1,5 +1,4 @@
 import { useAuthStore } from '@/features/auth/stores/auth.store';
-import React from 'react';
 import { Navigate, Outlet } from 'react-router';
 
 const ProtectedRoute = () => {

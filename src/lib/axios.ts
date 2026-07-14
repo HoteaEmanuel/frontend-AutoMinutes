@@ -1,6 +1,5 @@
 import { useAuthStore } from '@/features/auth/stores/auth.store';
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { redirect } from 'react-router';
 const API_URL = import.meta.env.VITE_REACT_API_URL;
 export const api = axios.create({
   baseURL: API_URL,
@@ -19,16 +18,18 @@ api.interceptors.request.use(
   },
   (error) => Promise.reject(error),
 );
-
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
     const original = error.config as
       | (InternalAxiosRequestConfig & { _retry?: boolean })
       | undefined;
-    const isRefreshCall = original?.url?.includes('/auth/refresh');
+    const isAuthCall =
+      original?.url?.includes('/auth/refresh') ||
+      original?.url?.includes('/auth/login') ||
+      original?.url?.includes('/auth/signup');
 
-    if (error.response?.status === 401 && original && !original._retry && !isRefreshCall) {
+    if (error.response?.status === 401 && original && !original._retry && !isAuthCall) {
       original._retry = true;
       try {
         const { data } = await api.post('/auth/refresh');
