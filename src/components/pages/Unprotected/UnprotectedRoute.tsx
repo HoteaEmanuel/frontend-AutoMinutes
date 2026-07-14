@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/features/auth/stores/auth.store';
+import Header from '@templates/Header/Header';
 import { Navigate, Outlet } from 'react-router';
 
 const UnprotectedRoute = () => {
