@@ -1,5 +1,5 @@
 import { useAuthStore } from '@/features/auth/stores/auth.store';
-import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { redirect } from 'react-router';
 const API_URL = import.meta.env.VITE_REACT_API_URL;
 export const api = axios.create({
@@ -13,7 +13,7 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const accessToken = useAuthStore.getState().accessToken;
-    if (accessToken) config.headers.Authorization = `Bearer ${accessToken}`;
+    config.headers.Authorization = `Bearer ${accessToken}`;
 
     return config;
   },
@@ -23,7 +23,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const original = error.config as (InternalAxiosRequestConfig & { _retry?: boolean }) | undefined;
+    const original = error.config as
+      | (InternalAxiosRequestConfig & { _retry?: boolean })
+      | undefined;
     const isRefreshCall = original?.url?.includes('/auth/refresh');
 
     if (error.response?.status === 401 && original && !original._retry && !isRefreshCall) {
