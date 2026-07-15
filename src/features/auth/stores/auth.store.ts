@@ -5,7 +5,6 @@ type User = {
   email: string;
   avatar: string;
 } | null;
-// 'pending' cat timp incercam sa refacem sesiunea din cookie la boot
 type Status = 'pending' | 'authenticated' | 'unauthenticated';
 type AuthState = {
   user: User;

@@ -1,12 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
-import { useTheme } from '@/features/theme/useTheme';
-import { Moon, Sun } from 'lucide-react';
-import React from 'react';
 import { Link } from 'react-router';
 
 const AuthNavBar = () => {
-  const { theme, setTheme } = useTheme();
   const user = useAuthStore((s) => s.user);
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur">
@@ -15,12 +11,6 @@ const AuthNavBar = () => {
           AutoMinutes
         </Link>
         <div className="flex items-center gap-2">
-          <Button
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            className={'bg-transparent hover:bg-transparent'}
-          >
-            {theme === 'dark' ? <Moon className="text-primary" /> : <Sun />}
-          </Button>
           {!user ? (
             <>
               <Button
