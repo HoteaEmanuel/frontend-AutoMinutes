@@ -36,7 +36,7 @@ const SignupPage = () => {
 
     console.log('USER: ', user);
     reset();
-    navigate('/home');
+    navigate('/meetings');
   };
 
   return (

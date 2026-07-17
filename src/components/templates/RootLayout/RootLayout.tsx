@@ -8,7 +8,7 @@ const RootLayout = () => {
       <Header>
         <AuthNavBar />
       </Header>
-      <main>
+      <main className="mt-20">
         <Outlet />
       </main>
     </div>

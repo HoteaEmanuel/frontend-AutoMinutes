@@ -15,7 +15,7 @@ const AppNavbar = () => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border backdrop-blur">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link to="/home" className="text-xl font-bold text-foreground">
+        <Link to="/meetings" className="text-xl font-bold text-foreground">
           AutoMinutes
         </Link>
 
