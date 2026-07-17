@@ -2,17 +2,15 @@ import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
 import { useTheme } from '@/features/theme/useTheme';
 
-import {  Moon, Sun } from 'lucide-react';
-import { Link,} from 'react-router';
+import { Moon, Sun } from 'lucide-react';
+import { Link } from 'react-router';
 import AppNavActions from '@molecules/AppNavActions/AppNavActions';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getUserInitials } from '@/features/user/utils/user';
 
 const AppNavbar = () => {
   const { theme, setTheme } = useTheme();
   const user = useAuthStore((s) => s.user);
-
-  const initials = user
-    ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase()
-    : '';
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border backdrop-blur">
@@ -31,19 +29,12 @@ const AppNavbar = () => {
           >
             {theme === 'dark' ? <Moon className="text-primary" /> : <Sun />}
           </Button>
-
-          {user &&
-            (user.avatar ? (
-              <img
-                src={user.avatar}
-                alt={`${user.firstName} ${user.lastName}`}
-                className="size-8 rounded-full object-cover"
-              />
-            ) : (
-              <span className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-                {initials}
-              </span>
-            ))}
+          {user && user.avatar && (
+            <Avatar>
+              <AvatarImage src={user.avatar} />
+              <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
+            </Avatar>
+          )}
         </div>
       </nav>
     </header>
