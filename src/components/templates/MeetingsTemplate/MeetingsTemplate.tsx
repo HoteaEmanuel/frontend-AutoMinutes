@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Label } from '@/components/ui/label';
 import { SORT_BY_OPTIONS } from '@/constants/sort';
@@ -40,7 +39,7 @@ const createScheduleRange = (date: Date | undefined, time: string | undefined) =
 
   return { scheduledFrom: from.toISOString(), scheduledTo: to.toISOString() };
 };
-const MeetingsTable = () => {
+const MeetingsTemplate = () => {
   const queryClient = useQueryClient();
   const [pageNo, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -51,11 +50,10 @@ const MeetingsTable = () => {
     timeAt: undefined,
     sortDateOrder: undefined,
   });
-
   const debouncedValue = useDebounce(filters.contentLike, 500, () => setPage(1));
   const { scheduledFrom, scheduledTo } = createScheduleRange(filters.scheduledAt, filters.timeAt);
 
-  const { data, refetch, isPending, error, isError } = useMeetings({
+  const { data, error, refetch, isPending, isError } = useMeetings({
     pageNo,
     pageSize,
     contentLike: debouncedValue,
@@ -93,10 +91,14 @@ const MeetingsTable = () => {
   ]);
 
   if (isPending) return <Loader2 className="animate-spin" />;
-  if (isError) return <ErrorRefetch errorMessage={error.message} refetch={refetch} />;
+  if (isError)
+    return (
+      <ErrorRefetch errorMessage={error?.message ?? 'Something went wrong'} refetch={refetch} />
+    );
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full overflow-hidden">
+    <div className="flex flex-col items-center gap-4 w-full overflow-hidden p-2">
+      <h1 className="text-left text-2xl font-bold w-full">Meetings</h1>
       <div className="w-full flex flex-col md:flex-row md:items-center gap-4 flex-wrap">
         <div className="flex flex-col gap-4 justify-center min-w-0 w-1/2">
           <Label>Search</Label>
@@ -170,4 +172,4 @@ const MeetingsTable = () => {
   );
 };
 
-export default MeetingsTable;
+export default MeetingsTemplate;
