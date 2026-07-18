@@ -11,11 +11,11 @@ import { getUserInitials } from '@/features/user/utils/user';
 const AppNavbar = () => {
   const { theme, setTheme } = useTheme();
   const user = useAuthStore((s) => s.user);
-
+  console.log('USER: ', user);
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border backdrop-blur">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link to="/home" className="text-xl font-bold text-foreground">
+        <Link to="/meetings" className="text-xl font-bold text-foreground">
           AutoMinutes
         </Link>
 
@@ -29,7 +29,7 @@ const AppNavbar = () => {
           >
             {theme === 'dark' ? <Moon className="text-primary" /> : <Sun />}
           </Button>
-          {user && user.avatar && (
+          {user && (
             <Avatar>
               <AvatarImage src={user.avatar} />
               <AvatarFallback>{getUserInitials(user)}</AvatarFallback>

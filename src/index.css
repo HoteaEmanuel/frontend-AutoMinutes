@@ -87,6 +87,15 @@
   --status-completed: var(--emerald-500);
   --status-failed: var(--red-500);
 
+  --status-pending-soft: color-mix(in srgb, var(--status-pending) 14%, transparent);
+  --status-processing-soft: color-mix(in srgb, var(--status-processing) 12%, transparent);
+  --status-completed-soft: color-mix(in srgb, var(--status-completed) 12%, transparent);
+  --status-failed-soft: color-mix(in srgb, var(--status-failed) 12%, transparent);
+
+  --table-header-bg: var(--neutral-100);
+  --table-row-hover: color-mix(in srgb, var(--neutral-200) 50%, transparent);
+  --table-row-odd: color-mix(in srgb, var(--neutral-200) 30%, transparent);
+  --table-row-border:color-mix(in srgb, var(--neutral-400) 30%, transparent);
   --shadow: rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
 
   --gradient-brand: linear-gradient(
@@ -151,14 +160,18 @@
   --status-completed: #34d399;
   --status-failed: #f87171;
 
+  --status-pending-soft: color-mix(in srgb, var(--status-pending) 22%, transparent);
+  --status-processing-soft: color-mix(in srgb, var(--status-processing) 20%, transparent);
+  --status-completed-soft: color-mix(in srgb, var(--status-completed) 20%, transparent);
+  --status-failed-soft: color-mix(in srgb, var(--status-failed) 20%, transparent);
+
+  --table-header-bg: var(--neutral-800);
+  --table-row-hover: color-mix(in srgb, var(--neutral-800) 60%, transparent);
+  --table-row-odd: color-mix(in srgb, var(--neutral-800) 35%, transparent);
+  --table-row-border: color-mix(in srgb, var(--neutral-200) 30%, transparent);
   --shadow: rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
 
-  --gradient-brand: linear-gradient(
-    120deg,
-    #2bc4b0 0%,
-    #3db6a6 45%,
-    #34d399 100%
-  );
+  --gradient-brand: linear-gradient(120deg, #2bc4b0 0%, #3db6a6 45%, #34d399 100%);
 }
 
 @theme inline {
@@ -190,6 +203,16 @@
   --color-status-processing: var(--status-processing);
   --color-status-completed: var(--status-completed);
   --color-status-failed: var(--status-failed);
+
+  --color-status-pending-soft: var(--status-pending-soft);
+  --color-status-processing-soft: var(--status-processing-soft);
+  --color-status-completed-soft: var(--status-completed-soft);
+  --color-status-failed-soft: var(--status-failed-soft);
+
+  --color-table-header-bg: var(--table-header-bg);
+  --color-table-row-hover: var(--table-row-hover);
+  --color-table-row-odd: var(--table-row-odd);
+  --color-table-row-border:var(--table-row-border);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -280,9 +303,9 @@ button {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap:0.5rem;
+  gap: 0.5rem;
 }
 
-button:hover{
-  scale:1.01;
+button:hover {
+  scale: 1.01;
 }

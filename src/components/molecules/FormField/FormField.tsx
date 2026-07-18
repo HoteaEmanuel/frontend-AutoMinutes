@@ -2,6 +2,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface FormFieldProps {
   label: string;
@@ -37,13 +38,13 @@ const FormField = ({
           {...register(id)}
         />
         {type === 'password' && (
-          <button
+          <Button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-          </button>
+          </Button>
         )}
       </div>
 
