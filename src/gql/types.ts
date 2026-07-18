@@ -63,7 +63,10 @@ export type PaginatedMeetingsDto = {
   contentLike?: InputMaybe<Scalars['String']['input']>;
   pageNo: Scalars['Float']['input'];
   pageSize: Scalars['Float']['input'];
-  status?: InputMaybe<Scalars['String']['input']>;
+  scheduledFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  scheduledTo?: InputMaybe<Scalars['DateTime']['input']>;
+  sortDateOrder?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<MeetingStatus>;
 };
 
 export type Query = {

@@ -14,6 +14,8 @@ type PaginationProps<TData> = {
   table: Table<TData>;
 };
 
+const PAGINATION_SIZE_OPTIONS = [10, 20, 25, 50];
+
 const Pagination = <TData,>({ onPageSizeChange, table }: PaginationProps<TData>) => {
   return (
     <div className="flex items-center justify-end px-2 w-full p-4">
@@ -26,11 +28,11 @@ const Pagination = <TData,>({ onPageSizeChange, table }: PaginationProps<TData>)
               onPageSizeChange(Number(value));
             }}
           >
-            <SelectTrigger className="h-8 w-[70px]">
+            <SelectTrigger className="h-10 w-[70px]">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 20, 25, 30, 40, 50].map((pageSize) => (
+              {PAGINATION_SIZE_OPTIONS.map((pageSize) => (
                 <SelectItem key={pageSize} value={`${pageSize}`}>
                   {pageSize}
                 </SelectItem>
@@ -39,8 +41,15 @@ const Pagination = <TData,>({ onPageSizeChange, table }: PaginationProps<TData>)
           </Select>
         </div>
         <div className="flex  items-center justify-center text-xs font-medium">
-          Page <span className="font-bold p-1">{table.getState().pagination.pageIndex + 1}</span> of{' '}
-          {table.getPageCount()}
+          {table.getPageCount() ? (
+            <>
+              Page{' '}
+              <span className="font-bold p-1">{table.getState().pagination.pageIndex + 1}</span> of{' '}
+              {table.getPageCount()}
+            </>
+          ) : (
+            <span className="font-semibold">No pages available</span>
+          )}
         </div>
         <div className="flex flex-1 items-center gap-2 justify-end">
           <Button
@@ -79,7 +88,6 @@ const Pagination = <TData,>({ onPageSizeChange, table }: PaginationProps<TData>)
             className="hidden size-8 lg:flex"
             onClick={() => {
               table.setPageIndex(table.getPageCount() - 1);
-              // onPageChange(table.getPageCount() - 1);
             }}
             disabled={!table.getCanNextPage()}
           >

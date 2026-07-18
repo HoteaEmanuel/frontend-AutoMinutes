@@ -18,7 +18,6 @@ const FIND_USER_MEETINGS = `
 `;
 
 export const fetchUserMeetings = async (input: PaginatedMeetingsDto) => {
-  if (input.status === '') input.status = undefined;
   const data = await gqlRequest<Pick<Query, 'findUserMeetings'>>(FIND_USER_MEETINGS, {
     input: input,
   });
