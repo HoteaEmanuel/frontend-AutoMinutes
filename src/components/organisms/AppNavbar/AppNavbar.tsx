@@ -7,6 +7,7 @@ import { Link } from 'react-router';
 import AppNavActions from '@molecules/AppNavActions/AppNavActions';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getUserInitials } from '@/features/user/utils/user';
+import { ProfileMenu } from '@organisms/ProfileMenu/ProfileMenu';
 
 const AppNavbar = () => {
   const { theme, setTheme } = useTheme();
@@ -29,12 +30,7 @@ const AppNavbar = () => {
           >
             {theme === 'dark' ? <Moon className="text-primary" /> : <Sun />}
           </Button>
-          {user && (
-            <Avatar>
-              <AvatarImage src={user.avatar} />
-              <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
-            </Avatar>
-          )}
+          <ProfileMenu />
         </div>
       </nav>
     </header>
