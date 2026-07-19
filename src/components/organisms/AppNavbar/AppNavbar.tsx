@@ -8,15 +8,12 @@ import AppNavActions from '@molecules/AppNavActions/AppNavActions';
 
 import { useState } from 'react';
 import NewMeetingModal from '@organisms/NewMeetingModal/NewMeetingModal';
+import { ProfileMenu } from '@organisms/ProfileMenu/ProfileMenu';
 
 const AppNavbar = () => {
   const { theme, setTheme } = useTheme();
   const user = useAuthStore((s) => s.user);
   const [isNewMeetingOpen, setIsNewMeetingOpen] = useState(false);
-
-  const initials = user
-    ? `${user.firstName?.[0] ?? ''}${user.lastName?.[0] ?? ''}`.toUpperCase()
-    : '';
 
   return (
     <>
@@ -62,6 +59,26 @@ const AppNavbar = () => {
 
       <NewMeetingModal isOpen={isNewMeetingOpen} onClose={() => setIsNewMeetingOpen(false)} />
     </>
+    <header className="sticky top-0 z-40 w-full border-b border-border backdrop-blur">
+      <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+        <Link to="/meetings" className="text-xl font-bold text-foreground">
+          AutoMinutes
+        </Link>
+
+        <AppNavActions />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Toggle theme"
+            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+          >
+            {theme === 'dark' ? <Moon className="text-primary" /> : <Sun />}
+          </Button>
+          <ProfileMenu />
+        </div>
+      </nav>
+    </header>
   );
 };
 
