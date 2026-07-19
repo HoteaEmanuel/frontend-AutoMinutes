@@ -16,8 +16,8 @@ const Oauth = () => {
   }, [mutate]);
 
   useEffect(() => {
-    const id = setTimeout(() => navigate(status === 'error' ? '/login' : '/home'), 4000);
-    return () => clearTimeout(id);
+    // const id = setTimeout(() => navigate(status === 'error' ? '/login' : '/mata'), 4000);
+    // return () => clearTimeout(id);
   }, [navigate, status]);
 
   return (

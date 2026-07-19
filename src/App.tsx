@@ -12,9 +12,10 @@ import { useAuthStore } from '@/features/auth/stores/auth.store';
 import { Loader2 } from 'lucide-react';
 import RootLayout from '@templates/RootLayout/RootLayout';
 import AppLayout from '@templates/AppLayout/AppLayout';
-import HomePage from '@pages/HomePage/Home';
 import ProfilePage from '@pages/ProfilePage/ProfilePage';
 import TodosPage from '@pages/Todos/TodosPage';
+import MeetingsPage from '@pages/MeetingsPage/MeetingsPage';
+import PageNotFound from '@pages/NotFound/PageNotFound';
 function App() {
   useInitAuth();
   const status = useAuthStore((s) => s.status);
@@ -33,6 +34,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route element={<RootLayout />}>
+            <Route path="*" element={<PageNotFound />} />
             <Route path="/" element={<LandingPage />} />
             <Route element={<UnprotectedRoute />}>
               <Route path="/auth/signup" element={<SignupPage />} />
@@ -43,7 +45,7 @@ function App() {
 
           <Route element={<ProtectedRoute />}>
             <Route element={<AppLayout />}>
-              <Route path="/home" element={<HomePage />} />
+              <Route path="/meetings" element={<MeetingsPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/todos" element={<TodosPage />} />
             </Route>

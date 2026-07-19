@@ -7,7 +7,7 @@ const AuthNavBar = () => {
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur">
       <nav className="w-screen flex items-center justify-between h-10 mt-2 max-w-3/4 mx-auto p-4 bg-transparent">
-        <Link className="text-2xl font-bold text-gray-500" to={'/'}>
+        <Link className="text-2xl font-bold text-gray-500" to={user ? '/meetings' : '/'}>
           AutoMinutes
         </Link>
         <div className="flex items-center gap-2">
@@ -25,7 +25,7 @@ const AuthNavBar = () => {
             </>
           ) : (
             <Button>
-              <Link to={'/home'}>Home</Link>
+              <Link to={'/meetings'}>Home</Link>
             </Button>
           )}
         </div>

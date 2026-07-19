@@ -5,6 +5,8 @@ import { useTheme } from '@/features/theme/useTheme';
 import { Moon, Plus, Sun } from 'lucide-react';
 import { Link } from 'react-router';
 import AppNavActions from '@molecules/AppNavActions/AppNavActions';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { getUserInitials } from '@/features/user/utils/user';
 
 import { useState } from 'react';
 import NewMeetingModal from '@organisms/NewMeetingModal/NewMeetingModal';
