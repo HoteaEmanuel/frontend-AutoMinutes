@@ -117,6 +117,8 @@
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
+@custom-variant data-horizontal (&[data-orientation="horizontal"]);
+@custom-variant data-vertical (&[data-orientation="vertical"]);
 
 .dark {
   --background: var(--neutral-950);
