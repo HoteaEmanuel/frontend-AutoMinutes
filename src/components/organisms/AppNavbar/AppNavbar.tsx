@@ -16,57 +16,20 @@ const AppNavbar = () => {
   const [isNewMeetingOpen, setIsNewMeetingOpen] = useState(false);
 
   return (
-    <>
-      <header className="sticky top-0 z-40 w-full border-b border-border backdrop-blur">
-        <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link to="/home" className="text-xl font-bold text-foreground">
-            AutoMinutes
-          </Link>
-
-          <AppNavActions />
-          <div className="flex items-center gap-2">
-            {user && (
-              <Button onClick={() => setIsNewMeetingOpen(true)}>
-                <Plus />
-                New meeting
-              </Button>
-            )}
-
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Toggle theme"
-              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            >
-              {theme === 'dark' ? <Moon className="text-primary" /> : <Sun />}
-            </Button>
-
-            {user &&
-              (user.avatar ? (
-                <img
-                  src={user.avatar}
-                  alt={`${user.firstName} ${user.lastName}`}
-                  className="size-8 rounded-full object-cover"
-                />
-              ) : (
-                <span className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-                  {initials}
-                </span>
-              ))}
-          </div>
-        </nav>
-      </header>
-
-      <NewMeetingModal isOpen={isNewMeetingOpen} onClose={() => setIsNewMeetingOpen(false)} />
-    </>
     <header className="sticky top-0 z-40 w-full border-b border-border backdrop-blur">
       <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Link to="/meetings" className="text-xl font-bold text-foreground">
+        <Link to="/home" className="text-xl font-bold text-foreground">
           AutoMinutes
         </Link>
 
         <AppNavActions />
         <div className="flex items-center gap-2">
+          {user && (
+            <Button onClick={() => setIsNewMeetingOpen(true)}>
+              <Plus />
+              New meeting
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -77,6 +40,8 @@ const AppNavbar = () => {
           </Button>
           <ProfileMenu />
         </div>
+
+        <NewMeetingModal isOpen={isNewMeetingOpen} onClose={() => setIsNewMeetingOpen(false)} />
       </nav>
     </header>
   );

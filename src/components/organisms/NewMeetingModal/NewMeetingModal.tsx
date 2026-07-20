@@ -118,12 +118,6 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <DialogHeader>
             <DialogTitle>New meeting</DialogTitle>
-
-            <DialogClose type="button" aria-label="Close">
-              <Button type="button" variant="ghost" size="icon">
-                <X />
-              </Button>
-            </DialogClose>
           </DialogHeader>
 
           <div className="flex flex-col gap-2">

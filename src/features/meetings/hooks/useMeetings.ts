@@ -29,3 +29,4 @@ export const useGetMeeting = (id: string) =>
     queryKey: meetingKeys.detail(id),
     queryFn: () => fetchMeeting(id),
   });
+  
