@@ -1,5 +1,8 @@
-import { FormEvent, useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { FileText, X } from 'lucide-react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,6 +14,9 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { meetingForm } from './meetingForm';
+
+type NewMeetingFormData = z.infer<typeof meetingForm>;
 
 type NewMeetingModalProps = {
   isOpen: boolean;
@@ -60,50 +66,54 @@ const getTimeValue = (hour: string, minute: string, period: string) => {
 
 const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
   const currentDateAndTime = getCurrentDateAndTime();
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState(currentDateAndTime.date);
-  const [time, setTime] = useState(currentDateAndTime.time);
   const [minDate, setMinDate] = useState(currentDateAndTime.date);
-  const [minTime, setMinTime] = useState(currentDateAndTime.time);
-  const [description, setDescription] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<NewMeetingFormData>({
+    resolver: zodResolver(meetingForm),
+    defaultValues: {
+      title: '',
+      date: currentDateAndTime.date,
+      time: currentDateAndTime.time,
+      description: '',
+    },
+  });
+
+  const time = watch('time');
+  const transcriptFile = watch('transcriptFile');
+  const selectedFile = transcriptFile?.[0];
   const selectedTime = getTimeParts(time);
 
   useEffect(() => {
     if (isOpen) {
       const currentDateAndTime = getCurrentDateAndTime();
-      setDate(currentDateAndTime.date);
-      setTime(currentDateAndTime.time);
+      reset({
+        title: '',
+        date: currentDateAndTime.date,
+        time: currentDateAndTime.time,
+        description: '',
+      });
       setMinDate(currentDateAndTime.date);
-      setMinTime(currentDateAndTime.time);
       setIsTimePickerOpen(false);
     }
-  }, [isOpen]);
+  }, [isOpen, reset]);
 
   const updateTime = (
     hour = selectedTime.hour,
     minute = selectedTime.minute,
     period = selectedTime.period,
   ) => {
-    setTime(getTimeValue(hour, minute, period));
+    setValue('time', getTimeValue(hour, minute, period), { shouldValidate: true });
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!title.trim() || !date || !time) {
-      setError('Title, date and time are required.');
-      return;
-    }
-
-    if (date < minDate || (date === minDate && time < minTime)) {
-      setError('Meeting date and time cannot be in the past.');
-      return;
-    }
-
-    setError('');
+  const onSubmit = () => {
     setIsLoading(true);
 
     setTimeout(() => {
@@ -115,19 +125,28 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[85vh] flex-col gap-4 overflow-y-auto">
           <DialogHeader>
             <DialogTitle>New meeting</DialogTitle>
+
+            <DialogClose
+              type="button"
+              aria-label="Close"
+              className="flex size-8 items-center justify-center rounded-lg hover:bg-muted"
+            >
+              <X className="size-4" />
+            </DialogClose>
           </DialogHeader>
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="meeting-title">Title *</Label>
             <Input
               id="meeting-title"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
               placeholder="e.g. Q3 Product Roadmap Review"
+              aria-invalid={!!errors.title}
+              {...register('title')}
             />
+            {errors.title && <p className="text-xs italic text-destructive">{errors.title.message}</p>}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -136,10 +155,11 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
               <Input
                 id="meeting-date"
                 type="date"
-                value={date}
                 min={minDate}
-                onChange={(event) => setDate(event.target.value)}
+                aria-invalid={!!errors.date}
+                {...register('date')}
               />
+              {errors.date && <p className="text-xs italic text-destructive">{errors.date.message}</p>}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -220,14 +240,34 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
             <Label htmlFor="meeting-description">Description</Label>
             <textarea
               id="meeting-description"
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
               placeholder="What is this meeting about?"
               className="min-h-24 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+              {...register('description')}
             />
           </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="meeting-file">Transcript file</Label>
+            <Input
+              id="meeting-file"
+              type="file"
+              accept=".txt,.docx,.pdf"
+              className="hidden"
+              {...register('transcriptFile')}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => document.getElementById('meeting-file')?.click()}
+              className="w-full justify-start"
+            >
+              <FileText />
+              {selectedFile ? selectedFile.name : 'Upload a file'}
+            </Button>
+            {errors.transcriptFile && (
+              <p className="text-xs italic text-destructive">{errors.transcriptFile.message}</p>
+            )}
+          </div>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
