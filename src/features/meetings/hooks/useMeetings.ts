@@ -1,6 +1,14 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { fetchAllMeetings, fetchMeeting, fetchUserMeetings } from '../api';
-import { PaginatedMeetingsDto } from '@/gql/types';
+import {
+  InvalidateOptions,
+  InvalidateQueryFilters,
+  keepPreviousData,
+  QueryClient,
+  useMutation,
+  useQuery,
+} from '@tanstack/react-query';
+import { createMeeting, fetchAllMeetings, fetchMeeting, fetchUserMeetings } from '../api';
+import { CreateMeetingDto, PaginatedMeetingsDto } from '@/gql/types';
+import { toast } from 'sonner';
 
 export const meetingKeys = {
   all: ['meetings'] as const,
@@ -29,4 +37,15 @@ export const useGetMeeting = (id: string) =>
     queryKey: meetingKeys.detail(id),
     queryFn: () => fetchMeeting(id),
   });
-  
+
+export const useAddMeeting = () => {
+  const queryClient = new QueryClient();
+  return useMutation({
+    mutationKey: meetingKeys.all,
+    mutationFn: (input: CreateMeetingDto) => createMeeting(input),
+    onSuccess: () => {
+      toast.success('Meeting created successfully!');
+    },
+    onSettled: () => queryClient.invalidateQueries([meetingKeys.all] as InvalidateQueryFilters),
+  });
+};
