@@ -8,6 +8,7 @@ import { meetingsQueryOptions, useMeetings } from '@/features/meetings/hooks/use
 import { MeetingStatus } from '@/gql/types';
 import { useDebounce } from '@/hooks/useDebounce';
 import { DatePickerTime } from '@molecules/DatePickerTime/DatePickerTime';
+import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import Selector from '@molecules/Selector/Selector';
 import { DataTable } from '@organisms/DataTable/DataTable';
 import { useQueryClient } from '@tanstack/react-query';
@@ -54,7 +55,7 @@ const MeetingsTable = () => {
   const debouncedValue = useDebounce(filters.contentLike, 500, () => setPage(1));
   const { scheduledFrom, scheduledTo } = createScheduleRange(filters.scheduledAt, filters.timeAt);
 
-  const { data, refetch, isPending, isError } = useMeetings({
+  const { data, refetch, isPending, error, isError } = useMeetings({
     pageNo,
     pageSize,
     contentLike: debouncedValue,
@@ -92,12 +93,7 @@ const MeetingsTable = () => {
   ]);
 
   if (isPending) return <Loader2 className="animate-spin" />;
-  if (isError)
-    return (
-      <Button onClick={() => refetch()} variant={'destructive'}>
-        Something went wrong - Try again
-      </Button>
-    );
+  if (isError) return <ErrorRefetch errorMessage={error.message} refetch={refetch} />;
 
   return (
     <div className="flex flex-col items-center gap-4 w-full overflow-hidden">

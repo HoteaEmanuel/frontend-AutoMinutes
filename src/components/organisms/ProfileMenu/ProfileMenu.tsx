@@ -10,10 +10,18 @@ import { useAuthStore } from '@/features/auth/stores/auth.store';
 import { getUserInitials } from '@/features/user/utils/user';
 import { LogOut, User } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { logout } from '@/features/auth/api/auth.api';
 
 export const ProfileMenu = () => {
-  const { user } = useAuthStore();
+  const { user, clearSession } = useAuthStore();
   const navigate = useNavigate();
+  const handleSignOut = async () => {
+    try {await logout();}
+    finally {
+      clearSession();
+      navigate('/auth/login');
+    }
+  };
   if (!user) return null;
   return (
     <DropdownMenu>
@@ -30,7 +38,7 @@ export const ProfileMenu = () => {
             <User />
             Profile
           </DropdownMenuItem>
-          <DropdownMenuItem variant="destructive">
+          <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
             <LogOut />
             Sign out
           </DropdownMenuItem>

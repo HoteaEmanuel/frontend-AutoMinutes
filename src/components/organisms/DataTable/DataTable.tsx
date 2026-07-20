@@ -14,6 +14,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import Pagination from '@organisms/PaginationSection/Pagination';
+import { useState } from 'react';
+import { Meeting } from '@/gql/types';
+import MeetingDialog from '@organisms/MeetingDialog/MeetingDialog';
 
 type DataTableProps = {
   data: any;
@@ -58,6 +61,10 @@ export function DataTable({
     table.setPageSize(value);
   };
 
+  const [meetingSelected, setMeetingSelected] = useState<string | null>(null);
+  console.log('MEET SELECT');
+  console.log(meetingSelected);
+
   return (
     <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full">
       <Table>
@@ -82,7 +89,8 @@ export function DataTable({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
-                className={`h-16 ${index % 2 ? 'bg-table-row-odd' : ''}`}
+                className={`h-16 cursor-pointer ${index % 2 ? 'bg-table-row-odd' : ''}`}
+                onClick={() => setMeetingSelected((row.original as Meeting).id)}
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
@@ -104,6 +112,13 @@ export function DataTable({
         </TableBody>
       </Table>
       <Pagination onPageSizeChange={handlePageSizeChange} table={table} />
+      {meetingSelected && (
+        <MeetingDialog
+          meetingId={meetingSelected}
+          open={true}
+          onOpenChange={() => setMeetingSelected(null)}
+        />
+      )}
     </div>
   );
 }

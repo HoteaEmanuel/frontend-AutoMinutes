@@ -40,8 +40,9 @@ const FormField = ({
         {type === 'password' && (
           <Button
             type="button"
+            variant={'ghost'}
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 active:-translate-y-1/2!"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </Button>

@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { fetchAllMeetings, fetchUserMeetings } from '../api';
+import { fetchAllMeetings, fetchMeeting, fetchUserMeetings } from '../api';
 import { PaginatedMeetingsDto } from '@/gql/types';
 
 export const meetingKeys = {
@@ -23,3 +23,10 @@ export const useGetAllMeetings = () =>
     queryKey: meetingKeys.all,
     queryFn: fetchAllMeetings,
   });
+
+export const useGetMeeting = (id: string) =>
+  useQuery({
+    queryKey: meetingKeys.detail(id),
+    queryFn: () => fetchMeeting(id),
+  });
+  

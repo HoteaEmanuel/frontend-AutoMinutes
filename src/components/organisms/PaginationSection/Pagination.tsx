@@ -17,6 +17,7 @@ type PaginationProps<TData> = {
 const PAGINATION_SIZE_OPTIONS = [10, 20, 25, 50];
 
 const Pagination = <TData,>({ onPageSizeChange, table }: PaginationProps<TData>) => {
+  console.log('PAGINATION RENDERED');
   return (
     <div className="flex items-center justify-end px-2 w-full p-4">
       <div className="flex items-center space-x-6 lg:space-x-8">
