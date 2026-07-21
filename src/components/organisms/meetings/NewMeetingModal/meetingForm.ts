@@ -6,7 +6,7 @@ const acceptedFileTypes = [
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 ];
 
-const acceptedFileExtensions = ['.txt', '.pdf', '.docx'];
+export const acceptedFileExtensions = ['.txt', '.pdf', '.docx'];
 
 export const meetingForm = z
   .object({
@@ -15,16 +15,12 @@ export const meetingForm = z
     time: z.string().min(1, 'Time is required.'),
     description: z.string().optional(),
     transcriptFile: z
-      .custom<FileList>()
+      .custom<File>()
       .optional()
-      .refine((files) => !files || files.length === 0 || files.length === 1, {
-        message: 'Upload only one file.',
-      })
       .refine(
-        (files) => {
-          if (!files || files.length === 0) return true;
+        (file) => {
+          if (!file) return true;
 
-          const file = files[0];
           const hasAcceptedType = acceptedFileTypes.includes(file.type);
           const hasAcceptedExtension = acceptedFileExtensions.some((extension) =>
             file.name.toLowerCase().endsWith(extension),

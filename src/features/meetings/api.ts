@@ -1,5 +1,5 @@
 import { gqlRequest } from '@/lib/graphql';
-import { Meeting, PaginatedMeetingsDto, Query } from '@/gql/types';
+import { CreateMeetingDto, Meeting, Mutation, PaginatedMeetingsDto, Query } from '@/gql/types';
 
 const FIND_USER_MEETINGS = `
   query FindUserMeetings($input: PaginatedMeetingsDto!) {
@@ -45,7 +45,6 @@ export const fetchMeeting = async (input: string) => {
   return data.findMeeting;
 };
 
-
 const FIND_ALL_MEETINGS = `
 query FindAll {
 findAll {
@@ -62,4 +61,23 @@ findAll {
 export const fetchAllMeetings = async () => {
   const data = await gqlRequest<Pick<Query, 'findAll'>>(FIND_ALL_MEETINGS);
   return data.findAll;
+};
+
+const CREATE_MEETING = `
+mutation CreateMeeting($createMeetingInput: CreateMeetingDto!) {
+  createMeeting(createMeetingInput: $createMeetingInput) {
+    id
+    title
+    description
+    status
+    createdAt
+    updatedAt
+  }
+}`;
+
+export const createMeeting = async (input: CreateMeetingDto) => {
+  const data = await gqlRequest<Pick<Mutation, 'createMeeting'>>(CREATE_MEETING, {
+    createMeetingInput: input,
+  });
+  return data.createMeeting;
 };

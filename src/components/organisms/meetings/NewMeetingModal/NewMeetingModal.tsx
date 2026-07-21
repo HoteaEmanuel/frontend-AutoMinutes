@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
 import { FileText, X } from 'lucide-react';
+import { format } from 'date-fns';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -14,7 +14,13 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { meetingForm } from './meetingForm';
+import { acceptedFileExtensions, meetingForm } from './meetingForm';
+import { DatePickerTime } from '@molecules/DatePickerTime/DatePickerTime';
+import FormField from '@molecules/FormField/FormField';
+import { useAddMeeting } from '@/features/meetings/hooks/useMeetings';
+import ErrorDisplay from '@molecules/Error/ErrorDisplay';
+import { extractTextFromFile } from '@/lib/utils';
+import { toast } from 'sonner';
 
 type NewMeetingFormData = z.infer<typeof meetingForm>;
 
@@ -22,9 +28,6 @@ type NewMeetingModalProps = {
   isOpen: boolean;
   onClose: () => void;
 };
-
-const hours = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, '0'));
-const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, '0'));
 
 const getCurrentDateAndTime = () => {
   const now = new Date();
@@ -37,44 +40,15 @@ const getCurrentDateAndTime = () => {
   };
 };
 
-const getTimeParts = (time: string) => {
-  const [hourValue, minute] = time.split(':');
-  const hour = Number(hourValue);
-  const period = hour >= 12 ? 'PM' : 'AM';
-  const displayHour = hour % 12 || 12;
-
-  return {
-    hour: String(displayHour).padStart(2, '0'),
-    minute,
-    period,
-  };
-};
-
-const getTimeValue = (hour: string, minute: string, period: string) => {
-  let hourValue = Number(hour);
-
-  if (period === 'PM' && hourValue !== 12) {
-    hourValue += 12;
-  }
-
-  if (period === 'AM' && hourValue === 12) {
-    hourValue = 0;
-  }
-
-  return `${String(hourValue).padStart(2, '0')}:${minute}`;
-};
-
 const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
   const currentDateAndTime = getCurrentDateAndTime();
-  const [minDate, setMinDate] = useState(currentDateAndTime.date);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const {
     register,
     handleSubmit,
-    reset,
     setValue,
     watch,
+    reset,
+    getValues,
     formState: { errors },
   } = useForm<NewMeetingFormData>({
     resolver: zodResolver(meetingForm),
@@ -86,57 +60,62 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
     },
   });
 
+  const date = watch('date');
   const time = watch('time');
   const transcriptFile = watch('transcriptFile');
-  const selectedFile = transcriptFile?.[0];
-  const selectedTime = getTimeParts(time);
 
-  useEffect(() => {
-    if (isOpen) {
-      const currentDateAndTime = getCurrentDateAndTime();
-      reset({
-        title: '',
-        date: currentDateAndTime.date,
-        time: currentDateAndTime.time,
-        description: '',
-      });
-      setMinDate(currentDateAndTime.date);
-      setIsTimePickerOpen(false);
-    }
-  }, [isOpen, reset]);
+  const [transcriptContent, setTranscriptContent] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const updateTime = (
-    hour = selectedTime.hour,
-    minute = selectedTime.minute,
-    period = selectedTime.period,
-  ) => {
-    setValue('time', getTimeValue(hour, minute, period), { shouldValidate: true });
+  const transcriptWordCount = transcriptContent.trim()
+    ? transcriptContent.trim().split(/\s+/).length
+    : 0;
+
+  const handleClearFile = () => {
+    setTranscriptContent('');
+    setValue('transcriptFile', undefined, { shouldValidate: true });
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const onSubmit = () => {
-    setIsLoading(true);
+  const handleDateChange = (selected: Date | undefined) => {
+    setValue('date', selected ? format(selected, 'yyyy-MM-dd') : '', { shouldValidate: true });
+    if (!selected) setValue('time', '', { shouldValidate: true });
+  };
 
-    setTimeout(() => {
-      setIsLoading(false);
+  const handleTimeChange = (value: string | undefined) => {
+    setValue('time', value ?? '', { shouldValidate: true });
+  };
+  const { mutateAsync: addMeeting, error, isError, isPending } = useAddMeeting();
+
+  const onSubmit = async () => {
+    try {
+      const formData = getValues();
+      const input = {
+        title: formData.title,
+        description: formData.description,
+        scheduledAt: new Date(`${formData.date}T${formData.time}`).toISOString(),
+        transcript: transcriptContent || undefined,
+      };
+      await addMeeting(input);
+      reset();
+      setTranscriptContent('');
       onClose();
-    }, 500);
+    } catch (error) {
+      toast.error('Something went wrong');
+    }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[85vh] flex-col gap-4 overflow-y-auto">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex min-w-0 max-h-[95vh] flex-col gap-4"
+        >
           <DialogHeader>
             <DialogTitle>New meeting</DialogTitle>
-
-            <DialogClose
-              type="button"
-              aria-label="Close"
-              className="flex size-8 items-center justify-center rounded-lg hover:bg-muted"
-            >
-              <X className="size-4" />
-            </DialogClose>
           </DialogHeader>
+          {isError && <ErrorDisplay error={error?.message} />}
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="meeting-title">Title *</Label>
@@ -146,136 +125,93 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
               aria-invalid={!!errors.title}
               {...register('title')}
             />
-            {errors.title && <p className="text-xs italic text-destructive">{errors.title.message}</p>}
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="meeting-date">Date *</Label>
-              <Input
-                id="meeting-date"
-                type="date"
-                min={minDate}
-                aria-invalid={!!errors.date}
-                {...register('date')}
-              />
-              {errors.date && <p className="text-xs italic text-destructive">{errors.date.message}</p>}
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="meeting-time">Time *</Label>
-              <div className="relative">
-                <Button
-                  id="meeting-time"
-                  type="button"
-                  variant="outline"
-                  onClick={() => setIsTimePickerOpen(!isTimePickerOpen)}
-                  className="h-8 w-full justify-start gap-1 px-2.5 font-normal"
-                >
-                  <span>{selectedTime.hour}</span>
-                  <span>:</span>
-                  <span>{selectedTime.minute}</span>
-                  <span className="ml-1">{selectedTime.period}</span>
-                </Button>
-
-                {isTimePickerOpen && (
-                  <div className="absolute right-0 top-full z-50 mt-2 grid w-full grid-cols-[1fr_1fr_auto] gap-2 rounded-lg border border-border bg-background p-3 shadow-lg">
-                    <div className="max-h-40 overflow-y-auto">
-                      {hours.map((hour) => (
-                        <button
-                          key={hour}
-                          type="button"
-                          onClick={() => updateTime(hour)}
-                          className={`mb-1 h-8 w-full rounded-md text-sm ${
-                            selectedTime.hour === hour
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-muted'
-                          }`}
-                        >
-                          {hour}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="max-h-40 overflow-y-auto">
-                      {minutes.map((minute) => (
-                        <button
-                          key={minute}
-                          type="button"
-                          onClick={() => updateTime(undefined, minute)}
-                          className={`mb-1 h-8 w-full rounded-md text-sm ${
-                            selectedTime.minute === minute
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-muted'
-                          }`}
-                        >
-                          {minute}
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                      {['AM', 'PM'].map((period) => (
-                        <button
-                          key={period}
-                          type="button"
-                          onClick={() => updateTime(undefined, undefined, period)}
-                          className={`h-8 rounded-md px-3 text-sm ${
-                            selectedTime.period === period
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-muted'
-                          }`}
-                        >
-                          {period}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            {errors.title && (
+              <p className="text-xs italic text-destructive">{errors.title.message}</p>
+            )}
           </div>
 
           <div className="flex flex-col gap-2">
-            <Label htmlFor="meeting-description">Description</Label>
-            <textarea
-              id="meeting-description"
-              placeholder="What is this meeting about?"
-              className="min-h-24 rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              {...register('description')}
+            <DatePickerTime
+              date={date ? new Date(`${date}T00:00:00`) : undefined}
+              time={time || undefined}
+              setDate={handleDateChange}
+              setTime={handleTimeChange}
             />
+            {errors.date && (
+              <p className="text-xs italic text-destructive">{errors.date.message}</p>
+            )}
+            {errors.time && (
+              <p className="text-xs italic text-destructive">{errors.time.message}</p>
+            )}
           </div>
+          <FormField
+            hasError={!!errors?.description}
+            id="meeting-description"
+            label="Description"
+            register={register}
+            error={errors.description?.message}
+            as="textarea"
+          />
 
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="meeting-file">Transcript file</Label>
-            <Input
-              id="meeting-file"
-              type="file"
-              accept=".txt,.docx,.pdf"
-              className="hidden"
-              {...register('transcriptFile')}
-            />
+          <Input
+            ref={fileInputRef}
+            type="file"
+            accept={acceptedFileExtensions.join(',')}
+            className="hidden"
+            id="meeting-file"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              const transcriptText = await extractTextFromFile(file);
+              setTranscriptContent(transcriptText);
+              setValue('transcriptFile', file, { shouldValidate: true });
+            }}
+          />
+          <div className="flex items-center gap-2">
             <Button
               type="button"
               variant="outline"
-              onClick={() => document.getElementById('meeting-file')?.click()}
+              onClick={() => fileInputRef.current?.click()}
               className="w-full justify-start"
             >
               <FileText />
-              {selectedFile ? selectedFile.name : 'Upload a file'}
+              {transcriptFile?.name ?? 'Upload transcript'}
             </Button>
-            {errors.transcriptFile && (
-              <p className="text-xs italic text-destructive">{errors.transcriptFile.message}</p>
+            {transcriptFile && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="Remove file"
+                onClick={handleClearFile}
+              >
+                <X />
+              </Button>
             )}
           </div>
+
+          {transcriptContent && (
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <p>Transcript content</p>
+                <span>{transcriptWordCount} words</span>
+              </div>
+              <div className="font-mono text-xs bg-muted whitespace-pre-wrap wrap-break-word p-2 border rounded-md max-h-40 overflow-y-auto">
+                {transcriptContent}
+              </div>
+            </div>
+          )}
+          {errors.transcriptFile && (
+            <p className="text-xs italic text-destructive">{errors.transcriptFile.message}</p>
+          )}
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
 
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Creating...' : 'Create meeting'}
+            <Button type="submit" disabled={isPending}>
+              {isPending ? 'Creating...' : 'Create meeting'}
             </Button>
           </DialogFooter>
         </form>
