@@ -1,67 +1,49 @@
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
-import { Label } from '@/components/ui/label';
-import { SORT_BY_OPTIONS } from '@/constants/sort';
-import { STATUSES } from '@/constants/status';
+import { PAGINATION_SIZE_OPTIONS } from '@/constants/pagination';
+import { SORTING_AVAILABLE } from '@/constants/sort';
+import { STATUS_OPTIONS, STATUSES } from '@/constants/status';
 import { columns } from '@/features/meetings/columns';
+import { useMeetingFilters } from '@/features/meetings/hooks/useMeetingFilters';
 import { meetingsQueryOptions, useMeetings } from '@/features/meetings/hooks/useMeetings';
 import { MeetingStatus } from '@/gql/types';
-import { useDebounce } from '@/hooks/useDebounce';
-import { DatePickerTime } from '@molecules/DatePickerTime/DatePickerTime';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
-import Selector from '@molecules/Selector/Selector';
 import { DataTable } from '@organisms/DataTable/DataTable';
+import MeetingFilters from '@organisms/meetings/MeetingFilters/MeetingFilters';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2, SearchIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
-type MeetingsFilters = {
-  contentLike: string;
-  status: MeetingStatus | undefined;
-  scheduledAt: Date | undefined;
-  timeAt: string | undefined;
-  sortDateOrder: string | undefined;
-};
+import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
 
-const createScheduleRange = (date: Date | undefined, time: string | undefined) => {
-  if (!date) return { scheduledFrom: undefined, scheduledTo: undefined };
-
-  const from = new Date(date);
-  const to = new Date(date);
-
-  if (time) {
-    const [hours, minutes] = time.split(':').map(Number);
-    from.setHours(hours, minutes, 0, 0);
-    to.setHours(hours, minutes + 1, 0, 0);
-  } else {
-    from.setHours(0, 0, 0, 0);
-    to.setHours(0, 0, 0, 0);
-    to.setDate(to.getDate() + 1);
-  }
-
-  return { scheduledFrom: from.toISOString(), scheduledTo: to.toISOString() };
-};
 const MeetingsTemplate = () => {
   const queryClient = useQueryClient();
-  const [pageNo, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [filters, setFilters] = useState<MeetingsFilters>({
-    contentLike: '',
-    status: undefined,
-    scheduledAt: undefined,
-    timeAt: undefined,
-    sortDateOrder: undefined,
-  });
-  const debouncedValue = useDebounce(filters.contentLike, 500, () => setPage(1));
-  const { scheduledFrom, scheduledTo } = createScheduleRange(filters.scheduledAt, filters.timeAt);
+
+  const { filters, setFilters } = useMeetingFilters();
+  const { pageNo, pageSize, scheduledFrom, scheduledTo, search, sortDateOrder, status } = filters;
 
   const { data, error, refetch, isPending, isError } = useMeetings({
     pageNo,
     pageSize,
-    contentLike: debouncedValue,
-    status: filters.status,
+    search,
+    status,
     scheduledFrom,
     scheduledTo,
-    sortDateOrder: filters.sortDateOrder,
+    sortDateOrder,
   });
+
+  const totalPages = data ? Math.max(1, Math.ceil(data.totalCount / pageSize)) : undefined;
+  const exceedesMaxPage = !!totalPages && pageNo > totalPages;
+  const validStatus = STATUS_OPTIONS.includes(status as string) || !status;
+  const validSort = SORTING_AVAILABLE.includes(sortDateOrder ?? '') || !sortDateOrder;
+
+  // Validare pageNo + pageSize + status + sort options
+
+  useEffect(() => {
+    if (exceedesMaxPage) setFilters({ pageNo: totalPages });
+    if (pageNo < 1) setFilters({ pageNo: 1 });
+    if (!validStatus) setFilters({ status: undefined });
+    if (!validSort) setFilters({ sortDateOrder: undefined });
+    if (!PAGINATION_SIZE_OPTIONS.includes(pageSize)) {
+      setFilters({ pageSize: PAGINATION_SIZE_OPTIONS[0] });
+    }
+  }, [exceedesMaxPage, totalPages, pageSize, setFilters]);
 
   // Prefetch the next page
   useEffect(() => {
@@ -72,102 +54,38 @@ const MeetingsTemplate = () => {
       meetingsQueryOptions({
         pageNo: pageNo + 1,
         pageSize,
-        contentLike: debouncedValue,
-        status: filters.status,
+        search,
+        status,
         scheduledFrom,
         scheduledTo,
+        sortDateOrder,
       }),
     );
   }, [
     data,
     pageNo,
     pageSize,
-    debouncedValue,
-    filters.status,
+    search,
+    status,
     scheduledFrom,
     scheduledTo,
+    sortDateOrder,
     queryClient,
-    filters.sortDateOrder,
   ]);
 
-  if (isPending) return <Loader2 className="animate-spin" />;
+  if (isPending || exceedesMaxPage || pageNo < 1 || !validStatus || !validSort)
+    return <Loader2 className="animate-spin" />;
   if (isError)
     return (
       <ErrorRefetch errorMessage={error?.message ?? 'Something went wrong'} refetch={refetch} />
     );
 
   return (
-    <div className="flex flex-col items-center gap-4 w-full overflow-hidden p-2">
-      <h1 className="text-left text-2xl font-bold w-full">Meetings</h1>
-      <div className="w-full flex flex-col md:flex-row md:items-center gap-4 flex-wrap">
-        <div className="flex flex-col gap-4 justify-center min-w-0 w-1/2">
-          <Label>Search</Label>
-          <InputGroup className="px-2 py-5">
-            <InputGroupInput
-              placeholder="Search meetings by title, description..."
-              onChange={(e) => setFilters((prev) => ({ ...prev, contentLike: e.target.value }))}
-              value={filters.contentLike}
-            />
-            <InputGroupAddon>
-              <SearchIcon />
-            </InputGroupAddon>
-          </InputGroup>
-        </div>
-        <div className="flex flex-col gap-4 justify-center">
-          <Selector
-            handleChange={(value) =>
-              setFilters((prev) => ({
-                ...prev,
-                status: value as MeetingStatus,
-              }))
-            }
-            items={STATUSES}
-            value={filters.status as string}
-            label={'Status'}
-          />
-        </div>
-        <div className="flex md:w-1/5 items-center">
-          <DatePickerTime
-            date={filters.scheduledAt}
-            time={filters.timeAt}
-            setDate={(date: Date | undefined) => {
-              setPage(1);
-              setFilters((prev) => ({
-                ...prev,
-                scheduledAt: date,
-                timeAt: date ? prev.timeAt : undefined,
-              }));
-            }}
-            setTime={(time: string | undefined) => {
-              setPage(1);
-              setFilters((prev) => ({ ...prev, timeAt: time }));
-            }}
-          />
-        </div>
-        <div className="flex flex-col gap-3 items-center">
-          <Selector
-            handleChange={(value) =>
-              setFilters((prev) => ({
-                ...prev,
-                sortDateOrder: value ?? 'Newest First',
-              }))
-            }
-            items={SORT_BY_OPTIONS}
-            label="Sort"
-            value={filters.sortDateOrder as string}
-          />
-        </div>
-      </div>
+    <div className="flex flex-col items-center gap-1 w-full p-2">
+      <h1 className="text-left text-2xl font-bold mr-auto">Meetings</h1>
 
-      <DataTable
-        columns={columns}
-        data={data?.meetings}
-        setPage={(value: number) => setPage(value)}
-        setPageSize={(value: number) => setPageSize(value)}
-        page={pageNo}
-        pageSize={pageSize}
-        totalCount={data?.totalCount!}
-      />
+      <MeetingFilters />
+      <DataTable columns={columns} data={data?.meetings} totalCount={data?.totalCount!} />
     </div>
   );
 };

@@ -16,26 +16,16 @@ import {
 import Pagination from '@organisms/PaginationSection/Pagination';
 import { useState } from 'react';
 import { Meeting } from '@/gql/types';
-import MeetingDialog from '@organisms/MeetingDialog/MeetingDialog';
+import MeetingDialog from '@organisms/meetings/MeetingDialog/MeetingDialog';
+import { useMeetingFilters } from '@/features/meetings/hooks/useMeetingFilters';
 
 type DataTableProps = {
   data: any;
   columns: any;
-  setPage: (page: number) => void;
-  setPageSize: (value: number) => void;
-  page: number;
-  pageSize: number;
   totalCount: number;
 };
-export function DataTable({
-  data,
-  columns,
-  page,
-  pageSize,
-  totalCount,
-  setPage,
-  setPageSize,
-}: DataTableProps) {
+export function DataTable({ data, columns, totalCount }: DataTableProps) {
+  const { filters, setFilters } = useMeetingFilters();
   const table = useReactTable({
     data: data,
     columns: columns,
@@ -45,35 +35,33 @@ export function DataTable({
     rowCount: totalCount,
     state: {
       pagination: {
-        pageIndex: page - 1,
-        pageSize,
+        pageIndex: filters.pageNo - 1,
+        pageSize: filters.pageSize,
       },
     },
     onPaginationChange: (updater) => {
       const next =
-        typeof updater === 'function' ? updater({ pageIndex: page - 1, pageSize }) : updater;
-      setPage(next.pageIndex + 1);
-      setPageSize(next.pageSize);
+        typeof updater === 'function'
+          ? updater({ pageIndex: filters.pageNo - 1, pageSize: filters.pageSize })
+          : updater;
+      setFilters({ pageNo: next.pageIndex + 1, pageSize: next.pageSize });
     },
   });
 
-  const handlePageSizeChange = (value: number) => {
-    table.setPageSize(value);
-  };
-
   const [meetingSelected, setMeetingSelected] = useState<string | null>(null);
-  console.log('MEET SELECT');
-  console.log(meetingSelected);
 
   return (
-    <div className="overflow-hidden rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full">
-      <Table>
+    <div className="flex flex-col max-h-[70vh] rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full">
+      <Table containerClassName="flex-1 min-h-0 scrollbar-themed">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className="sticky top-0 z-10 bg-table-header-bg rounded-sm"
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(header.column.columnDef.header, header.getContext())}
@@ -111,7 +99,7 @@ export function DataTable({
           )}
         </TableBody>
       </Table>
-      <Pagination onPageSizeChange={handlePageSizeChange} table={table} />
+      <Pagination table={table} />
       {meetingSelected && (
         <MeetingDialog
           meetingId={meetingSelected}
