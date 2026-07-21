@@ -1,10 +1,9 @@
 import { PAGINATION_SIZE_OPTIONS } from '@/constants/pagination';
 import { SORTING_AVAILABLE } from '@/constants/sort';
-import { STATUS_OPTIONS, STATUSES } from '@/constants/status';
+import { STATUS_OPTIONS } from '@/constants/status';
 import { columns } from '@/features/meetings/columns';
 import { useMeetingFilters } from '@/features/meetings/hooks/useMeetingFilters';
 import { meetingsQueryOptions, useMeetings } from '@/features/meetings/hooks/useMeetings';
-import { MeetingStatus } from '@/gql/types';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import { DataTable } from '@organisms/DataTable/DataTable';
 import MeetingFilters from '@organisms/meetings/MeetingFilters/MeetingFilters';
