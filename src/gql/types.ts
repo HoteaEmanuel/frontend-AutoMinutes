@@ -60,11 +60,11 @@ export type PaginatedMeetings = {
 };
 
 export type PaginatedMeetingsDto = {
-  contentLike?: InputMaybe<Scalars['String']['input']>;
   pageNo: Scalars['Float']['input'];
   pageSize: Scalars['Float']['input'];
   scheduledFrom?: InputMaybe<Scalars['DateTime']['input']>;
   scheduledTo?: InputMaybe<Scalars['DateTime']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
   sortDateOrder?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<MeetingStatus>;
 };
