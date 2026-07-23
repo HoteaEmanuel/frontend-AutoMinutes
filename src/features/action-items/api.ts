@@ -1,9 +1,9 @@
 import { gqlRequest } from '@/lib/graphql';
 import {
+  ActionItemsFilterDto,
   CreateActionItemDto,
   DeleteActionItemDto,
   Mutation,
-  PaginatedMeetingsDto,
   Query,
   UpdateActionItemDto,
 } from '@/gql/types';
@@ -22,26 +22,35 @@ const ACTION_ITEM_FIELDS = `
   }
 `;
 
-const FIND_ACTION_ITEMS_BOARD = `
-  query FindActionItemsBoard($input: PaginatedMeetingsDto!) {
-    findUserMeetings(input: $input) {
-      totalCount
-      meetings {
-        id
-        title
-        actionItems {
-          ${ACTION_ITEM_FIELDS}
-        }
-      }
+const GET_USER_ACTION_ITEMS = `
+  query GetUserActionItems($filter: ActionItemsFilterDto) {
+    getUserActionItems(filter: $filter) {
+      ${ACTION_ITEM_FIELDS}
     }
   }
 `;
 
-export const fetchActionItemsBoard = async (input: PaginatedMeetingsDto) => {
-  const data = await gqlRequest<Pick<Query, 'findUserMeetings'>>(FIND_ACTION_ITEMS_BOARD, {
-    input,
+export const fetchUserActionItems = async (filter: ActionItemsFilterDto) => {
+  const data = await gqlRequest<Pick<Query, 'getUserActionItems'>>(GET_USER_ACTION_ITEMS, {
+    filter,
   });
-  return data.findUserMeetings;
+  return data.getUserActionItems;
+};
+
+const GET_USER_ACTION_ITEM_ASSIGNEES = `
+  query GetUserActionItemAssignees {
+    getUserActionItemAssignees {
+      id
+      name
+    }
+  }
+`;
+
+export const fetchUserActionItemAssignees = async () => {
+  const data = await gqlRequest<Pick<Query, 'getUserActionItemAssignees'>>(
+    GET_USER_ACTION_ITEM_ASSIGNEES,
+  );
+  return data.getUserActionItemAssignees;
 };
 
 const CREATE_ACTION_ITEM = `

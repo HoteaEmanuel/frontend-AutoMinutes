@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { createActionItem, deleteActionItem, updateActionItem } from '../api';
-import { actionItemsKeys } from './useActionItemsBoard';
+import { actionItemsKeys } from './useActionItems';
 
 export const useCreateActionItem = () => {
   const queryClient = useQueryClient();
@@ -9,7 +9,7 @@ export const useCreateActionItem = () => {
     mutationFn: createActionItem,
     onSuccess: () => {
       toast.success('Action item created successfully!');
-      queryClient.invalidateQueries({ queryKey: actionItemsKeys.board });
+      queryClient.invalidateQueries({ queryKey: actionItemsKeys.all });
     },
   });
 };
@@ -20,7 +20,7 @@ export const useUpdateActionItem = () => {
     mutationFn: updateActionItem,
     onSuccess: () => {
       toast.success('Action item updated successfully!');
-      queryClient.invalidateQueries({ queryKey: actionItemsKeys.board });
+      queryClient.invalidateQueries({ queryKey: actionItemsKeys.all });
     },
   });
 };
@@ -31,7 +31,7 @@ export const useDeleteActionItem = () => {
     mutationFn: deleteActionItem,
     onSuccess: () => {
       toast.success('Action item deleted successfully!');
-      queryClient.invalidateQueries({ queryKey: actionItemsKeys.board });
+      queryClient.invalidateQueries({ queryKey: actionItemsKeys.all });
     },
   });
 };

@@ -5,13 +5,20 @@ import {
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
-import { createMeeting, fetchAllMeetings, fetchMeeting, fetchUserMeetings } from '../api';
+import {
+  createMeeting,
+  fetchAllMeetings,
+  fetchMeeting,
+  fetchUserMeetingOptions,
+  fetchUserMeetings,
+} from '../api';
 import { CreateMeetingDto, PaginatedMeetingsDto } from '@/gql/types';
 import { toast } from 'sonner';
 
 export const meetingKeys = {
   all: ['meetings'] as const,
   detail: (id: string) => ['meetings', id] as const,
+  options: ['meetings', 'options'] as const,
 };
 
 export const meetingsQueryOptions = (input: PaginatedMeetingsDto) => ({
@@ -29,6 +36,12 @@ export const useGetAllMeetings = () =>
   useQuery({
     queryKey: meetingKeys.all,
     queryFn: fetchAllMeetings,
+  });
+
+export const useUserMeetingOptions = () =>
+  useQuery({
+    queryKey: meetingKeys.options,
+    queryFn: fetchUserMeetingOptions,
   });
 
 export const useGetMeeting = (id: string) =>

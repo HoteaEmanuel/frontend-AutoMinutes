@@ -40,6 +40,12 @@ export type ActionItemStatus =
   | 'OPEN'
   | 'UNKNOWN';
 
+export type ActionItemsFilterDto = {
+  assigneeId?: InputMaybe<Scalars['String']['input']>;
+  meetingId?: InputMaybe<Scalars['String']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Attendee = {
   __typename?: 'Attendee';
   aiGenerated: Scalars['Boolean']['output'];
@@ -175,12 +181,21 @@ export type PaginatedMeetingsDto = {
 export type Query = {
   __typename?: 'Query';
   findAll: Array<Meeting>;
+  findById: Attendee;
   findMeeting: Meeting;
   findUserMeetings: PaginatedMeetings;
   getAIResults: AiResults;
   getActionItems: Array<ActionItem>;
   getAttendees: Array<Attendee>;
   getTranscript?: Maybe<Transcript>;
+  getUserActionItemAssignees: Array<Attendee>;
+  getUserActionItems: Array<ActionItem>;
+  getUserMeetings: Array<Meeting>;
+};
+
+
+export type QueryFindByIdArgs = {
+  attendeeId: Scalars['String']['input'];
 };
 
 
@@ -211,6 +226,11 @@ export type QueryGetAttendeesArgs = {
 
 export type QueryGetTranscriptArgs = {
   meetingId: Scalars['String']['input'];
+};
+
+
+export type QueryGetUserActionItemsArgs = {
+  filter?: InputMaybe<ActionItemsFilterDto>;
 };
 
 export type Transcript = {

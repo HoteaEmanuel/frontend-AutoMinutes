@@ -45,6 +45,20 @@ export const fetchMeeting = async (input: string) => {
   return data.findMeeting;
 };
 
+const GET_USER_MEETINGS = `
+  query GetUserMeetings {
+    getUserMeetings {
+      id
+      title
+    }
+  }
+`;
+
+export const fetchUserMeetingOptions = async () => {
+  const data = await gqlRequest<Pick<Query, 'getUserMeetings'>>(GET_USER_MEETINGS);
+  return data.getUserMeetings;
+};
+
 const FIND_ALL_MEETINGS = `
 query FindAll {
 findAll {

@@ -78,6 +78,7 @@ const ActionItemEditDialog = ({ item, open, onOpenChange }: ActionItemEditDialog
           <FormField
             id="title"
             label="Title *"
+            placeholder='Title'
             register={register}
             error={errors.title?.message}
             hasError={!!errors.title}
@@ -87,6 +88,7 @@ const ActionItemEditDialog = ({ item, open, onOpenChange }: ActionItemEditDialog
             id="description"
             label="Description"
             as="textarea"
+            placeholder='Description...'
             register={register}
             error={errors.description?.message}
             hasError={!!errors.description}

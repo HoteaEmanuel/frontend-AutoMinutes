@@ -18,6 +18,7 @@ type FilterComboboxProps = {
   onSelect: (value: string | null) => void;
   placeholder: string;
   emptyMessage: string;
+  disabled?: boolean;
 };
 
 const FilterCombobox = ({
@@ -26,6 +27,7 @@ const FilterCombobox = ({
   onSelect,
   placeholder,
   emptyMessage,
+  disabled = false,
 }: FilterComboboxProps) => {
   const selectedItem = options.find((option) => option.value === selectedValue) ?? null;
 
@@ -34,8 +36,13 @@ const FilterCombobox = ({
       items={options}
       value={selectedItem}
       onValueChange={(item) => onSelect(item?.value ?? null)}
+      disabled={disabled}
     >
-      <ComboboxInput placeholder={placeholder} showClear={selectedItem !== null} />
+      <ComboboxInput
+        placeholder={placeholder}
+        showClear={selectedItem !== null}
+        disabled={disabled}
+      />
       <ComboboxContent>
         <ComboboxEmpty>{emptyMessage}</ComboboxEmpty>
         <ComboboxList>
