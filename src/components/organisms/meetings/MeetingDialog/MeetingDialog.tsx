@@ -4,6 +4,9 @@ import { useGetMeeting } from '@/features/meetings/hooks/useMeetings';
 import MeetingStatusBadge from '@molecules/MeetingStatusBadge/MeetingStatusBadge';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import { Loader2 } from 'lucide-react';
+import TranscriptTab from './TranscriptTab';
+import AttendeesTab from './AttendeesTab';
+import AiResultsTab from './AiResultsTab';
 
 type MeetingDialogProps = {
   open: boolean;
@@ -48,7 +51,10 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
             </DialogHeader>
 
             <Tabs defaultValue="overview" className="min-h-0">
-              <TabsList variant="line" className="w-full justify-start overflow-x-auto border-b px-6">
+              <TabsList
+                variant="line"
+                className="w-full justify-start overflow-x-auto border-b px-6"
+              >
                 <TabsTrigger value="overview" className="px-3">
                   Overview
                 </TabsTrigger>
@@ -91,15 +97,15 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
                 </TabsContent>
 
                 <TabsContent value="transcript" className="text-sm text-muted-foreground">
-                  Transcript details will be added here.
+                  <TranscriptTab meetingId={meetingId} />
                 </TabsContent>
 
                 <TabsContent value="ai-results" className="text-sm text-muted-foreground">
-                  AI results will be added here.
+                  <AiResultsTab meetingId={meetingId} />
                 </TabsContent>
 
                 <TabsContent value="attendees" className="text-sm text-muted-foreground">
-                  Attendees will be added here.
+                  <AttendeesTab meetingId={meetingId} />
                 </TabsContent>
               </div>
             </Tabs>

@@ -64,7 +64,7 @@ export const fetchAllMeetings = async () => {
 };
 
 const CREATE_MEETING = `
-mutation CreateMeeting($createMeetingInput: CreateMeetingDto!) {
+mutation ($createMeetingInput: CreateMeetingDto!) {
   createMeeting(createMeetingInput: $createMeetingInput) {
     id
     title
@@ -80,4 +80,20 @@ export const createMeeting = async (input: CreateMeetingDto) => {
     createMeetingInput: input,
   });
   return data.createMeeting;
+};
+
+const FIND_TRANSCRIPT = `
+query ($meetingId: String!) {
+  getTranscript(meetingId: $meetingId) {
+    content
+  }
+}
+`;
+
+export const findTranscript = async (meetingId: string) => {
+  const data = await gqlRequest<Pick<Query, 'getTranscript'>>(FIND_TRANSCRIPT, {
+    meetingId: meetingId,
+  });
+
+  return data.getTranscript;
 };
