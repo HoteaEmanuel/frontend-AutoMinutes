@@ -19,7 +19,13 @@ async function extractTextFromPdf(file: File) {
     const page = await pdf.getPage(pageNumber)
     const content = await page.getTextContent()
     const pageText = content.items
-      .map((item) => ("str" in item ? item.str : ""))
+      .map((item: unknown) => {
+        if (typeof item === "object" && item !== null && "str" in item) {
+          return String((item as { str: unknown }).str)
+        }
+
+        return ""
+      })
       .join(" ")
     pageTexts.push(pageText)
   }

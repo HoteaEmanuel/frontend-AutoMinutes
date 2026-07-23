@@ -1,5 +1,4 @@
 import {
-  InvalidateOptions,
   InvalidateQueryFilters,
   keepPreviousData,
   QueryClient,

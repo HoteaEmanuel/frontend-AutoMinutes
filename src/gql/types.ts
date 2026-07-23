@@ -2,13 +2,13 @@ export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
-  DateTime: { input: string; output: string; }
+  DateTime: { input: string; output: string };
 };
 
 export type CreateMeetingDto = {
@@ -29,11 +29,7 @@ export type Meeting = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
-export type MeetingStatus =
-  | 'COMPLETED'
-  | 'FAILED'
-  | 'PENDING'
-  | 'PROCESSING';
+export type MeetingStatus = 'COMPLETED' | 'FAILED' | 'PENDING' | 'PROCESSING';
 
 export type Mutation = {
   __typename?: 'Mutation';
@@ -41,11 +37,9 @@ export type Mutation = {
   deleteMeeting: Meeting;
 };
 
-
 export type MutationCreateMeetingArgs = {
   createMeetingInput: CreateMeetingDto;
 };
-
 
 export type MutationDeleteMeetingArgs = {
   id: Scalars['String']['input'];
@@ -60,11 +54,11 @@ export type PaginatedMeetings = {
 };
 
 export type PaginatedMeetingsDto = {
+  search?: InputMaybe<Scalars['String']['input']>;
   pageNo: Scalars['Float']['input'];
   pageSize: Scalars['Float']['input'];
   scheduledFrom?: InputMaybe<Scalars['DateTime']['input']>;
   scheduledTo?: InputMaybe<Scalars['DateTime']['input']>;
-  search?: InputMaybe<Scalars['String']['input']>;
   sortDateOrder?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<MeetingStatus>;
 };
@@ -76,11 +70,9 @@ export type Query = {
   findUserMeetings: PaginatedMeetings;
 };
 
-
 export type QueryFindMeetingArgs = {
   id: Scalars['String']['input'];
 };
-
 
 export type QueryFindUserMeetingsArgs = {
   input: PaginatedMeetingsDto;

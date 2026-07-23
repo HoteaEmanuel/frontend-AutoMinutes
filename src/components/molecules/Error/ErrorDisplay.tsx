@@ -1,5 +1,3 @@
-import React from 'react';
-
 const ErrorDisplay = ({ error }: { error: string }) => {
   return (
     <div className="flex gap-2 items-center">

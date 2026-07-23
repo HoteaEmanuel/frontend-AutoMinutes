@@ -1,5 +1,5 @@
 import { gqlRequest } from '@/lib/graphql';
-import { CreateMeetingDto, Meeting, Mutation, PaginatedMeetingsDto, Query } from '@/gql/types';
+import { CreateMeetingDto, Mutation, PaginatedMeetingsDto, Query } from '@/gql/types';
 
 const FIND_USER_MEETINGS = `
   query FindUserMeetings($input: PaginatedMeetingsDto!) {
