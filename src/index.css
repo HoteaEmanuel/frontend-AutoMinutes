@@ -92,6 +92,14 @@
   --status-completed-soft: color-mix(in srgb, var(--status-completed) 12%, transparent);
   --status-failed-soft: color-mix(in srgb, var(--status-failed) 12%, transparent);
 
+  --status-open: var(--amber-500);
+  --status-in-progress: var(--blue-500);
+  --status-done: var(--emerald-500);
+
+  --status-open-soft: color-mix(in srgb, var(--status-open) 14%, transparent);
+  --status-in-progress-soft: color-mix(in srgb, var(--status-in-progress) 12%, transparent);
+  --status-done-soft: color-mix(in srgb, var(--status-done) 12%, transparent);
+
   --table-header-bg: var(--neutral-100);
   --table-row-hover: color-mix(in srgb, var(--neutral-200) 50%, transparent);
   --table-row-odd: color-mix(in srgb, var(--neutral-200) 30%, transparent);
@@ -167,6 +175,14 @@
   --status-completed-soft: color-mix(in srgb, var(--status-completed) 20%, transparent);
   --status-failed-soft: color-mix(in srgb, var(--status-failed) 20%, transparent);
 
+  --status-open: #fbbf24;
+  --status-in-progress: #60a5fa;
+  --status-done: #34d399;
+
+  --status-open-soft: color-mix(in srgb, var(--status-open) 22%, transparent);
+  --status-in-progress-soft: color-mix(in srgb, var(--status-in-progress) 20%, transparent);
+  --status-done-soft: color-mix(in srgb, var(--status-done) 20%, transparent);
+
   --table-header-bg: var(--neutral-800);
   --table-row-hover: color-mix(in srgb, var(--neutral-800) 60%, transparent);
   --table-row-odd: color-mix(in srgb, var(--neutral-800) 35%, transparent);
@@ -210,6 +226,14 @@
   --color-status-processing-soft: var(--status-processing-soft);
   --color-status-completed-soft: var(--status-completed-soft);
   --color-status-failed-soft: var(--status-failed-soft);
+
+  --color-status-open: var(--status-open);
+  --color-status-in-progress: var(--status-in-progress);
+  --color-status-done: var(--status-done);
+
+  --color-status-open-soft: var(--status-open-soft);
+  --color-status-in-progress-soft: var(--status-in-progress-soft);
+  --color-status-done-soft: var(--status-done-soft);
 
   --color-table-header-bg: var(--table-header-bg);
   --color-table-row-hover: var(--table-row-hover);
