@@ -23,8 +23,6 @@ query findAIResults( $meetingId: String!) {
 }
 `;
 
-// Selectam doar summary: tab-ul se reincarca oricum prin invalidare, iar o selectie
-// subtire evita rezolvarea din nou a action items/attendees pe raspunsul mutatiei.
 const GENERATE_AI_RESULTS = `
   mutation GenerateAIResults($meetingId: String!) {
     generateAIResults(aiInput: { meetingId: $meetingId }) {

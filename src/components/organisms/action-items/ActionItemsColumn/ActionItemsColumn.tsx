@@ -34,7 +34,7 @@ const ActionItemsColumn = ({ status, items }: ActionItemsColumnProps) => {
         <ActionItemsSortMenu sort={sort} onSortChange={setSort} />
       </div>
 
-      <div className="scrollbar-themed flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pr-1">
+      <div className="scrollbar-themed min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
         {sortedItems.length === 0 ? (
           <p className="px-1 text-xs text-muted-foreground">No action items</p>
         ) : (

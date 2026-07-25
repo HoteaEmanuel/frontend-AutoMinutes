@@ -18,9 +18,10 @@ const columnBorderClass: Record<ActionItemColumnStatus, string> = {
 
 type ActionItemCardProps = {
   item: BoardActionItem;
+  hideMeetingTitle?: boolean;
 };
 
-const ActionItemCard = ({ item }: ActionItemCardProps) => {
+const ActionItemCard = ({ item, hideMeetingTitle }: ActionItemCardProps) => {
   const done = item.status === 'DONE';
   const columnStatus = resolveColumnStatus(item.status);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -39,7 +40,9 @@ const ActionItemCard = ({ item }: ActionItemCardProps) => {
           >
             {item.title}
           </span>
-          <span className="text-[11px] text-muted-foreground">{item.meetingTitle}</span>
+          {!hideMeetingTitle && (
+            <span className="text-[11px] text-muted-foreground">{item.meetingTitle}</span>
+          )}
         </div>
         <ActionItemActionsMenu onEdit={() => setIsEditOpen(true)} onDelete={() => setIsDeleteOpen(true)} />
       </div>

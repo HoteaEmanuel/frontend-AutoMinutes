@@ -8,6 +8,7 @@ import OverviewTab from './OverviewTab';
 import TranscriptTab from './TranscriptTab';
 import AttendeesTab from './AttendeesTab';
 import AiResultsTab from './AiResultsTab';
+import TodosTab from './TodosTab';
 
 type MeetingDialogProps = {
   open: boolean;
@@ -57,7 +58,7 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
             <Tabs defaultValue="overview" className="min-h-0 min-w-0">
               <TabsList
                 variant="line"
-                className="w-full justify-start overflow-x-auto border-b border-border/50 px-4 sm:px-6"
+                className="w-full justify-start overflow-x-auto overflow-y-hidden border-b border-border/50 px-4 sm:px-6"
               >
                 <TabsTrigger value="overview" className={tabTriggerClassName}>
                   Overview
@@ -70,6 +71,9 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
                 </TabsTrigger>
                 <TabsTrigger value="attendees" className={tabTriggerClassName}>
                   Attendees
+                </TabsTrigger>
+                <TabsTrigger value="todos" className={tabTriggerClassName}>
+                  Todos
                 </TabsTrigger>
               </TabsList>
 
@@ -88,6 +92,10 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
 
                 <TabsContent value="attendees" className="text-sm text-muted-foreground">
                   <AttendeesTab meetingId={meetingId} />
+                </TabsContent>
+
+                <TabsContent value="todos" className="text-sm text-muted-foreground">
+                  <TodosTab meetingId={meetingId} meetingTitle={data.title} />
                 </TabsContent>
               </div>
             </Tabs>
