@@ -1,5 +1,11 @@
 import { gqlRequest } from '@/lib/graphql';
-import { CreateMeetingDto, Mutation, PaginatedMeetingsDto, Query } from '@/gql/types';
+import {
+  CreateMeetingDto,
+  Mutation,
+  PaginatedMeetingsDto,
+  Query,
+  UploadTranscriptDto,
+} from '@/gql/types';
 
 const FIND_USER_MEETINGS = `
   query FindUserMeetings($input: PaginatedMeetingsDto!) {
@@ -113,4 +119,21 @@ export const findTranscript = async (meetingId: string) => {
   });
 
   return data.getTranscript;
+};
+
+const UPLOAD_TRANSCRIPT = `
+mutation UploadTranscript($uploadTranscriptDto: UploadTranscriptDto!) {
+  uploadTranscript(uploadTranscriptDto: $uploadTranscriptDto) {
+    id
+    content
+  }
+}
+`;
+
+export const uploadTranscript = async (input: UploadTranscriptDto) => {
+  const data = await gqlRequest<Pick<Mutation, 'uploadTranscript'>>(UPLOAD_TRANSCRIPT, {
+    uploadTranscriptDto: input,
+  });
+
+  return data.uploadTranscript;
 };
