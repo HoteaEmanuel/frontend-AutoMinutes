@@ -310,6 +310,34 @@ layer base {
   padding: 0.5rem;
 }
 
+.ai-btn-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in oklch, white 55%, transparent),
+    transparent
+  );
+  transform: skewX(-20deg) translateX(-160%);
+  animation: ai-btn-shine-sweep 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ai-btn-shine-sweep {
+  0%,
+  100% {
+    transform: skewX(-20deg) translateX(-160%);
+  }
+  50% {
+    transform: skewX(-20deg) translateX(260%);
+  }
+}
+
 code,
 .counter {
   font-family: var(--mono);

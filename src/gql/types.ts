@@ -73,6 +73,7 @@ export type CreateActionItemDto = {
   deadline?: InputMaybe<Scalars['DateTime']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   meetingId: Scalars['String']['input'];
+  status?: InputMaybe<ActionItemStatus>;
   title: Scalars['String']['input'];
 };
 
@@ -135,6 +136,7 @@ export type Mutation = {
   setPassword: Scalars['Boolean']['output'];
   updateActionItem: ActionItem;
   updateProfile: User;
+  uploadTranscript: Transcript;
 };
 
 
@@ -195,6 +197,11 @@ export type MutationUpdateActionItemArgs = {
 
 export type MutationUpdateProfileArgs = {
   input: UpdateProfileInput;
+};
+
+
+export type MutationUploadTranscriptArgs = {
+  uploadTranscriptDto: UploadTranscriptDto;
 };
 
 export type PaginatedMeetings = {
@@ -302,6 +309,11 @@ export type UpdateProfileInput = {
   lastName?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UploadTranscriptDto = {
+  content: Scalars['String']['input'];
+  meetingId: Scalars['String']['input'];
+};
+
 export type User = {
   __typename?: 'User';
   avatar?: Maybe<Scalars['String']['output']>;
@@ -324,7 +336,6 @@ export type AddAttendeeDto = {
 
 export type AiResultsDto = {
   meetingId: Scalars['String']['input'];
-  transcript: Scalars['String']['input'];
 };
 
 export type DeleteAttendeeDto = {

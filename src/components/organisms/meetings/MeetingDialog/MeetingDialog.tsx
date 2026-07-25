@@ -43,7 +43,7 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
 
         {data && (
           <>
-            <DialogHeader className="gap-3 border-b border-border/50 p-6">
+            <DialogHeader className="gap-3 border-b border-border/50 p-4 sm:p-6">
               <div className="flex flex-col gap-3 pr-10 sm:flex-row sm:items-center">
                 <MeetingStatusBadge status={data.status} />
                 <span className="text-sm text-muted-foreground">
@@ -54,10 +54,10 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
               <DialogTitle className="text-2xl font-bold">{data.title}</DialogTitle>
             </DialogHeader>
 
-            <Tabs defaultValue="overview" className="min-h-0">
+            <Tabs defaultValue="overview" className="min-h-0 min-w-0">
               <TabsList
                 variant="line"
-                className="w-full justify-start overflow-x-auto border-b border-border/50 px-6"
+                className="w-full justify-start overflow-x-auto border-b border-border/50 px-4 sm:px-6"
               >
                 <TabsTrigger value="overview" className={tabTriggerClassName}>
                   Overview
@@ -73,7 +73,7 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
                 </TabsTrigger>
               </TabsList>
 
-              <div className="max-h-[55vh] overflow-y-auto p-6">
+              <div className="max-h-[55vh] min-w-0 overflow-y-auto p-4 sm:p-6">
                 <TabsContent value="overview">
                   <OverviewTab meetingId={meetingId} />
                 </TabsContent>
