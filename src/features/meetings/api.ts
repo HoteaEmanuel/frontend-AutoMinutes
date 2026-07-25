@@ -34,6 +34,9 @@ const FIND_MEETING_BY_ID = `
     scheduledAt
     createdAt
     description
+    actionItems {
+      id
+    }
   }
 }
 `;
