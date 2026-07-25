@@ -54,7 +54,7 @@ const TodosTemplate = () => {
     assigneesQuery.refetch();
   };
 
-  if (isPending) return <Loader2 className="animate-spin" />;
+  if (isPending) return <Loader2 className="animate-spin mx-auto" />;
   if (isError)
     return (
       <ErrorRefetch errorMessage={error?.message ?? 'Something went wrong'} refetch={refetchAll} />
