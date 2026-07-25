@@ -17,6 +17,9 @@ export const findAttendess = async (meetingId: string) => {
   const data = await gqlRequest<Pick<Query, 'getAttendees'>>(FIND_ATTENDEES, {
     meetingId: meetingId,
   });
+  return data.getAttendees;
+};
+
 const GET_ATTENDEES = `
   query GetAttendees($meetingId: String!) {
     getAttendees(meetingId: $meetingId) {
