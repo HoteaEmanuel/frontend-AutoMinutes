@@ -1,5 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchAttendees } from '../api';
+import { findAttendess, fetchAttendees } from '../api';
+import { meetingKeys } from '@/features/meetings/hooks/useMeetings';
+
+export const useGetAttendees = (meetingId: string) =>
+  useQuery({
+    queryKey: [meetingKeys.detail(meetingId), 'attendees'],
+    queryFn: () => findAttendess(meetingId),
+  });
 
 export const attendeesKeys = {
   list: (meetingId: string) => ['attendees', meetingId] as const,
