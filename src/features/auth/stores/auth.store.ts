@@ -11,6 +11,7 @@ type AuthState = {
   accessToken: string | null;
   status: Status;
   setSession: ({ accessToken, user }: { accessToken: string; user: User }) => void;
+  setUser: (user: Partial<NonNullable<User>>) => void;
   clearSession: () => void;
 };
 export const useAuthStore = create<AuthState>((set) => ({
@@ -24,6 +25,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       user,
       status: 'authenticated',
     })),
+
+  setUser: (user: Partial<NonNullable<User>>) =>
+    set((state) => (state.user ? { user: { ...state.user, ...user } } : {})),
   clearSession: () =>
     set(() => ({
       user: null,
