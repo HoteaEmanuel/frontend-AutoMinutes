@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Personal project context notes (not for the team repo)
+PROJECT_CONTEXT.md

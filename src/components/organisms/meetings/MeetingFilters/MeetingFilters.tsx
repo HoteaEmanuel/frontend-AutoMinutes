@@ -1,7 +1,7 @@
 import { InputGroup, InputGroupInput, InputGroupAddon } from '@/components/ui/input-group';
 import { Label } from '@/components/ui/label';
 import { SORT_BY_OPTIONS } from '@/constants/sort';
-import { STATUSES } from '@/constants/status';
+import { STATUS_FILTER_ALL, STATUS_FILTER_OPTIONS } from '@/constants/status';
 import { useMeetingFilters } from '@/features/meetings/hooks/useMeetingFilters';
 import { MeetingStatus } from '@/gql/types';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -40,11 +40,11 @@ const MeetingFilters = () => {
         <Selector
           handleChange={(value) =>
             setFilters({
-              status: value as MeetingStatus,
+              status: value === STATUS_FILTER_ALL ? undefined : (value as MeetingStatus),
             })
           }
-          items={STATUSES}
-          value={filters.status as string}
+          items={STATUS_FILTER_OPTIONS}
+          value={filters.status ?? STATUS_FILTER_ALL}
           label={'Status'}
         />
       </div>

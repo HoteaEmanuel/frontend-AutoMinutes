@@ -27,8 +27,8 @@ const Selector = ({ items, handleChange, value, label }: SelectorProps<string>) 
         <SelectContent>
           <SelectGroup>
             {items.map((option) => (
-              <SelectItem value={option.label} key={option.label}>
-                {option.value}
+              <SelectItem value={option.value} key={option.value}>
+                {option.label}
               </SelectItem>
             ))}
           </SelectGroup>

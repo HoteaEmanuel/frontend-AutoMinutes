@@ -28,6 +28,7 @@ export type ActionItem = {
   assignee?: Maybe<Attendee>;
   deadline?: Maybe<Scalars['DateTime']['output']>;
   description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
   meetingId: Scalars['ID']['output'];
   status: ActionItemStatus;
   title: Scalars['String']['output'];
@@ -39,10 +40,17 @@ export type ActionItemStatus =
   | 'OPEN'
   | 'UNKNOWN';
 
+export type ActionItemsFilterDto = {
+  assigneeId?: InputMaybe<Scalars['String']['input']>;
+  meetingId?: InputMaybe<Scalars['String']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type Attendee = {
   __typename?: 'Attendee';
   aiGenerated: Scalars['Boolean']['output'];
   email?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
   meetingId: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   role: AttendeeRole;
@@ -80,7 +88,7 @@ export type Meeting = {
   actionItems: Array<ActionItem>;
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
-  findMeetingTranscript: Transcript;
+  findMeetingTranscript?: Maybe<Transcript>;
   id: Scalars['ID']['output'];
   scheduledAt: Scalars['DateTime']['output'];
   status: MeetingStatus;
@@ -109,6 +117,7 @@ export type Mutation = {
   deleteAttendee: Attendee;
   deleteMeeting: Meeting;
   generateAIResults: AiResults;
+  updateActionItem: ActionItem;
 };
 
 
@@ -146,6 +155,11 @@ export type MutationGenerateAiResultsArgs = {
   aiInput: AiResultsDto;
 };
 
+
+export type MutationUpdateActionItemArgs = {
+  updateActionItemDto: UpdateActionItemDto;
+};
+
 export type PaginatedMeetings = {
   __typename?: 'PaginatedMeetings';
   meetings: Array<Meeting>;
@@ -167,12 +181,21 @@ export type PaginatedMeetingsDto = {
 export type Query = {
   __typename?: 'Query';
   findAll: Array<Meeting>;
+  findById: Attendee;
   findMeeting: Meeting;
   findUserMeetings: PaginatedMeetings;
   getAIResults: AiResults;
   getActionItems: Array<ActionItem>;
   getAttendees: Array<Attendee>;
-  getTranscript: Transcript;
+  getTranscript?: Maybe<Transcript>;
+  getUserActionItemAssignees: Array<Attendee>;
+  getUserActionItems: Array<ActionItem>;
+  getUserMeetings: Array<Meeting>;
+};
+
+
+export type QueryFindByIdArgs = {
+  attendeeId: Scalars['String']['input'];
 };
 
 
@@ -205,11 +228,26 @@ export type QueryGetTranscriptArgs = {
   meetingId: Scalars['String']['input'];
 };
 
+
+export type QueryGetUserActionItemsArgs = {
+  filter?: InputMaybe<ActionItemsFilterDto>;
+};
+
 export type Transcript = {
   __typename?: 'Transcript';
   content: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   meetingId: Scalars['ID']['output'];
+};
+
+export type UpdateActionItemDto = {
+  actionItemId: Scalars['String']['input'];
+  assigneeId?: InputMaybe<Scalars['String']['input']>;
+  deadline?: InputMaybe<Scalars['DateTime']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  meetingId: Scalars['String']['input'];
+  status?: InputMaybe<ActionItemStatus>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AddAttendeeDto = {
