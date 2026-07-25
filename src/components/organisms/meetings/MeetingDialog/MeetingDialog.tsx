@@ -4,6 +4,7 @@ import { useGetMeeting } from '@/features/meetings/hooks/useMeetings';
 import MeetingStatusBadge from '@molecules/MeetingStatusBadge/MeetingStatusBadge';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import { Loader2 } from 'lucide-react';
+import OverviewTab from './OverviewTab';
 import TranscriptTab from './TranscriptTab';
 import AttendeesTab from './AttendeesTab';
 import AiResultsTab from './AiResultsTab';
@@ -13,6 +14,9 @@ type MeetingDialogProps = {
   meetingId: string;
   onOpenChange: () => void;
 };
+
+const tabTriggerClassName =
+  'px-3 data-active:text-primary data-active:after:bg-primary dark:data-active:text-primary';
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'medium',
@@ -39,7 +43,7 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
 
         {data && (
           <>
-            <DialogHeader className="gap-3 border-b p-6">
+            <DialogHeader className="gap-3 border-b border-border/50 p-6">
               <div className="flex flex-col gap-3 pr-10 sm:flex-row sm:items-center">
                 <MeetingStatusBadge status={data.status} />
                 <span className="text-sm text-muted-foreground">
@@ -53,47 +57,25 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
             <Tabs defaultValue="overview" className="min-h-0">
               <TabsList
                 variant="line"
-                className="w-full justify-start overflow-x-auto border-b px-6"
+                className="w-full justify-start overflow-x-auto border-b border-border/50 px-6"
               >
-                <TabsTrigger value="overview" className="px-3">
+                <TabsTrigger value="overview" className={tabTriggerClassName}>
                   Overview
                 </TabsTrigger>
-                <TabsTrigger value="transcript" className="px-3">
+                <TabsTrigger value="transcript" className={tabTriggerClassName}>
                   Transcript
                 </TabsTrigger>
-                <TabsTrigger value="ai-results" className="px-3">
+                <TabsTrigger value="ai-results" className={tabTriggerClassName}>
                   AI Results
                 </TabsTrigger>
-                <TabsTrigger value="attendees" className="px-3">
+                <TabsTrigger value="attendees" className={tabTriggerClassName}>
                   Attendees
                 </TabsTrigger>
               </TabsList>
 
               <div className="max-h-[55vh] overflow-y-auto p-6">
-                <TabsContent value="overview" className="flex flex-col gap-5">
-                  <div className="flex flex-col gap-2">
-                    <p className="text-xs font-semibold uppercase text-muted-foreground">
-                      Description
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {data.description || 'No description added.'}
-                    </p>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-lg border p-4">
-                      <p className="text-2xl font-bold">0</p>
-                      <p className="text-sm text-muted-foreground">Attendees</p>
-                    </div>
-                    <div className="rounded-lg border p-4">
-                      <p className="text-2xl font-bold">0</p>
-                      <p className="text-sm text-muted-foreground">Action items</p>
-                    </div>
-                    <div className="rounded-lg border p-4">
-                      <p className="text-2xl font-bold">0</p>
-                      <p className="text-sm text-muted-foreground">Transcript words</p>
-                    </div>
-                  </div>
+                <TabsContent value="overview">
+                  <OverviewTab meetingId={meetingId} />
                 </TabsContent>
 
                 <TabsContent value="transcript" className="text-sm text-muted-foreground">
