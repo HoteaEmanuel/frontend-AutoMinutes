@@ -3,7 +3,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format } from 'date-fns';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import FormField from '@molecules/FormField/FormField';
 import Selector from '@molecules/Selector/Selector';
 import DatePicker from '@molecules/DatePicker/DatePicker';
@@ -78,7 +84,7 @@ const ActionItemEditDialog = ({ item, open, onOpenChange }: ActionItemEditDialog
           <FormField
             id="title"
             label="Title *"
-            placeholder='Title'
+            placeholder="Title"
             register={register}
             error={errors.title?.message}
             hasError={!!errors.title}
@@ -88,7 +94,7 @@ const ActionItemEditDialog = ({ item, open, onOpenChange }: ActionItemEditDialog
             id="description"
             label="Description"
             as="textarea"
-            placeholder='Description...'
+            placeholder="Description..."
             register={register}
             error={errors.description?.message}
             hasError={!!errors.description}
@@ -104,7 +110,9 @@ const ActionItemEditDialog = ({ item, open, onOpenChange }: ActionItemEditDialog
                     id="action-item-deadline"
                     label="Deadline"
                     date={field.value ? new Date(`${field.value}T00:00:00`) : undefined}
-                    setDate={(selected) => field.onChange(selected ? format(selected, 'yyyy-MM-dd') : '')}
+                    setDate={(selected) =>
+                      field.onChange(selected ? format(selected, 'yyyy-MM-dd') : '')
+                    }
                   />
                 )}
               />

@@ -1,7 +1,6 @@
 import { useGetTranscript } from '@/features/meetings/hooks/useTranscript';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import { Loader2 } from 'lucide-react';
-import React from 'react';
 
 const TranscriptTab = ({ meetingId }: { meetingId: string }) => {
   const { data, isError, isPending, refetch, error } = useGetTranscript(meetingId);
