@@ -1,4 +1,3 @@
-import { Button } from '@/components/ui/button';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group';
 import { Label } from '@/components/ui/label';
 import { SORT_BY_OPTIONS } from '@/constants/sort';
@@ -15,7 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, SearchIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 type MeetingsFilters = {
-  contentLike: string;
+  search: string;
   status: MeetingStatus | undefined;
   scheduledAt: Date | undefined;
   timeAt: string | undefined;
@@ -45,20 +44,20 @@ const MeetingsTable = () => {
   const [pageNo, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [filters, setFilters] = useState<MeetingsFilters>({
-    contentLike: '',
+    search: '',
     status: undefined,
     scheduledAt: undefined,
     timeAt: undefined,
     sortDateOrder: undefined,
   });
 
-  const debouncedValue = useDebounce(filters.contentLike, 500, () => setPage(1));
+  const debouncedValue = useDebounce(filters.search, 500, () => setPage(1));
   const { scheduledFrom, scheduledTo } = createScheduleRange(filters.scheduledAt, filters.timeAt);
 
   const { data, refetch, isPending, error, isError } = useMeetings({
     pageNo,
     pageSize,
-    contentLike: debouncedValue,
+    search: debouncedValue,
     status: filters.status,
     scheduledFrom,
     scheduledTo,
@@ -74,7 +73,7 @@ const MeetingsTable = () => {
       meetingsQueryOptions({
         pageNo: pageNo + 1,
         pageSize,
-        contentLike: debouncedValue,
+        search: debouncedValue,
         status: filters.status,
         scheduledFrom,
         scheduledTo,
@@ -103,8 +102,8 @@ const MeetingsTable = () => {
           <InputGroup className="px-2 py-5">
             <InputGroupInput
               placeholder="Search meetings by title, description..."
-              onChange={(e) => setFilters((prev) => ({ ...prev, contentLike: e.target.value }))}
-              value={filters.contentLike}
+              onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+              value={filters.search}
             />
             <InputGroupAddon>
               <SearchIcon />

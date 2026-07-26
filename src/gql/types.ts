@@ -60,9 +60,9 @@ export type PaginatedMeetings = {
 };
 
 export type PaginatedMeetingsDto = {
-  contentLike?: InputMaybe<Scalars['String']['input']>;
   pageNo: Scalars['Float']['input'];
   pageSize: Scalars['Float']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
   scheduledFrom?: InputMaybe<Scalars['DateTime']['input']>;
   scheduledTo?: InputMaybe<Scalars['DateTime']['input']>;
   sortDateOrder?: InputMaybe<Scalars['String']['input']>;
