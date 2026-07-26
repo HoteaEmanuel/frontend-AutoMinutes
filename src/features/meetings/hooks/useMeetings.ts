@@ -1,12 +1,12 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  addAttendee,
   createMeeting,
   fetchAllMeetings,
   fetchMeeting,
   fetchUserMeetingOptions,
   fetchUserMeetings,
 } from '../api';
+import { addAttendee } from '@/features/attendees/api';
 import { CreateMeetingDto, PaginatedMeetingsDto } from '@/gql/types';
 import { toast } from 'sonner';
 

@@ -1,12 +1,5 @@
 import { gqlRequest } from '@/lib/graphql';
-import {
-  AddAttendeeDto,
-  CreateMeetingDto,
-  Mutation,
-  PaginatedMeetingsDto,
-  Query,
-  UploadTranscriptDto,
-} from '@/gql/types';
+import { CreateMeetingDto, Mutation, PaginatedMeetingsDto, Query, UploadTranscriptDto } from '@/gql/types';
 
 const FIND_USER_MEETINGS = `
   query FindUserMeetings($input: PaginatedMeetingsDto!) {
@@ -107,25 +100,6 @@ export const createMeeting = async (input: CreateMeetingDto) => {
     createMeetingInput: input,
   });
   return data.createMeeting;
-};
-
-const ADD_ATTENDEE = `
-  mutation AddAttendee($addAttendeeDto: addAttendeeDto!) {
-    addAttendee(addAttendeeDto: $addAttendeeDto) {
-      id
-      name
-      email
-      meetingId
-      role
-    }
-  }
-`;
-
-export const addAttendee = async (input: AddAttendeeDto) => {
-  const data = await gqlRequest<Pick<Mutation, 'addAttendee'>>(ADD_ATTENDEE, {
-    addAttendeeDto: input,
-  });
-  return data.addAttendee;
 };
 
 const FIND_TRANSCRIPT = `

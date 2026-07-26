@@ -1,14 +1,22 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
-import { FileText, Plus, Trash2 } from 'lucide-react';
+import { FileText, Plus, Trash2, Users } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { format, startOfDay } from 'date-fns';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useCreateMeeting } from '@/features/meetings/hooks/useMeetings';
 import { extractTextFromFile } from '@/lib/utils';
+import { getErrorMessage } from '@/lib/errors';
+import AssigneeAvatar from '@molecules/AssigneeAvatar/AssigneeAvatar';
+import { DatePickerTime } from '@molecules/DatePickerTime/DatePickerTime';
+import EmptyState from '@molecules/EmptyState/EmptyState';
+import FormField from '@molecules/FormField/FormField';
 import { acceptedFileExtensions, meetingForm } from './meetingForm';
 
 type NewMeetingFormData = z.infer<typeof meetingForm>;
@@ -24,8 +32,23 @@ type Attendee = {
   email: string;
 };
 
-const hours = Array.from({ length: 12 }, (_, index) => String(index + 1).padStart(2, '0'));
-const minutes = Array.from({ length: 60 }, (_, index) => String(index).padStart(2, '0'));
+const attendeeFields: Array<{
+  key: keyof Attendee;
+  id: string;
+  label: string;
+  placeholder: string;
+  type?: string;
+}> = [
+  { key: 'firstName', id: 'attendee-first-name', label: 'First name *', placeholder: 'First name' },
+  { key: 'lastName', id: 'attendee-last-name', label: 'Last name *', placeholder: 'Last name' },
+  {
+    key: 'email',
+    id: 'attendee-email',
+    label: 'Email *',
+    placeholder: 'participant@example.com',
+    type: 'email',
+  },
+];
 
 const getCurrentDateAndTime = () => {
   const now = new Date();
@@ -38,39 +61,10 @@ const getCurrentDateAndTime = () => {
   };
 };
 
-const getTimeParts = (time: string) => {
-  const [hourValue, minute] = time.split(':');
-  const hour = Number(hourValue);
-  const period = hour >= 12 ? 'PM' : 'AM';
-  const displayHour = hour % 12 || 12;
-
-  return {
-    hour: String(displayHour).padStart(2, '0'),
-    minute,
-    period,
-  };
-};
-
-const getTimeValue = (hour: string, minute: string, period: string) => {
-  let hourValue = Number(hour);
-
-  if (period === 'PM' && hourValue !== 12) {
-    hourValue += 12;
-  }
-
-  if (period === 'AM' && hourValue === 12) {
-    hourValue = 0;
-  }
-
-  return `${String(hourValue).padStart(2, '0')}:${minute}`;
-};
-
 const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
   const currentDateAndTime = getCurrentDateAndTime();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
-  const [minDate, setMinDate] = useState(currentDateAndTime.date);
-  const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [attendee, setAttendee] = useState<Attendee>({ firstName: '', lastName: '', email: '' });
   const [attendeeError, setAttendeeError] = useState('');
@@ -96,9 +90,9 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
     },
   });
 
+  const date = watch('date');
   const time = watch('time');
   const selectedFile = watch('transcriptFile');
-  const selectedTime = getTimeParts(time);
 
   useEffect(() => {
     if (isOpen) {
@@ -115,21 +109,9 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
       setAttendee({ firstName: '', lastName: '', email: '' });
       setAttendeeError('');
       setMeetingError('');
-      setMinDate(currentDateAndTime.date);
-      setIsTimePickerOpen(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }, [isOpen, reset]);
-
-  const updateTime = (
-    hour = selectedTime.hour,
-    minute = selectedTime.minute,
-    period = selectedTime.period,
-    closePicker = false,
-  ) => {
-    setValue('time', getTimeValue(hour, minute, period), { shouldValidate: true });
-    if (closePicker) setIsTimePickerOpen(false);
-  };
 
   const goToTranscriptStep = async () => {
     const isValid = await trigger(['title', 'date', 'time', 'description']);
@@ -188,7 +170,7 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
 
       onClose();
     } catch (error) {
-      setMeetingError(error instanceof Error ? error.message : 'Something went wrong.');
+      setMeetingError(getErrorMessage(error));
     }
   };
 
@@ -226,120 +208,45 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
                   </p>
                 </div>
 
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="meeting-title">Title *</Label>
-                  <Input
-                    id="meeting-title"
+                <FieldGroup>
+                  <FormField
+                    id="title"
+                    label="Title *"
                     placeholder="e.g. Q3 Product Roadmap Review"
-                    aria-invalid={!!errors.title}
-                    {...register('title')}
+                    register={register}
+                    error={errors.title?.message}
+                    hasError={!!errors.title}
                   />
-                  {errors.title && (
-                    <p className="text-xs italic text-destructive">{errors.title.message}</p>
-                  )}
-                </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="meeting-date">Date *</Label>
-                    <Input
-                      id="meeting-date"
-                      type="date"
-                      min={minDate}
-                      aria-invalid={!!errors.date}
-                      {...register('date')}
+                  <Field data-invalid={!!(errors.date || errors.time)}>
+                    <DatePickerTime
+                      id="meeting-date-time"
+                      date={date ? new Date(`${date}T00:00:00`) : undefined}
+                      time={time}
+                      disabled={{ before: startOfDay(new Date()) }}
+                      setDate={(selected) =>
+                        setValue('date', selected ? format(selected, 'yyyy-MM-dd') : '', {
+                          shouldValidate: true,
+                        })
+                      }
+                      setTime={(value) => setValue('time', value ?? '', { shouldValidate: true })}
                     />
-                    {errors.date && (
-                      <p className="text-xs italic text-destructive">{errors.date.message}</p>
-                    )}
-                  </div>
+                    <FieldError
+                      className="text-xs italic"
+                      errors={[errors.date, errors.time].filter(Boolean)}
+                    />
+                  </Field>
 
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="meeting-time">Time *</Label>
-                    <div className="relative">
-                      <Button
-                        id="meeting-time"
-                        type="button"
-                        variant="outline"
-                        onClick={() => setIsTimePickerOpen(!isTimePickerOpen)}
-                        className="h-8 w-full justify-start gap-1 px-2.5 font-normal"
-                      >
-                        <span>{selectedTime.hour}</span>
-                        <span>:</span>
-                        <span>{selectedTime.minute}</span>
-                        <span className="ml-1">{selectedTime.period}</span>
-                      </Button>
-
-                      {isTimePickerOpen && (
-                        <div className="absolute right-0 top-full z-50 mt-2 grid w-full grid-cols-[1fr_1fr_auto] gap-2 rounded-lg border border-border bg-background p-3 shadow-lg">
-                          <div className="max-h-40 overflow-y-auto">
-                            {hours.map((hour) => (
-                              <button
-                                key={hour}
-                                type="button"
-                                onClick={() => updateTime(hour)}
-                                className={`mb-1 h-8 w-full rounded-md text-sm ${
-                                  selectedTime.hour === hour
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'hover:bg-muted'
-                                }`}
-                              >
-                                {hour}
-                              </button>
-                            ))}
-                          </div>
-
-                          <div className="max-h-40 overflow-y-auto">
-                            {minutes.map((minute) => (
-                              <button
-                                key={minute}
-                                type="button"
-                                onClick={() => updateTime(undefined, minute)}
-                                className={`mb-1 h-8 w-full rounded-md text-sm ${
-                                  selectedTime.minute === minute
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'hover:bg-muted'
-                                }`}
-                              >
-                                {minute}
-                              </button>
-                            ))}
-                          </div>
-
-                          <div className="flex flex-col gap-1">
-                            {['AM', 'PM'].map((period) => (
-                              <button
-                                key={period}
-                                type="button"
-                                onClick={() => updateTime(undefined, undefined, period, true)}
-                                className={`h-8 rounded-md px-3 text-sm ${
-                                  selectedTime.period === period
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'hover:bg-muted'
-                                }`}
-                              >
-                                {period}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                    {errors.time && (
-                      <p className="text-xs italic text-destructive">{errors.time.message}</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="meeting-description">Description</Label>
-                  <textarea
-                    id="meeting-description"
-                    placeholder="What is this meeting about?"
-                    className="min-h-24 flex-1 resize-none rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                    {...register('description')}
-                  />
-                </div>
+                  <Field>
+                    <FieldLabel htmlFor="meeting-description">Description</FieldLabel>
+                    <Textarea
+                      id="meeting-description"
+                      placeholder="What is this meeting about?"
+                      className="min-h-24 flex-1 resize-none"
+                      {...register('description')}
+                    />
+                  </Field>
+                </FieldGroup>
               </div>
             )}
 
@@ -372,16 +279,15 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
                   Add a file
                 </Button>
                 {selectedFile && (
-                  <div className="rounded-lg border bg-muted/40 p-4">
-                    <p className="text-sm font-medium">Uploaded file</p>
-                    <p className="text-sm text-muted-foreground">{selectedFile.name}</p>
-                  </div>
+                  <Card className="flex-row items-center gap-3 bg-muted/50 px-4 py-3 ring-0">
+                    <FileText className="size-5 shrink-0 text-muted-foreground" />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{selectedFile.name}</p>
+                      <p className="text-xs text-muted-foreground">Ready to upload</p>
+                    </div>
+                  </Card>
                 )}
-                {errors.transcriptFile && (
-                  <p className="text-xs italic text-destructive">
-                    {errors.transcriptFile.message}
-                  </p>
-                )}
+                <FieldError className="text-xs italic" errors={[errors.transcriptFile]} />
               </div>
             )}
 
@@ -394,106 +300,80 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
                   </p>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="attendee-first-name">First name *</Label>
-                    <Input
-                      id="attendee-first-name"
-                      value={attendee.firstName}
-                      onKeyDown={addAttendeeOnEnter}
-                      onChange={(event) =>
-                        setAttendee((currentAttendee) => ({
-                          ...currentAttendee,
-                          firstName: event.target.value,
-                        }))
-                      }
-                      placeholder="First name"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="attendee-last-name">Last name *</Label>
-                    <Input
-                      id="attendee-last-name"
-                      value={attendee.lastName}
-                      onKeyDown={addAttendeeOnEnter}
-                      onChange={(event) =>
-                        setAttendee((currentAttendee) => ({
-                          ...currentAttendee,
-                          lastName: event.target.value,
-                        }))
-                      }
-                      placeholder="Last name"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="attendee-email">Email *</Label>
-                    <Input
-                      id="attendee-email"
-                      type="email"
-                      value={attendee.email}
-                      onKeyDown={addAttendeeOnEnter}
-                      onChange={(event) =>
-                        setAttendee((currentAttendee) => ({
-                          ...currentAttendee,
-                          email: event.target.value,
-                        }))
-                      }
-                      placeholder="participant@example.com"
-                    />
-                  </div>
-                </div>
+                <FieldGroup className="grid gap-3 sm:grid-cols-3">
+                  {attendeeFields.map(({ key, id, label, placeholder, type }) => (
+                    <Field key={key}>
+                      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+                      <Input
+                        id={id}
+                        type={type ?? 'text'}
+                        value={attendee[key]}
+                        onKeyDown={addAttendeeOnEnter}
+                        onChange={(event) =>
+                          setAttendee((currentAttendee) => ({
+                            ...currentAttendee,
+                            [key]: event.target.value,
+                          }))
+                        }
+                        placeholder={placeholder}
+                      />
+                    </Field>
+                  ))}
+                </FieldGroup>
 
-                {attendeeError && <p className="text-xs italic text-destructive">{attendeeError}</p>}
+                <FieldError className="text-xs italic">{attendeeError}</FieldError>
 
                 <Button type="button" variant="outline" onClick={addAttendee} className="w-fit">
                   <Plus />
                   Add attendee
                 </Button>
 
-                <div className="h-28 overflow-y-auto">
-                  {attendees.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                      {attendees.map((currentAttendee) => (
-                        <div
-                          key={currentAttendee.email}
-                          className="flex flex-col gap-3 rounded-lg border bg-muted/30 p-3 sm:flex-row sm:items-center sm:justify-between"
-                        >
-                          <div className="grid flex-1 gap-2 text-sm sm:grid-cols-3">
-                            <div>
-                              <p className="text-xs text-muted-foreground">First name</p>
-                              <p className="font-medium">{currentAttendee.firstName}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground">Last name</p>
-                              <p className="font-medium">{currentAttendee.lastName}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground">Email</p>
-                              <p className="font-medium">{currentAttendee.email}</p>
-                            </div>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            aria-label="Remove attendee"
-                            onClick={() => removeAttendee(currentAttendee.email)}
-                          >
-                            <Trash2 />
-                          </Button>
+                {attendees.length === 0 ? (
+                  <EmptyState
+                    icon={Users}
+                    title="No attendees added yet"
+                    description="Add attendees above to include them in this meeting."
+                    accent="blue"
+                    className="py-4"
+                  />
+                ) : (
+                  <div className="scrollbar-subtle max-h-52 space-y-1.5 overflow-y-auto">
+                    {attendees.map((currentAttendee) => (
+                      <Card
+                        key={currentAttendee.email}
+                        className="flex-row items-center gap-3 bg-muted/50 px-4 py-3 ring-0"
+                      >
+                        <AssigneeAvatar
+                          name={`${currentAttendee.firstName} ${currentAttendee.lastName}`}
+                          className="data-[size=sm]:size-8"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-medium">
+                            {currentAttendee.firstName} {currentAttendee.lastName}
+                          </p>
+                          <p className="truncate text-sm text-muted-foreground">
+                            {currentAttendee.email}
+                          </p>
                         </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          aria-label="Remove attendee"
+                          onClick={() => removeAttendee(currentAttendee.email)}
+                        >
+                          <Trash2 />
+                        </Button>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           <DialogFooter>
-            {meetingError && (
-              <p className="mr-auto text-sm text-destructive">{meetingError}</p>
-            )}
+            {meetingError && <p className="mr-auto text-sm text-destructive">{meetingError}</p>}
 
             {step > 1 && (
               <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
