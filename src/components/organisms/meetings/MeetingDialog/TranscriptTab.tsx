@@ -5,7 +5,8 @@ import { acceptedFileExtensions } from '@organisms/meetings/NewMeetingModal/meet
 import { extractTextFromFile } from '@/lib/utils';
 import { getErrorMessage } from '@/lib/errors';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
-import { Check, Copy, Loader2, Upload } from 'lucide-react';
+import EmptyState from '@molecules/EmptyState/EmptyState';
+import { Check, Copy, FileText, Loader2, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import ReplaceTranscriptAlert from './ReplaceTranscriptAlert';
@@ -107,7 +108,7 @@ const TranscriptTab = ({ meetingId }: { meetingId: string }) => {
       </div>
 
       {content ? (
-        <div className="max-h-[45vh] min-w-0 space-y-2 overflow-y-auto rounded-lg border bg-muted/50 p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap wrap-break-word text-foreground">
+        <div className="scrollbar-subtle max-h-[45vh] min-w-0 space-y-2 overflow-y-auto rounded-lg border bg-muted/50 p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap wrap-break-word text-foreground">
           {content
             .split(/\r?\n/)
             .filter((line) => line.trim().length > 0)
@@ -116,7 +117,12 @@ const TranscriptTab = ({ meetingId }: { meetingId: string }) => {
             ))}
         </div>
       ) : (
-        <p className="py-6 text-center font-semibold">No transcript available</p>
+        <EmptyState
+          icon={FileText}
+          title="No transcript available"
+          description="Upload a transcript to get started."
+          accent="emerald"
+        />
       )}
 
       <ReplaceTranscriptAlert

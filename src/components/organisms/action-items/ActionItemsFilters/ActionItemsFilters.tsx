@@ -41,7 +41,7 @@ const ActionItemsFilters = ({
     <div className="flex flex-wrap items-start gap-4">
       <div className="flex flex-col gap-1.5">
         <span className="text-xs font-medium text-muted-foreground">Search</span>
-        <InputGroup className="px-2 py-5">
+        <InputGroup>
           <InputGroupInput
             placeholder="Search by title, description..."
             value={localSearch}

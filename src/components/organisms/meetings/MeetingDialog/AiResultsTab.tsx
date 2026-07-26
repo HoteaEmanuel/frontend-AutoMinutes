@@ -4,6 +4,8 @@ import { useGenerateAIResults, useGetAIResults } from '@/features/ai-results/hoo
 import { useGetMeeting } from '@/features/meetings/hooks/useMeetings';
 import { useGetTranscript } from '@/features/meetings/hooks/useTranscript';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
+import EmptyState from '@molecules/EmptyState/EmptyState';
+import AiScanningLoader from '@atoms/AiScanningLoader/AiScanningLoader';
 import { cn } from '@/lib/utils';
 import { Loader2, RefreshCw, Sparkles } from 'lucide-react';
 import { useState } from 'react';
@@ -32,6 +34,7 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
 
   const isBusy = isGenerating || meeting?.status === 'PROCESSING';
   const hasTranscript = Boolean(transcript?.content.trim());
+  const aiActionItems = data?.actionItems?.filter((item) => item.aiGenerated) ?? [];
 
   const handleGenerate = () => mutate();
 
@@ -72,18 +75,28 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
             <Sparkles className="relative z-10" />
           )}
           <span className="relative z-10">
-            {data ? 'Regenerate' : isBusy ? 'Generating...' : 'Generate results'}
+            {data ? 'Regenerate' : isBusy ? 'Analyzing...' : 'Generate results'}
           </span>
         </Button>
       </div>
 
       {isBusy && (
-        <p className="py-8 text-center text-sm text-muted-foreground">
-          Generating results… this can take a minute.
-        </p>
+        <div className="flex flex-col items-center gap-2 py-8">
+          <AiScanningLoader />
+          <p className="text-center text-sm text-muted-foreground">
+            Analyzing transcript… this can take a minute.
+          </p>
+        </div>
       )}
 
-      {!isBusy && !data && <p className="py-6 text-center font-semibold">No AI Results found</p>}
+      {!isBusy && !data && (
+        <EmptyState
+          icon={Sparkles}
+          title="No AI results found"
+          description="Generate results to get a summary, decisions, and todos."
+          accent="primary"
+        />
+      )}
 
       {!isBusy && data && (
         <>
@@ -117,15 +130,15 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
             </Section>
           )}
 
-          {!!data.actionItems?.length && (
+          {!!aiActionItems.length && (
             <Section title="Action Items">
               <div className="flex flex-col gap-2">
-                {data.actionItems.map((item) => (
+                {aiActionItems.map((item) => (
                   <div key={item.id} className="flex flex-col gap-1 rounded-lg border p-3">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-sm font-medium">{item.title}</p>
                       <div className="flex shrink-0 items-center gap-2">
-                        {item.aiGenerated && <Badge variant="secondary">AI</Badge>}
+                        <Badge variant="secondary">AI</Badge>
                         <Badge variant="outline">{statusLabels[item.status] ?? item.status}</Badge>
                       </div>
                     </div>

@@ -62,14 +62,11 @@ const TodosTemplate = () => {
 
   return (
     <div className="flex flex-col gap-2 w-full p-2">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-baseline gap-2">
-          <h1 className="text-lg font-bold">Action Items</h1>
-          <p className="text-xs text-muted-foreground">
-            {items.length} item{items.length === 1 ? '' : 's'}{' '}
-            {selectedMeetingTitle ? `in "${selectedMeetingTitle}"` : 'across all meetings'}
-          </p>
-        </div>
+      <div className="flex flex-wrap items-end justify-between gap-2 mb-5">
+        <h1 className="text-lg font-bold">
+          {items.length} todo{items.length === 1 ? '' : 's'}{' '}
+          {selectedMeetingTitle ? `in "${selectedMeetingTitle}"` : 'across all meetings'}
+        </h1>
 
         <div className="flex flex-wrap items-start gap-4">
           <ActionItemsFilters

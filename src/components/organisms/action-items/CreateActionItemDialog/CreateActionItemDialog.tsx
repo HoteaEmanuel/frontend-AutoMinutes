@@ -27,12 +27,18 @@ type MeetingOption = {
 type CreateActionItemFormData = z.infer<typeof createActionItemForm>;
 
 type CreateActionItemDialogProps = {
-  meetings: MeetingOption[];
+  meetings?: MeetingOption[];
+  meetingId?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 };
 
-const CreateActionItemDialog = ({ meetings, open, onOpenChange }: CreateActionItemDialogProps) => {
+const CreateActionItemDialog = ({
+  meetings,
+  meetingId,
+  open,
+  onOpenChange,
+}: CreateActionItemDialogProps) => {
   const {
     register,
     handleSubmit,
@@ -44,7 +50,7 @@ const CreateActionItemDialog = ({ meetings, open, onOpenChange }: CreateActionIt
   } = useForm<CreateActionItemFormData>({
     resolver: zodResolver(createActionItemForm),
     defaultValues: {
-      meetingId: '',
+      meetingId: meetingId ?? '',
       title: '',
       description: '',
       deadline: '',
@@ -91,27 +97,29 @@ const CreateActionItemDialog = ({ meetings, open, onOpenChange }: CreateActionIt
             <DialogTitle>Create action item</DialogTitle>
           </DialogHeader>
 
-          <div className="flex flex-col gap-2">
-            <Label>Meeting *</Label>
-            <Controller
-              control={control}
-              name="meetingId"
-              render={({ field }) => (
-                <FilterCombobox
-                  options={meetings}
-                  selectedValue={field.value || null}
-                  onSelect={(value) => field.onChange(value ?? '')}
-                  placeholder="Select a meeting"
-                  emptyMessage="No meetings found."
-                />
+          {!meetingId && (
+            <div className="flex flex-col gap-2">
+              <Label>Meeting *</Label>
+              <Controller
+                control={control}
+                name="meetingId"
+                render={({ field }) => (
+                  <FilterCombobox
+                    options={meetings ?? []}
+                    selectedValue={field.value || null}
+                    onSelect={(value) => field.onChange(value ?? '')}
+                    placeholder="Select a meeting"
+                    emptyMessage="No meetings found."
+                  />
+                )}
+              />
+              {errors.meetingId && (
+                <p className="text-xs italic text-left text-destructive">
+                  {errors.meetingId.message}
+                </p>
               )}
-            />
-            {errors.meetingId && (
-              <p className="text-xs italic text-left text-destructive">
-                {errors.meetingId.message}
-              </p>
-            )}
-          </div>
+            </div>
+          )}
 
           <FormField
             id="title"

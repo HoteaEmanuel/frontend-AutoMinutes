@@ -3,7 +3,8 @@ import { Card } from '@/components/ui/card';
 import { useAttendees } from '@/features/attendees/hooks/useAttendees';
 import AssigneeAvatar from '@molecules/AssigneeAvatar/AssigneeAvatar';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
-import { Loader2 } from 'lucide-react';
+import EmptyState from '@molecules/EmptyState/EmptyState';
+import { Loader2, Users } from 'lucide-react';
 
 const roleLabels: Record<string, string> = {
   ORGANIZER: 'Organizer',
@@ -16,7 +17,14 @@ const AttendeesTab = ({ meetingId }: { meetingId: string }) => {
   if (isPending) return <Loader2 className="animate-spin" />;
   if (isError) return <ErrorRefetch errorMessage={error.message} refetch={refetch} />;
   if (attendees.length === 0)
-    return <p className="text-center font-semibold">No attendees found</p>;
+    return (
+      <EmptyState
+        icon={Users}
+        title="No attendees found"
+        description="Attendees will show up here once they're added to this meeting."
+        accent="blue"
+      />
+    );
 
   return (
     <div className="scrollbar-subtle max-h-[45vh] space-y-1.5 overflow-y-auto">

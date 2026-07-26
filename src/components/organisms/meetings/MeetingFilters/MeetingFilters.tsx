@@ -22,7 +22,7 @@ const MeetingFilters = () => {
   }, [debouncedSearch]);
 
   return (
-    <div className="w-full flex flex-col md:flex-row md:items-center gap-4 flex-wrap">
+    <div className="w-full flex flex-col md:flex-row md:items-center gap-4 flex-wrap mb-5">
       <div className="flex flex-col gap-4 justify-center min-w-0 w-1/2">
         <Label>Search</Label>
         <InputGroup className="px-2 py-5">
