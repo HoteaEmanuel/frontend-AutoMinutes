@@ -6,16 +6,17 @@ import { useMeetingFilters } from '@/features/meetings/hooks/useMeetingFilters';
 import { meetingsQueryOptions, useMeetings } from '@/features/meetings/hooks/useMeetings';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import { DataTable } from '@organisms/DataTable/DataTable';
+import { DataTableSkeleton } from '@organisms/DataTable/DataTableSkeleton';
 import MeetingFilters from '@organisms/meetings/MeetingFilters/MeetingFilters';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
 import { useEffect } from 'react';
 
 const MeetingsTemplate = () => {
   const queryClient = useQueryClient();
 
   const { filters, setFilters } = useMeetingFilters();
-  const { pageNo, pageSize, scheduledFrom, scheduledTo, search, sortDateOrder, status } = filters;
+  const { pageNo, pageSize, scheduledFrom, scheduledTo, search, sortDateOrder, status, hasTodos } =
+    filters;
 
   const { data, error, refetch, isPending, isError } = useMeetings({
     pageNo,
@@ -25,6 +26,7 @@ const MeetingsTemplate = () => {
     scheduledFrom,
     scheduledTo,
     sortDateOrder,
+    hasTodos,
   });
 
   const totalPages = data ? Math.max(1, Math.ceil(data.totalCount / pageSize)) : undefined;
@@ -58,6 +60,7 @@ const MeetingsTemplate = () => {
         scheduledFrom,
         scheduledTo,
         sortDateOrder,
+        hasTodos,
       }),
     );
   }, [
@@ -69,22 +72,28 @@ const MeetingsTemplate = () => {
     scheduledFrom,
     scheduledTo,
     sortDateOrder,
+    hasTodos,
     queryClient,
   ]);
 
-  if (isPending || exceedesMaxPage || pageNo < 1 || !validStatus || !validSort)
-    return <Loader2 className="animate-spin" />;
   if (isError)
     return (
       <ErrorRefetch errorMessage={error?.message ?? 'Something went wrong'} refetch={refetch} />
     );
+
+  const showSkeleton =
+    isPending || exceedesMaxPage || pageNo < 1 || !validStatus || !validSort;
 
   return (
     <div className="flex flex-col items-center gap-1 w-full p-2">
       <h1 className="text-left text-2xl font-bold mr-auto">Meetings</h1>
 
       <MeetingFilters />
-      <DataTable columns={columns} data={data?.meetings} totalCount={data?.totalCount!} />
+      {showSkeleton ? (
+        <DataTableSkeleton />
+      ) : (
+        <DataTable columns={columns} data={data?.meetings} totalCount={data?.totalCount!} />
+      )}
     </div>
   );
 };

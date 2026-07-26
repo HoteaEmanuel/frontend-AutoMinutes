@@ -28,6 +28,7 @@ export const fetchUserMeetings = async (input: PaginatedMeetingsDto) => {
   const data = await gqlRequest<Pick<Query, 'findUserMeetings'>>(FIND_USER_MEETINGS, {
     input: input,
   });
+  await new Promise((promise) => setTimeout(promise, 500));
   return data.findUserMeetings;
 };
 
@@ -68,24 +69,6 @@ export const fetchUserMeetingOptions = async () => {
   return data.getUserMeetings;
 };
 
-const FIND_ALL_MEETINGS = `
-query FindAll {
-findAll {
-      id
-      title
-      description
-      status
-      scheduledAt
-      createdAt
-      updatedAt
-    }
-  }`;
-
-export const fetchAllMeetings = async () => {
-  const data = await gqlRequest<Pick<Query, 'findAll'>>(FIND_ALL_MEETINGS);
-  return data.findAll;
-};
-
 const CREATE_MEETING = `
 mutation ($createMeetingInput: CreateMeetingDto!) {
   createMeeting(createMeetingInput: $createMeetingInput) {
@@ -103,6 +86,18 @@ export const createMeeting = async (input: CreateMeetingDto) => {
     createMeetingInput: input,
   });
   return data.createMeeting;
+};
+
+const DELETE_MEETING = `
+mutation ($id: String!) {
+  deleteMeeting(id: $id) {
+    id
+  }
+}`;
+
+export const deleteMeeting = async (id: string) => {
+  const data = await gqlRequest<Pick<Mutation, 'deleteMeeting'>>(DELETE_MEETING, { id });
+  return data.deleteMeeting;
 };
 
 const FIND_TRANSCRIPT = `

@@ -1,0 +1,101 @@
+Meeting: Q3 Product Planning — AutoMinutes Team Sync
+Date: 2026-07-24, 10:00 AM
+Location: Conference Room B / Google Meet
+Attendees: Sarah Chen (Product Lead), Bogdan Marinescu (Backend), Hotea (Frontend), Priya Nair (Design), Marcus Feld (QA)
+
+---
+
+Sarah: Alright, everyone's here. Thanks for joining. Let's keep this to forty-five minutes. The main things I want to cover today are the release timeline for the meeting-management module, the transcript upload flow, and how we're handling the AI reprocessing feature. Marcus, you had something on QA too, we'll get to that at the end.
+
+Bogdan: Sounds good. Before we start — quick update from my side. The REST endpoints for meetings and attendees are done and merged. The /process endpoint that sends transcripts to the LLM is working, but it's still synchronous, which is a problem for long transcripts.
+
+Sarah: How long are we talking?
+
+Bogdan: A one-hour meeting transcript can take twelve, fifteen seconds to come back. The request just hangs. If someone uploads a two-hour board meeting, it'll time out.
+
+Priya: From a UX standpoint that's rough. Users will think the app froze.
+
+Hotea: Right. On the frontend I've got the loading spinner and the disabled button state, but a fifteen-second spinner with no feedback feels broken. We should really move to an async job with a status the frontend can poll.
+
+Sarah: Okay. Let's make a decision here. We're moving the AI processing to an asynchronous job model. The frontend polls the processing status — pending, processing, completed, failed — instead of waiting on a single request. Bogdan, can you own that?
+
+Bogdan: Yes. I'll refactor the /process endpoint to kick off a background job and return immediately with a job status of "processing". I'll have that ready for review by next Thursday, July 30th.
+
+Sarah: Great. Hotea, you'll need to update the frontend to poll for status?
+
+Hotea: Yeah. I'll add a polling mechanism on the meeting detail view that checks status every couple of seconds until it's completed or failed. I'll wire it into the existing TanStack Query setup. I can have it done by the 31st, assuming Bogdan's endpoint is ready by Thursday.
+
+Sarah: Perfect. Let's talk transcript upload. Right now it's a plain text paste, correct?
+
+Hotea: Correct. The requirements mention file upload though. Should I prioritize that for this release?
+
+Sarah: Priya, do we have a design for the upload flow?
+
+Priya: Not yet. I have the paste-in state designed but not the file drag-and-drop. I can get you mockups for the file upload flow — drag-and-drop plus a fallback file picker — by Monday the 28th.
+
+Sarah: Let's do this: file upload is in scope for this release, but text paste stays as the primary path. Priya delivers mockups Monday, Hotea implements after. Marcus, flag this for the test plan.
+
+Marcus: Noted. I'll add file-upload test cases — empty file, wrong format, oversized file, and the happy path.
+
+Bogdan: One thing on validation — the backend already rejects empty transcripts and requires a meeting title. But we haven't decided on a max transcript size. If someone pastes a fifty-thousand-line transcript, we could hit the LLM token limit.
+
+Sarah: Good catch. What's a reasonable cap?
+
+Bogdan: I'd suggest we cap it and chunk anything larger before sending to the LLM. But chunking is a bigger piece of work.
+
+Sarah: Let's not do chunking this release. Decision: we set a transcript size limit for now and show a clear error if it's exceeded. Chunking goes on the backlog for Q4. Bogdan, pick a sensible limit and document it.
+
+Bogdan: Will do. I'll settle on a limit and add it to the API docs by end of week.
+
+Sarah: Now, reprocessing. The requirement says users should be able to reprocess a transcript and keep previous results traceable. Where are we?
+
+Bogdan: The backend stores AI results as separate documents, so in theory we can keep a history. But right now reprocessing overwrites the latest result. I haven't built versioning.
+
+Hotea: On the frontend, if reprocessing fails, the spec says we must keep the previous results and not clear existing data. So I need to make sure a failed reprocess doesn't wipe what's on screen.
+
+Sarah: Both good points. Let's split it. For this release: reprocessing works, and a failed reprocess preserves the existing results. Full version history — being able to browse past AI outputs — we push to Q4. Agreed?
+
+Bogdan: Agreed.
+
+Hotea: Works for me. I'll make sure the UI keeps the last successful result if a reprocess returns a failed status.
+
+Priya: Quick note — can we show users when the last processing happened? A "last processed" timestamp would help a lot.
+
+Sarah: Yes, let's add that. Bogdan, does the API already return a processing timestamp?
+
+Bogdan: It returns updatedAt on the AI result. I can expose a dedicated processedAt field to be explicit. Small change.
+
+Sarah: Do it. Hotea, display the "last processed" time on the meeting detail view.
+
+Hotea: Got it.
+
+Marcus: Coming back to QA — I'm blocked on test data. I don't have realistic transcripts to feed the system, so I can't properly test action-item extraction. Can someone get me a set of sample transcripts?
+
+Sarah: Good point. Hotea, you're closest to the AI output shape — can you put together three or four sample transcripts of varying length that we can use as test fixtures?
+
+Hotea: Sure, I can do that. I'll create sample transcripts with clear decisions and action items so we can verify extraction quality. I'll share them with Marcus by Tuesday the 29th.
+
+Marcus: That unblocks me, thanks.
+
+Sarah: Anything else before we wrap?
+
+Priya: One future thing, not for this release — I think a dark mode toggle would be worth doing. The requirements list it as optional but a lot of our users work late.
+
+Sarah: Agreed it's worth doing. Let's park it for Q4 and revisit. Not committing anyone now.
+
+Bogdan: And longer term we should think about Swagger docs being kept up to date automatically. Right now I update them by hand.
+
+Sarah: Noted for the backlog. Okay — let me recap the decisions. We're moving AI processing to async with status polling. File upload is in scope, text paste stays primary. We're capping transcript size instead of chunking this release. Reprocessing preserves previous results on failure, full history is Q4. And we're adding a "last processed" timestamp. Everyone clear on their actions?
+
+Hotea: Clear.
+
+Bogdan: Clear.
+
+Marcus: Clear.
+
+Priya: Yep.
+
+Sarah: Great. Thanks everyone. Next sync same time next week.
+
+---
+Meeting ended: 10:43 AM

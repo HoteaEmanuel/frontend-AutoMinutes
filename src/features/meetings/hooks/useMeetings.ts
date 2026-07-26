@@ -1,13 +1,7 @@
-import {
-  InvalidateQueryFilters,
-  keepPreviousData,
-  QueryClient,
-  useMutation,
-  useQuery,
-} from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createMeeting,
-  fetchAllMeetings,
+  deleteMeeting,
   fetchMeeting,
   fetchUserMeetingOptions,
   fetchUserMeetings,
@@ -22,7 +16,7 @@ export const meetingKeys = {
 };
 
 export const meetingsQueryOptions = (input: PaginatedMeetingsDto) => ({
-  queryKey: [meetingKeys.all, { ...input }],
+  queryKey: [...meetingKeys.all, { ...input }],
   queryFn: () => fetchUserMeetings({ ...input }),
 });
 
@@ -30,12 +24,6 @@ export const useMeetings = (input: PaginatedMeetingsDto) =>
   useQuery({
     ...meetingsQueryOptions(input),
     placeholderData: keepPreviousData,
-  });
-
-export const useGetAllMeetings = () =>
-  useQuery({
-    queryKey: meetingKeys.all,
-    queryFn: fetchAllMeetings,
   });
 
 export const useUserMeetingOptions = () =>
@@ -51,13 +39,27 @@ export const useGetMeeting = (id: string) =>
   });
 
 export const useAddMeeting = () => {
-  const queryClient = new QueryClient();
+  const queryClient = useQueryClient();
   return useMutation({
     mutationKey: meetingKeys.all,
     mutationFn: (input: CreateMeetingDto) => createMeeting(input),
     onSuccess: () => {
       toast.success('Meeting created successfully!');
     },
-    onSettled: () => queryClient.invalidateQueries([meetingKeys.all] as InvalidateQueryFilters),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: meetingKeys.all }),
+  });
+};
+
+export const useDeleteMeeting = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteMeeting(id),
+    onSuccess: () => {
+      toast.success('Meeting deleted successfully!');
+      queryClient.invalidateQueries({ queryKey: meetingKeys.all });
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 };

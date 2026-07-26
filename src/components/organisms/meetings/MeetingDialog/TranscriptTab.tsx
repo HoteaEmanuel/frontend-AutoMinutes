@@ -10,6 +10,7 @@ import { Check, Copy, FileText, Loader2, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import ReplaceTranscriptAlert from './ReplaceTranscriptAlert';
+import TranscriptTabSkeleton from './TranscriptTabSkeleton';
 
 const TranscriptTab = ({ meetingId }: { meetingId: string }) => {
   const { data, isError, isPending, refetch, error } = useGetTranscript(meetingId);
@@ -68,7 +69,7 @@ const TranscriptTab = ({ meetingId }: { meetingId: string }) => {
     setPendingUpload(null);
   };
 
-  if (isPending) return <Loader2 className="animate-spin" />;
+  if (isPending) return <TranscriptTabSkeleton />;
   if (isError) return <ErrorRefetch errorMessage={error.message} refetch={refetch} />;
 
   const content = data?.content.trim() ? data.content : null;

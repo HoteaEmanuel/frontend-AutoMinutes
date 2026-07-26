@@ -4,7 +4,8 @@ import { useAttendees } from '@/features/attendees/hooks/useAttendees';
 import AssigneeAvatar from '@molecules/AssigneeAvatar/AssigneeAvatar';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import EmptyState from '@molecules/EmptyState/EmptyState';
-import { Loader2, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
+import AttendeesTabSkeleton from './AttendeesTabSkeleton';
 
 const roleLabels: Record<string, string> = {
   ORGANIZER: 'Organizer',
@@ -14,7 +15,8 @@ const roleLabels: Record<string, string> = {
 
 const AttendeesTab = ({ meetingId }: { meetingId: string }) => {
   const { data: attendees, isError, isPending, refetch, error } = useAttendees(meetingId);
-  if (isPending) return <Loader2 className="animate-spin" />;
+
+  if (isPending) return <AttendeesTabSkeleton />;
   if (isError) return <ErrorRefetch errorMessage={error.message} refetch={refetch} />;
   if (attendees.length === 0)
     return (
