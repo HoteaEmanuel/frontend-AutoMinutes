@@ -1,4 +1,4 @@
-import { useEffect, useState, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { FileText, Plus, Trash2 } from 'lucide-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -8,8 +8,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useCreateMeeting } from '@/features/meetings/hooks/useMeetings';
-import { getTranscriptText } from '@/lib/utils';
-import { meetingForm } from './meetingForm';
+import { extractTextFromFile } from '@/lib/utils';
+import { acceptedFileExtensions, meetingForm } from './meetingForm';
 
 type NewMeetingFormData = z.infer<typeof meetingForm>;
 
@@ -67,6 +67,7 @@ const getTimeValue = (hour: string, minute: string, period: string) => {
 
 const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
   const currentDateAndTime = getCurrentDateAndTime();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
   const [minDate, setMinDate] = useState(currentDateAndTime.date);
   const [isTimePickerOpen, setIsTimePickerOpen] = useState(false);
@@ -91,12 +92,12 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
       date: currentDateAndTime.date,
       time: currentDateAndTime.time,
       description: '',
+      transcriptFile: undefined,
     },
   });
 
   const time = watch('time');
-  const transcriptFile = watch('transcriptFile');
-  const selectedFile = transcriptFile?.[0];
+  const selectedFile = watch('transcriptFile');
   const selectedTime = getTimeParts(time);
 
   useEffect(() => {
@@ -107,6 +108,7 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
         date: currentDateAndTime.date,
         time: currentDateAndTime.time,
         description: '',
+        transcriptFile: undefined,
       });
       setStep(1);
       setAttendees([]);
@@ -115,6 +117,7 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
       setMeetingError('');
       setMinDate(currentDateAndTime.date);
       setIsTimePickerOpen(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }, [isOpen, reset]);
 
@@ -144,6 +147,11 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
       return;
     }
 
+    if (!attendee.email.includes('@')) {
+      setAttendeeError('Add a valid email address.');
+      return;
+    }
+
     setAttendees((currentAttendees) => [...currentAttendees, attendee]);
     setAttendee({ firstName: '', lastName: '', email: '' });
     setAttendeeError('');
@@ -166,7 +174,7 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
     setMeetingError('');
 
     try {
-      const transcript = await getTranscriptText(selectedFile);
+      const transcript = selectedFile ? await extractTextFromFile(selectedFile) : undefined;
 
       await createMeeting.mutateAsync({
         meeting: {
@@ -345,16 +353,19 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
                 </div>
 
                 <Input
+                  ref={fileInputRef}
                   id="meeting-file"
                   type="file"
-                  accept=".txt,.docx,.pdf"
+                  accept={acceptedFileExtensions.join(',')}
                   className="hidden"
-                  {...register('transcriptFile')}
+                  onChange={(event) =>
+                    setValue('transcriptFile', event.target.files?.[0], { shouldValidate: true })
+                  }
                 />
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => document.getElementById('meeting-file')?.click()}
+                  onClick={() => fileInputRef.current?.click()}
                   className="w-full justify-start"
                 >
                   <FileText />

@@ -16,10 +16,10 @@ const ErrorRefetch = ({ errorMessage, refetch }: ErrorRefetchProps) => {
         refetch();
       }}
       variant={'destructive'}
-      className={'py-8 w-sm mx-auto'}
+      className={'py-10 w-sm mx-auto'}
     >
-      <div className="flex gap-2 items-center">
-        <CircleAlert className="text-red-500 size-7" />
+      <div className="flex flex-col gap-2 items-center">
+        <CircleAlert className="text-red-500 size-5" />
         <div className="flex flex-col items-center justify-center">
           <p className="font-bold">Something went wrong!</p>
           <p className="text-xs">Try again</p>

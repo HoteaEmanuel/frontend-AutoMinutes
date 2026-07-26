@@ -8,16 +8,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { PAGINATION_SIZE_OPTIONS } from '@/constants/pagination';
 
 type PaginationProps<TData> = {
-  onPageSizeChange: (value: number) => void;
   table: Table<TData>;
 };
 
-const PAGINATION_SIZE_OPTIONS = [10, 20, 25, 50];
-
-const Pagination = <TData,>({ onPageSizeChange, table }: PaginationProps<TData>) => {
-  console.log('PAGINATION RENDERED');
+const Pagination = <TData,>({ table }: PaginationProps<TData>) => {
   return (
     <div className="flex items-center justify-end px-2 w-full p-4">
       <div className="flex items-center space-x-6 lg:space-x-8">
@@ -25,9 +22,7 @@ const Pagination = <TData,>({ onPageSizeChange, table }: PaginationProps<TData>)
           <p className="text-xs font-medium">Rows per page</p>
           <Select
             value={`${table.getState().pagination.pageSize}`}
-            onValueChange={(value) => {
-              onPageSizeChange(Number(value));
-            }}
+            onValueChange={(value) => table.setPageSize(Number(value))}
           >
             <SelectTrigger className="h-10 w-[70px]">
               <SelectValue placeholder={table.getState().pagination.pageSize} />
@@ -57,7 +52,9 @@ const Pagination = <TData,>({ onPageSizeChange, table }: PaginationProps<TData>)
             variant="outline"
             size="icon"
             className="hidden size-8 lg:flex"
-            onClick={() => table.setPageIndex(0)}
+            onClick={() => {
+              table.setPageIndex(0);
+            }}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Go to first page</span>
@@ -67,7 +64,9 @@ const Pagination = <TData,>({ onPageSizeChange, table }: PaginationProps<TData>)
             variant="outline"
             size="icon"
             className="size-8"
-            onClick={() => table.previousPage()}
+            onClick={() => {
+              table.previousPage();
+            }}
             disabled={!table.getCanPreviousPage()}
           >
             <span className="sr-only">Go to previous page</span>
@@ -77,7 +76,9 @@ const Pagination = <TData,>({ onPageSizeChange, table }: PaginationProps<TData>)
             variant="outline"
             size="icon"
             className="size-8"
-            onClick={() => table.nextPage()}
+            onClick={() => {
+              table.nextPage();
+            }}
             disabled={!table.getCanNextPage()}
           >
             <span className="sr-only">Go to next page</span>

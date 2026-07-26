@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router';
 import { ThemeContextProvider } from './features/theme/ThemeProvider';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import SignupPage from '@pages/Auth/SignupPage';
 import LoginPage from '@pages/Auth/LoginPage';
 import { Toaster } from 'sonner';
@@ -31,28 +32,30 @@ function App() {
 
   return (
     <ThemeContextProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route element={<RootLayout />}>
-            <Route path="*" element={<PageNotFound />} />
-            <Route path="/" element={<LandingPage />} />
-            <Route element={<UnprotectedRoute />}>
-              <Route path="/auth/signup" element={<SignupPage />} />
-              <Route path="/auth/login" element={<LoginPage />} />
-              <Route path="/auth/oauth" element={<Oauth />} />
+      <TooltipProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route element={<RootLayout />}>
+              <Route path="*" element={<PageNotFound />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route element={<UnprotectedRoute />}>
+                <Route path="/auth/signup" element={<SignupPage />} />
+                <Route path="/auth/login" element={<LoginPage />} />
+                <Route path="/auth/oauth" element={<Oauth />} />
+              </Route>
             </Route>
-          </Route>
 
-          <Route element={<ProtectedRoute />}>
-            <Route element={<AppLayout />}>
-              <Route path="/meetings" element={<MeetingsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/todos" element={<TodosPage />} />
+            <Route element={<ProtectedRoute />}>
+              <Route element={<AppLayout />}>
+                <Route path="/meetings" element={<MeetingsPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/todos" element={<TodosPage />} />
+              </Route>
             </Route>
-          </Route>
-        </Routes>
-      </BrowserRouter>
-      <Toaster />
+          </Routes>
+        </BrowserRouter>
+        <Toaster />
+      </TooltipProvider>
     </ThemeContextProvider>
   );
 }

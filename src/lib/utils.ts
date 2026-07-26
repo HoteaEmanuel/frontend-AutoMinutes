@@ -1,47 +1,59 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-import mammoth from 'mammoth';
+import * as pdfjsLib from "pdfjs-dist"
+import pdfWorkerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url"
+import mammoth from "mammoth"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerUrl
 
-const getFileExtension = (file: File) => file.name.split('.').pop()?.toLowerCase();
+async function extractTextFromPdf(file: File) {
+  const buffer = await file.arrayBuffer()
+  const pdf = await pdfjsLib.getDocument({ data: buffer }).promise
 
-const getPdfText = async (file: File) => {
-  const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
-  const pages: string[] = [];
+  const pageTexts: string[] = []
+  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber++) {
+    const page = await pdf.getPage(pageNumber)
+    const content = await page.getTextContent()
+    const pageText = content.items
+      .map((item: unknown) => {
+        if (typeof item === "object" && item !== null && "str" in item) {
+          return String((item as { str: unknown }).str)
+        }
 
-  for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
-    const page = await pdf.getPage(pageNumber);
-    const content = await page.getTextContent();
-    const text = content.items
-      .map((item) => ('str' in item ? item.str : ''))
-      .join(' ');
-
-    pages.push(text);
+        return ""
+      })
+      .join(" ")
+    pageTexts.push(pageText)
   }
 
-  return pages.join('\n').trim();
-};
+  return pageTexts.join("\n\n").trim()
+}
 
-const getDocxText = async (file: File) => {
-  const result = await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() });
-  return result.value.trim();
-};
+async function extractTextFromDocx(file: File) {
+  const buffer = await file.arrayBuffer()
+  const { value } = await mammoth.extractRawText({ arrayBuffer: buffer })
+  return value.trim()
+}
 
-export const getTranscriptText = async (file?: File) => {
-  if (!file) return undefined;
+async function extractTextFromTxt(file: File) {
+  return (await file.text()).trim()
+}
 
-  const extension = getFileExtension(file);
+export async function extractTextFromFile(file: File) {
+  const extension = file.name.split(".").pop()?.toLowerCase()
 
-  if (extension === 'txt') return file.text();
-  if (extension === 'pdf') return getPdfText(file);
-  if (extension === 'docx') return getDocxText(file);
-
-  return undefined;
-};
+  switch (extension) {
+    case "txt":
+      return extractTextFromTxt(file)
+    case "pdf":
+      return extractTextFromPdf(file)
+    case "docx":
+      return extractTextFromDocx(file)
+    default:
+      throw new Error(`Unsupported file type: .${extension ?? "unknown"}`)
+  }
+}

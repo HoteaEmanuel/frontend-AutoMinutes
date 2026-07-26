@@ -5,7 +5,7 @@ import { useTheme } from '@/features/theme/useTheme';
 import { Moon, Plus, Sun } from 'lucide-react';
 import { Link } from 'react-router';
 import AppNavActions from '@molecules/AppNavActions/AppNavActions';
-import NewMeetingModal from '@organisms/NewMeetingModal/NewMeetingModal';
+import NewMeetingModal from '@organisms/meetings/NewMeetingModal/NewMeetingModal';
 import { ProfileMenu } from '@organisms/ProfileMenu/ProfileMenu';
 
 const AppNavbar = () => {

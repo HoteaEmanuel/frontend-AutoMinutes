@@ -8,3 +8,5 @@ export const SORT_BY_OPTIONS = [
     value: 'Oldest First',
   },
 ];
+
+export const SORTING_AVAILABLE = ['Newest First', 'Oldest First'];

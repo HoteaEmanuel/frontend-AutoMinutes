@@ -92,6 +92,14 @@
   --status-completed-soft: color-mix(in srgb, var(--status-completed) 12%, transparent);
   --status-failed-soft: color-mix(in srgb, var(--status-failed) 12%, transparent);
 
+  --status-open: var(--amber-500);
+  --status-in-progress: var(--blue-500);
+  --status-done: var(--emerald-500);
+
+  --status-open-soft: color-mix(in srgb, var(--status-open) 14%, transparent);
+  --status-in-progress-soft: color-mix(in srgb, var(--status-in-progress) 12%, transparent);
+  --status-done-soft: color-mix(in srgb, var(--status-done) 12%, transparent);
+
   --table-header-bg: var(--neutral-100);
   --table-row-hover: color-mix(in srgb, var(--neutral-200) 50%, transparent);
   --table-row-odd: color-mix(in srgb, var(--neutral-200) 30%, transparent);
@@ -167,6 +175,14 @@
   --status-completed-soft: color-mix(in srgb, var(--status-completed) 20%, transparent);
   --status-failed-soft: color-mix(in srgb, var(--status-failed) 20%, transparent);
 
+  --status-open: #fbbf24;
+  --status-in-progress: #60a5fa;
+  --status-done: #34d399;
+
+  --status-open-soft: color-mix(in srgb, var(--status-open) 22%, transparent);
+  --status-in-progress-soft: color-mix(in srgb, var(--status-in-progress) 20%, transparent);
+  --status-done-soft: color-mix(in srgb, var(--status-done) 20%, transparent);
+
   --table-header-bg: var(--neutral-800);
   --table-row-hover: color-mix(in srgb, var(--neutral-800) 60%, transparent);
   --table-row-odd: color-mix(in srgb, var(--neutral-800) 35%, transparent);
@@ -210,6 +226,14 @@
   --color-status-processing-soft: var(--status-processing-soft);
   --color-status-completed-soft: var(--status-completed-soft);
   --color-status-failed-soft: var(--status-failed-soft);
+
+  --color-status-open: var(--status-open);
+  --color-status-in-progress: var(--status-in-progress);
+  --color-status-done: var(--status-done);
+
+  --color-status-open-soft: var(--status-open-soft);
+  --color-status-in-progress-soft: var(--status-in-progress-soft);
+  --color-status-done-soft: var(--status-done-soft);
 
   --color-table-header-bg: var(--table-header-bg);
   --color-table-row-hover: var(--table-row-hover);
@@ -286,6 +310,120 @@ layer base {
   padding: 0.5rem;
 }
 
+.ai-btn-shine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    transparent,
+    color-mix(in oklch, white 55%, transparent),
+    transparent
+  );
+  transform: skewX(-20deg) translateX(-160%);
+  animation: ai-btn-shine-sweep 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes ai-btn-shine-sweep {
+  0%,
+  100% {
+    transform: skewX(-20deg) translateX(-160%);
+  }
+  50% {
+    transform: skewX(-20deg) translateX(260%);
+  }
+}
+
+.ai-scan-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-scan-mini {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 160px;
+  height: 80px;
+}
+
+.ai-scan-bars {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-scan-bar {
+  height: 8px;
+  border-radius: 10px;
+  background: linear-gradient(
+    to right,
+    var(--primary),
+    color-mix(in oklch, var(--primary) 35%, white),
+    var(--primary)
+  );
+  background-size: 200% 100%;
+  animation: ai-scan-bar-fill ease-in-out 3s infinite alternate-reverse;
+}
+
+.ai-scan-bar-1 {
+  width: 100%;
+}
+
+.ai-scan-bar-2 {
+  width: 82%;
+}
+
+.ai-scan-bar-3 {
+  width: 58%;
+}
+
+.ai-scan-icon {
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  z-index: 2;
+  width: 64px;
+  height: auto;
+  filter: drop-shadow(0 2px 5px rgb(0 0 0 / 0.35));
+  animation: ai-scan-sweep ease-in-out 3s infinite alternate-reverse;
+}
+
+.ai-scan-icon circle {
+  fill: color-mix(in srgb, var(--background) 20%, transparent);
+  stroke: var(--foreground);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.ai-scan-icon line {
+  stroke: var(--foreground);
+}
+
+@keyframes ai-scan-bar-fill {
+  0% {
+    background-position: left;
+  }
+  100% {
+    background-position: right;
+  }
+}
+
+@keyframes ai-scan-sweep {
+  0% {
+    transform: translateY(-50%) translateX(0%) rotate(60deg);
+  }
+  100% {
+    transform: translateY(-50%) translateX(210%) rotate(15deg);
+  }
+}
+
 code,
 .counter {
   font-family: var(--mono);
@@ -310,4 +448,62 @@ button {
 
 button:hover {
   scale: 1.01;
+}
+
+.scrollbar-themed {
+  scrollbar-width: thin;
+  scrollbar-color: var(--neutral-300) transparent;
+}
+
+.scrollbar-themed::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.scrollbar-themed::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-themed::-webkit-scrollbar-thumb {
+  background-color: var(--neutral-300);
+  border-radius: 9999px;
+}
+
+.scrollbar-themed::-webkit-scrollbar-thumb:hover {
+  background-color: var(--neutral-400);
+}
+
+.dark .scrollbar-themed {
+  scrollbar-color: var(--neutral-700) transparent;
+}
+
+.dark .scrollbar-themed::-webkit-scrollbar-thumb {
+  background-color: var(--neutral-700);
+}
+
+.dark .scrollbar-themed::-webkit-scrollbar-thumb:hover {
+  background-color: var(--neutral-600);
+}
+
+.scrollbar-subtle {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklch, var(--foreground) 20%, transparent) transparent;
+}
+
+.scrollbar-subtle::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-subtle::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-subtle::-webkit-scrollbar-thumb {
+  background-color: color-mix(in oklch, var(--foreground) 20%, transparent);
+  border-radius: 9999px;
+}
+
+.scrollbar-subtle::-webkit-scrollbar-thumb:hover {
+  background-color: color-mix(in oklch, var(--foreground) 35%, transparent);
 }
