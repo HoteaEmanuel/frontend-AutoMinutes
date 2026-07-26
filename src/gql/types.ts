@@ -215,9 +215,9 @@ export type PaginatedMeetings = {
 export type PaginatedMeetingsDto = {
   pageNo: Scalars['Float']['input'];
   pageSize: Scalars['Float']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
   scheduledFrom?: InputMaybe<Scalars['DateTime']['input']>;
   scheduledTo?: InputMaybe<Scalars['DateTime']['input']>;
-  search?: InputMaybe<Scalars['String']['input']>;
   sortDateOrder?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<MeetingStatus>;
 };

@@ -1,5 +1,6 @@
 import { gqlRequest } from '@/lib/graphql';
 import {
+  AddAttendeeDto,
   CreateMeetingDto,
   Mutation,
   PaginatedMeetingsDto,
@@ -10,16 +11,16 @@ import {
 const FIND_USER_MEETINGS = `
   query FindUserMeetings($input: PaginatedMeetingsDto!) {
     findUserMeetings(input: $input) {
-    totalCount,
-    meetings {
-      id
-      title
-      description
-      status
-      scheduledAt
-      createdAt
-      updatedAt
-}
+      totalCount
+      meetings {
+        id
+        title
+        description
+        status
+        scheduledAt
+        createdAt
+        updatedAt
+      }
     }
   }
 `;
@@ -32,19 +33,19 @@ export const fetchUserMeetings = async (input: PaginatedMeetingsDto) => {
 };
 
 const FIND_MEETING_BY_ID = `
-  query FindMeetingById($findMeetingId: String!){
-  findMeeting(id: $findMeetingId) {
-    id
-    title
-    status
-    scheduledAt
-    createdAt
-    description
-    actionItems {
+  query FindMeetingById($findMeetingId: String!) {
+    findMeeting(id: $findMeetingId) {
       id
+      title
+      status
+      scheduledAt
+      createdAt
+      description
+      actionItems {
+        id
+      }
     }
   }
-}
 `;
 
 export const fetchMeeting = async (input: string) => {
@@ -69,8 +70,8 @@ export const fetchUserMeetingOptions = async () => {
 };
 
 const FIND_ALL_MEETINGS = `
-query FindAll {
-findAll {
+  query FindAll {
+    findAll {
       id
       title
       description
@@ -79,7 +80,8 @@ findAll {
       createdAt
       updatedAt
     }
-  }`;
+  }
+`;
 
 export const fetchAllMeetings = async () => {
   const data = await gqlRequest<Pick<Query, 'findAll'>>(FIND_ALL_MEETINGS);
@@ -87,16 +89,18 @@ export const fetchAllMeetings = async () => {
 };
 
 const CREATE_MEETING = `
-mutation ($createMeetingInput: CreateMeetingDto!) {
-  createMeeting(createMeetingInput: $createMeetingInput) {
-    id
-    title
-    description
-    status
-    createdAt
-    updatedAt
+  mutation CreateMeeting($createMeetingInput: CreateMeetingDto!) {
+    createMeeting(createMeetingInput: $createMeetingInput) {
+      id
+      title
+      description
+      status
+      scheduledAt
+      createdAt
+      updatedAt
+    }
   }
-}`;
+`;
 
 export const createMeeting = async (input: CreateMeetingDto) => {
   const data = await gqlRequest<Pick<Mutation, 'createMeeting'>>(CREATE_MEETING, {
@@ -105,12 +109,31 @@ export const createMeeting = async (input: CreateMeetingDto) => {
   return data.createMeeting;
 };
 
-const FIND_TRANSCRIPT = `
-query ($meetingId: String!) {
-  getTranscript(meetingId: $meetingId) {
-    content
+const ADD_ATTENDEE = `
+  mutation AddAttendee($addAttendeeDto: addAttendeeDto!) {
+    addAttendee(addAttendeeDto: $addAttendeeDto) {
+      id
+      name
+      email
+      meetingId
+      role
+    }
   }
-}
+`;
+
+export const addAttendee = async (input: AddAttendeeDto) => {
+  const data = await gqlRequest<Pick<Mutation, 'addAttendee'>>(ADD_ATTENDEE, {
+    addAttendeeDto: input,
+  });
+  return data.addAttendee;
+};
+
+const FIND_TRANSCRIPT = `
+  query FindTranscript($meetingId: String!) {
+    getTranscript(meetingId: $meetingId) {
+      content
+    }
+  }
 `;
 
 export const findTranscript = async (meetingId: string) => {
@@ -122,12 +145,12 @@ export const findTranscript = async (meetingId: string) => {
 };
 
 const UPLOAD_TRANSCRIPT = `
-mutation UploadTranscript($uploadTranscriptDto: UploadTranscriptDto!) {
-  uploadTranscript(uploadTranscriptDto: $uploadTranscriptDto) {
-    id
-    content
+  mutation UploadTranscript($uploadTranscriptDto: UploadTranscriptDto!) {
+    uploadTranscript(uploadTranscriptDto: $uploadTranscriptDto) {
+      id
+      content
+    }
   }
-}
 `;
 
 export const uploadTranscript = async (input: UploadTranscriptDto) => {

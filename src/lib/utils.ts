@@ -33,7 +33,7 @@ async function extractTextFromPdf(file: File) {
   return pageTexts.join("\n\n").trim()
 }
 
-async function extractTextFromDocx(file: File){
+async function extractTextFromDocx(file: File) {
   const buffer = await file.arrayBuffer()
   const { value } = await mammoth.extractRawText({ arrayBuffer: buffer })
   return value.trim()
