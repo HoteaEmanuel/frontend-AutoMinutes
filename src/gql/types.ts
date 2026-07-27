@@ -135,6 +135,7 @@ export type Mutation = {
   generateAIResults: AiResults;
   setPassword: Scalars['Boolean']['output'];
   updateActionItem: ActionItem;
+  updateAttendee: Attendee;
   updateProfile: User;
   uploadTranscript: Transcript;
 };
@@ -192,6 +193,11 @@ export type MutationSetPasswordArgs = {
 
 export type MutationUpdateActionItemArgs = {
   updateActionItemDto: UpdateActionItemDto;
+};
+
+
+export type MutationUpdateAttendeeArgs = {
+  updateAttendeeDto: UpdateAttendeeDto;
 };
 
 
@@ -340,4 +346,11 @@ export type AiResultsDto = {
 
 export type DeleteAttendeeDto = {
   attendeeId: Scalars['String']['input'];
+};
+
+export type UpdateAttendeeDto = {
+  attendeeId: Scalars['String']['input'];
+  email?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<AttendeeRole>;
 };
