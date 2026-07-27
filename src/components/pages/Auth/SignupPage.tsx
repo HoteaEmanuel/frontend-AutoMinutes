@@ -5,10 +5,9 @@ import { Button } from '@/components/ui/button';
 import FormField from '@/components/molecules/FormField/FormField';
 import Divider from '@molecules/Divider/Divider';
 import GoogleButton from '@molecules/GoogleButton/GoogleButton';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import z from 'zod';
 import { useSignUp } from '@/features/auth/hooks/useSignUp';
-import { useAuthStore } from '@/features/auth/stores/auth.store';
 import { Card } from '@/components/ui/card';
 import { getErrorMessage } from '@/lib/errors';
 
@@ -23,20 +22,17 @@ const SignupPage = () => {
   });
 
   const { mutateAsync: signUp, isPending, error } = useSignUp();
-  const user = useAuthStore((auth) => auth.user);
-  const navigate = useNavigate();
 
   const onSubmit = async (data: z.infer<typeof signupSchema>) => {
-    await signUp({
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      password: data.password,
-    });
-
-    console.log('USER: ', user);
-    reset();
-    navigate('/meetings');
+    try {
+      await signUp({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        password: data.password,
+      });
+      reset();
+    } catch {}
   };
 
   return (

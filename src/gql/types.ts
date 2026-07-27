@@ -43,6 +43,7 @@ export type ActionItemStatus =
 export type ActionItemsFilterDto = {
   assigneeId?: InputMaybe<Scalars['String']['input']>;
   meetingId?: InputMaybe<Scalars['String']['input']>;
+  onlyMine?: InputMaybe<Scalars['Boolean']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -272,6 +273,7 @@ export type QueryGetAiResultsArgs = {
 
 export type QueryGetActionItemsArgs = {
   meetingId: Scalars['String']['input'];
+  onlyMine?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 

@@ -3,6 +3,9 @@ import { ThemeContextProvider } from './features/theme/ThemeProvider';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import SignupPage from '@pages/Auth/SignupPage';
 import LoginPage from '@pages/Auth/LoginPage';
+import VerifyEmailPage from '@pages/Auth/VerifyEmailPage';
+import ForgotPasswordPage from '@pages/Auth/ForgotPasswordPage';
+import ResetPasswordPage from '@pages/Auth/ResetPasswordPage';
 import { Toaster } from 'sonner';
 import Oauth from '@pages/Oauth/Oauth';
 import ProtectedRoute from '@pages/Protected/ProtectedRoute';
@@ -41,6 +44,9 @@ function App() {
               <Route element={<UnprotectedRoute />}>
                 <Route path="/auth/signup" element={<SignupPage />} />
                 <Route path="/auth/login" element={<LoginPage />} />
+                <Route path="/auth/verify-email" element={<VerifyEmailPage />} />
+                <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+                <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
                 <Route path="/auth/oauth" element={<Oauth />} />
               </Route>
             </Route>

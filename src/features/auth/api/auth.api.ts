@@ -19,3 +19,15 @@ export const googleAuth = () => {
 export const refresh = () => api.post('/auth/refresh');
 
 export const logout = () => api.post('/auth/logout');
+
+export const verifyEmail = async (dto: { email: string; code: string }) =>
+  api.post('/auth/verify-email', dto).then((data) => data);
+
+export const resendVerification = async (dto: { email: string }) =>
+  api.post('/auth/resend-verification', dto).then((data) => data);
+
+export const forgotPassword = async (dto: { email: string }) =>
+  api.post('/auth/forgot-password', dto).then((data) => data);
+
+export const resetPassword = async (dto: { token: string; newPassword: string }) =>
+  api.post('/auth/reset-password', dto).then((data) => data);
