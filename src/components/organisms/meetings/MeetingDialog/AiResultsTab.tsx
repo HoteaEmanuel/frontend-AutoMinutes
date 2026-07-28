@@ -79,8 +79,8 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
           disabled={isBusy || !hasTranscript}
           onClick={data ? () => setConfirmOpen(true) : handleGenerate}
           className={cn(
-            'relative isolate overflow-hidden rounded-full border-2 border-(--primary-hover) shadow-[0_4px_0_0_var(--primary-active)] transition-none!',
-            'active:translate-y-1! active:border-(--primary-active)! active:shadow-none!',
+            'ai-btn-hover-sweep relative isolate overflow-hidden rounded-full border-2 border-[var(--primary-hover)] shadow-[0_4px_0_0_var(--primary-active)] transition-none!',
+            'active:translate-y-1! active:border-[var(--primary-active)]! active:shadow-none!',
             isBusy && 'disabled:opacity-100!',
           )}
         >

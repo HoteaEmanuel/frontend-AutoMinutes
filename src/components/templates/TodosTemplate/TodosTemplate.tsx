@@ -16,13 +16,15 @@ const TodosTemplate = () => {
   const [selectedAssigneeId, setSelectedAssigneeId] = useState<string | null>(null);
   const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [onlyMine, setOnlyMine] = useState(false);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const meetingsQuery = useUserMeetingOptions();
   const assigneesQuery = useUserActionItemAssignees();
   const itemsQuery = useUserActionItems({
     meetingId: selectedMeetingId ?? undefined,
-    assigneeId: selectedAssigneeId ?? undefined,
+    assigneeId: onlyMine ? undefined : selectedAssigneeId ?? undefined,
     search: search || undefined,
+    onlyMine: onlyMine || undefined,
   });
 
   const meetings = useMemo(
@@ -84,7 +86,7 @@ const TodosTemplate = () => {
           {selectedMeetingTitle ? `in "${selectedMeetingTitle}"` : 'across all meetings'}
         </h1>
 
-        <div className="flex flex-wrap items-start gap-4">
+        <div className="flex flex-wrap items-start gap-6">
           <ActionItemsFilters
             assignees={assignees}
             selectedAssigneeId={selectedAssigneeId}
@@ -94,6 +96,8 @@ const TodosTemplate = () => {
             onSelectMeeting={setSelectedMeetingId}
             search={search}
             onSearchChange={setSearch}
+            onlyMine={onlyMine}
+            onToggleOnlyMine={setOnlyMine}
           />
 
           <Button type="button" onClick={() => setIsCreateOpen(true)} className="self-end">

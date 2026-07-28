@@ -265,6 +265,25 @@
   color: var(--foreground);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(2rem);
+    transition:
+      opacity 0.6s ease-out,
+      transform 0.6s ease-out;
+  }
+
+  .reveal.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 body {
   margin: 0;
   background: var(--background);
@@ -336,6 +355,25 @@ layer base {
   50% {
     transform: skewX(-20deg) translateX(260%);
   }
+}
+
+.ai-btn-hover-sweep::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  z-index: 0;
+  width: 40%;
+  height: 160%;
+  background: color-mix(in oklch, white 45%, transparent);
+  transform: skewX(-20deg) translate(-220%, -50%);
+  transition: transform 0.5s ease;
+  pointer-events: none;
+}
+
+.ai-btn-hover-sweep:hover::before {
+  transform: skewX(-20deg) translate(320%, -50%);
+  transition-delay: 0.1s;
 }
 
 .ai-scan-loader {

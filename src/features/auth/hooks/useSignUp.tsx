@@ -1,14 +1,17 @@
 import { useMutation } from '@tanstack/react-query';
 import { signup } from '../api/auth.api';
-import { useAuthStore } from '../stores/auth.store';
 import { toast } from 'sonner';
+import { useNavigate } from 'react-router';
+
 export const useSignUp = () => {
-  const setSession = useAuthStore((auth) => auth.setSession);
+  const navigate = useNavigate();
   return useMutation({
     mutationFn: signup,
     onSuccess: ({ data }) => {
-      setSession({ accessToken: data.accessToken, user: data.user });
-      toast.success('Sign up successfully');
+      toast.success('Account created - check your email for the code');
+      navigate(`/auth/verify-email?email=${encodeURIComponent(data.email)}&sent=1`, {
+        replace: true,
+      });
     },
   });
 };

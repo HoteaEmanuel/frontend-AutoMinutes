@@ -57,6 +57,11 @@ const LoginPage = () => {
             error={errors.password?.message}
             hasError={!!errors.email?.message || !!error}
           />
+          <div className="flex justify-end -mt-2">
+            <Link to="/auth/forgot-password" className="text-xxs underline text-muted-foreground">
+              Forgot password
+            </Link>
+          </div>
           <Button type="submit" disabled={isPending}>
             {isPending ? 'Loggin...' : 'Log In'}
           </Button>

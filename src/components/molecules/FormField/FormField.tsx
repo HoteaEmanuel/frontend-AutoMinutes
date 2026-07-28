@@ -58,7 +58,9 @@ const FormField = ({
             type={type === 'password' && showPassword ? 'text' : type}
             placeholder={placeholder}
             aria-invalid={hasError}
-            className={hasError ? 'border-destructive focus-visible:ring-destructive' : undefined}
+            className={`${type === 'password' ? 'pr-8' : ''} ${
+              hasError ? 'border-destructive focus-visible:ring-destructive' : ''
+            }`}
             hidden={hidden}
             {...register(id)}
           />
@@ -68,8 +70,9 @@ const FormField = ({
           <Button
             type="button"
             variant={'ghost'}
+            size={'icon-xs'}
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 active:-translate-y-1/2!"
+            className="absolute right-1 top-1/2 -translate-y-1/2 active:-translate-y-1/2!"
           >
             {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
           </Button>

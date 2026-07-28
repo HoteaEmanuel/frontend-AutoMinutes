@@ -1,13 +1,20 @@
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
-import { Link } from 'react-router';
+import { cn } from '@/lib/utils';
+import { Link, useLocation } from 'react-router';
 
 const AuthNavBar = () => {
   const user = useAuthStore((s) => s.user);
+  const { pathname } = useLocation();
+  const isLandingPage = pathname === '/';
+
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur">
-      <nav className="w-screen flex items-center justify-between h-10 mt-2 max-w-3/4 mx-auto p-4 bg-transparent">
-        <Link className="text-2xl font-bold text-gray-500" to={user ? '/meetings' : '/'}>
+      <nav className="w-full flex items-center justify-between h-10 mt-2 max-w-3/4 mx-auto p-4 bg-transparent">
+        <Link
+          className={cn('text-2xl font-bold', isLandingPage ? 'text-white/80' : 'text-foreground')}
+          to={user ? '/meetings' : '/'}
+        >
           AutoMinutes
         </Link>
         <div className="flex items-center gap-2">

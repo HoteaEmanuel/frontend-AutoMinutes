@@ -27,7 +27,11 @@ api.interceptors.response.use(
     const isAuthCall =
       original?.url?.includes('/auth/refresh') ||
       original?.url?.includes('/auth/login') ||
-      original?.url?.includes('/auth/signup');
+      original?.url?.includes('/auth/signup') ||
+      original?.url?.includes('/auth/verify-email') ||
+      original?.url?.includes('/auth/resend-verification') ||
+      original?.url?.includes('/auth/forgot-password') ||
+      original?.url?.includes('/auth/reset-password');
 
     if (error.response?.status === 401 && original && !original._retry && !isAuthCall) {
       original._retry = true;
