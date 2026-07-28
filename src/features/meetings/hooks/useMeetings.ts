@@ -6,8 +6,20 @@ import {
   fetchUserMeetingOptions,
   fetchUserMeetings,
 } from '../api';
+import { addAttendee } from '@/features/attendees/api';
 import { CreateMeetingDto, PaginatedMeetingsDto } from '@/gql/types';
 import { toast } from 'sonner';
+
+type NewMeetingAttendee = {
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
+type CreateNewMeetingInput = {
+  meeting: CreateMeetingDto;
+  attendees: NewMeetingAttendee[];
+};
 
 export const meetingKeys = {
   all: ['meetings'] as const,

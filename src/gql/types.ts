@@ -135,6 +135,7 @@ export type Mutation = {
   generateAIResults: AiResults;
   setPassword: Scalars['Boolean']['output'];
   updateActionItem: ActionItem;
+  updateAttendee: Attendee;
   updateProfile: User;
   uploadTranscript: Transcript;
 };
@@ -195,6 +196,11 @@ export type MutationUpdateActionItemArgs = {
 };
 
 
+export type MutationUpdateAttendeeArgs = {
+  updateAttendeeDto: UpdateAttendeeDto;
+};
+
+
 export type MutationUpdateProfileArgs = {
   input: UpdateProfileInput;
 };
@@ -216,9 +222,9 @@ export type PaginatedMeetingsDto = {
   hasTodos?: InputMaybe<Scalars['Boolean']['input']>;
   pageNo: Scalars['Float']['input'];
   pageSize: Scalars['Float']['input'];
+  search?: InputMaybe<Scalars['String']['input']>;
   scheduledFrom?: InputMaybe<Scalars['DateTime']['input']>;
   scheduledTo?: InputMaybe<Scalars['DateTime']['input']>;
-  search?: InputMaybe<Scalars['String']['input']>;
   sortDateOrder?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<MeetingStatus>;
 };
@@ -340,4 +346,11 @@ export type AiResultsDto = {
 
 export type DeleteAttendeeDto = {
   attendeeId: Scalars['String']['input'];
+};
+
+export type UpdateAttendeeDto = {
+  attendeeId: Scalars['String']['input'];
+  email?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<AttendeeRole>;
 };

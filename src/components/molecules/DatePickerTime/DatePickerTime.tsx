@@ -15,20 +15,31 @@ type DatePickerTimeProps = {
   time: string | undefined;
   setDate: (date: Date | undefined) => void;
   setTime: (time: string | undefined) => void;
+  id?: string;
+  disabled?: React.ComponentProps<typeof Calendar>['disabled'];
 };
-export function DatePickerTime({ date, time, setDate, setTime }: DatePickerTimeProps) {
+export function DatePickerTime({
+  date,
+  time,
+  setDate,
+  setTime,
+  id = 'date-picker',
+  disabled,
+}: DatePickerTimeProps) {
   const [open, setOpen] = React.useState(false);
+  const dateFieldId = `${id}-date`;
+  const timeFieldId = `${id}-time`;
 
   return (
     <FieldGroup className="flex-row">
       <Field>
-        <FieldLabel htmlFor="date-picker-optional">Date</FieldLabel>
+        <FieldLabel htmlFor={dateFieldId}>Date</FieldLabel>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger
             render={
               <Button
                 variant="outline"
-                id="date-picker-optional"
+                id={dateFieldId}
                 className="w-32 justify-between font-normal"
               >
                 {date ? format(date, 'PPP') : 'Select date'}
@@ -42,6 +53,7 @@ export function DatePickerTime({ date, time, setDate, setTime }: DatePickerTimeP
               selected={date}
               captionLayout="dropdown"
               defaultMonth={date}
+              disabled={disabled}
               onSelect={(selected) => {
                 setDate(selected);
                 if (!selected) setTime(undefined);
@@ -52,10 +64,10 @@ export function DatePickerTime({ date, time, setDate, setTime }: DatePickerTimeP
         </Popover>
       </Field>
       <Field className="w-32">
-        <FieldLabel htmlFor="time-picker-optional">Time</FieldLabel>
+        <FieldLabel htmlFor={timeFieldId}>Time</FieldLabel>
         <Input
           type="time"
-          id="time-picker-optional"
+          id={timeFieldId}
           disabled={!date}
           value={time ?? ''}
           onChange={(e) => setTime(e.target.value || undefined)}
