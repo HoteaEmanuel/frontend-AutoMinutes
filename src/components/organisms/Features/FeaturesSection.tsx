@@ -54,7 +54,10 @@ const FeaturesSection = () => {
 
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature) => (
-            <Card key={feature.title} className="text-left">
+            <Card
+              key={feature.title}
+              className="bg-linear-to-br from-card to-primary/5 text-left transition-colors hover:ring-primary/40"
+            >
               <CardHeader>
                 <feature.icon className="size-6 text-primary" />
                 <CardTitle className="text-lg">{feature.title}</CardTitle>
