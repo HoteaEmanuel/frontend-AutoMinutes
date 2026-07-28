@@ -8,6 +8,8 @@ import AssigneeAvatar from '@molecules/AssigneeAvatar/AssigneeAvatar';
 import AttendeeActionsMenu from '@molecules/AttendeeActionsMenu/AttendeeActionsMenu';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import EmptyState from '@molecules/EmptyState/EmptyState';
+import { Users } from 'lucide-react';
+import AttendeesTabSkeleton from './AttendeesTabSkeleton';
 import { Loader2, Plus, Users } from 'lucide-react';
 import AddAttendeeDialog from './AddAttendeeDialog';
 import AttendeeDeleteAlert from './AttendeeDeleteAlert';
@@ -21,9 +23,18 @@ const roleLabels: Record<string, string> = {
 
 const AttendeesTab = ({ meetingId }: { meetingId: string }) => {
   const { data: attendees, isError, isPending, refetch, error } = useAttendees(meetingId);
-  const [isAddOpen, setIsAddOpen] = useState(false);
-  const [editingAttendee, setEditingAttendee] = useState<Attendee | null>(null);
-  const [deletingAttendee, setDeletingAttendee] = useState<Attendee | null>(null);
+
+  if (isPending) return <AttendeesTabSkeleton />;
+  if (isError) return <ErrorRefetch errorMessage={error.message} refetch={refetch} />;
+  if (attendees.length === 0)
+    return (
+      <EmptyState
+        icon={Users}
+        title="No attendees found"
+        description="Attendees will show up here once they're added to this meeting."
+        accent="blue"
+      />
+    );
 
   return (
     <div className="flex flex-col gap-3">

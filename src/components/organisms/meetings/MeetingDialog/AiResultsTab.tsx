@@ -7,8 +7,10 @@ import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import EmptyState from '@molecules/EmptyState/EmptyState';
 import AiScanningLoader from '@atoms/AiScanningLoader/AiScanningLoader';
 import { cn } from '@/lib/utils';
-import { Loader2, RefreshCw, Sparkles } from 'lucide-react';
-import { useState } from 'react';
+import { Check, Copy, Loader2, RefreshCw, Sparkles } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import AiResultsTabSkeleton from './AiResultsTabSkeleton';
 import RegenerateAIResultsAlert from './RegenerateAIResultsAlert';
 
 const statusLabels: Record<string, string> = {
@@ -31,6 +33,10 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
   const { data: transcript } = useGetTranscript(meetingId);
   const { mutate, isPending: isGenerating } = useGenerateAIResults(meetingId);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [summaryCopied, setSummaryCopied] = useState(false);
+  const summaryCopyTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => () => clearTimeout(summaryCopyTimeout.current), []);
 
   const isBusy = isGenerating || meeting?.status === 'PROCESSING';
   const hasTranscript = Boolean(transcript?.content.trim());
@@ -43,7 +49,19 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
     mutate();
   };
 
-  if (isPending) return <Loader2 className="animate-spin" />;
+  const handleCopySummary = async () => {
+    if (!data?.summary) return;
+    try {
+      await navigator.clipboard.writeText(data.summary);
+      clearTimeout(summaryCopyTimeout.current);
+      setSummaryCopied(true);
+      summaryCopyTimeout.current = setTimeout(() => setSummaryCopied(false), 2000);
+    } catch {
+      toast.error('Could not copy summary');
+    }
+  };
+
+  if (isPending) return <AiResultsTabSkeleton />;
   if (isError) return <ErrorRefetch errorMessage={error.message} refetch={refetch} />;
 
   return (
@@ -99,9 +117,20 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
       )}
 
       {!isBusy && data && (
-        <>
+        <div className="scrollbar-subtle flex max-h-[calc(55vh-7rem)] flex-col gap-5 overflow-y-auto pr-1">
           <Section title="Summary">
-            <p className="text-sm">{data.summary}</p>
+            <div className="flex items-start justify-between gap-2">
+              <p className="text-sm">{data.summary}</p>
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Copy summary"
+                className="shrink-0"
+                onClick={handleCopySummary}
+              >
+                {summaryCopied ? <Check /> : <Copy />}
+              </Button>
+            </div>
           </Section>
 
           {!!data.decisions?.length && (
@@ -157,7 +186,7 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
               </div>
             </Section>
           )}
-        </>
+        </div>
       )}
 
       <RegenerateAIResultsAlert

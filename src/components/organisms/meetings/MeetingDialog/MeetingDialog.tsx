@@ -1,14 +1,17 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { useGetMeeting } from '@/features/meetings/hooks/useMeetings';
 import MeetingStatusBadge from '@molecules/MeetingStatusBadge/MeetingStatusBadge';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import OverviewTab from './OverviewTab';
 import TranscriptTab from './TranscriptTab';
 import AttendeesTab from './AttendeesTab';
 import AiResultsTab from './AiResultsTab';
 import TodosTab from './TodosTab';
+import MeetingDeleteAlert from './MeetingDeleteAlert';
 
 type MeetingDialogProps = {
   open: boolean;
@@ -26,6 +29,7 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 
 const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) => {
   const { data, error, isPending, isError, refetch } = useGetMeeting(meetingId);
+  const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -44,12 +48,28 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
 
         {data && (
           <>
+            <MeetingDeleteAlert
+              meetingId={meetingId}
+              meetingTitle={data.title}
+              open={deleteAlertOpen}
+              onOpenChange={setDeleteAlertOpen}
+              onDeleted={onOpenChange}
+            />
+
             <DialogHeader className="gap-3 border-b border-border/50 p-4 sm:p-6">
               <div className="flex flex-col gap-3 pr-10 sm:flex-row sm:items-center">
                 <MeetingStatusBadge status={data.status} />
                 <span className="text-sm text-muted-foreground">
                   {dateFormatter.format(new Date(data.scheduledAt))}
                 </span>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => setDeleteAlertOpen(true)}
+                >
+                  <Trash2 />
+                  Delete meeting
+                </Button>
               </div>
 
               <DialogTitle className="text-2xl font-bold">{data.title}</DialogTitle>

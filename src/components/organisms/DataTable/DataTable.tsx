@@ -15,8 +15,10 @@ import {
 } from '@/components/ui/table';
 import Pagination from '@organisms/PaginationSection/Pagination';
 import { useState } from 'react';
+import { CalendarSearch } from 'lucide-react';
 import { Meeting } from '@/gql/types';
 import MeetingDialog from '@organisms/meetings/MeetingDialog/MeetingDialog';
+import EmptyState from '@molecules/EmptyState/EmptyState';
 import { useMeetingFilters } from '@/features/meetings/hooks/useMeetingFilters';
 
 type DataTableProps = {
@@ -88,12 +90,14 @@ export function DataTable({ data, columns, totalCount }: DataTableProps) {
               </TableRow>
             ))
           ) : (
-            <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center text-muted-foreground"
-              >
-                No results.
+            <TableRow className="hover:bg-transparent">
+              <TableCell colSpan={columns.length} className="h-64">
+                <EmptyState
+                  icon={CalendarSearch}
+                  title="No meetings found"
+                  description="Try adjusting your filters or create a new meeting."
+                  accent="blue"
+                />
               </TableCell>
             </TableRow>
           )}

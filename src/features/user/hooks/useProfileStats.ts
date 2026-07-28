@@ -8,7 +8,7 @@ export type ProfileStats = {
   completed: number;
 };
 
-const fetchProfileStats = async (): Promise<ProfileStats> => {
+const fetchProfileStats = async () => {
   const [meetings, actionItems] = await Promise.all([
     fetchUserMeetings({ pageNo: 1, pageSize: 1 }),
     fetchUserActionItems({}),

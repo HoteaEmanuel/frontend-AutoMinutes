@@ -1,3 +1,4 @@
+import { Checkbox } from '@/components/ui/checkbox';
 import { InputGroup, InputGroupInput, InputGroupAddon } from '@/components/ui/input-group';
 import { Label } from '@/components/ui/label';
 import { SORT_BY_OPTIONS } from '@/constants/sort';
@@ -62,6 +63,14 @@ const MeetingFilters = () => {
           items={SORT_BY_OPTIONS}
           label="Sort"
           value={filters.sortDateOrder as string}
+        />
+      </div>
+      <div className="flex flex-col gap-4 justify-center">
+        <Label>Has todos
+        </Label>
+        <Checkbox
+          checked={filters.hasTodos ?? false}
+          onCheckedChange={(checked) => setFilters({ hasTodos: checked ? true : undefined })}
         />
       </div>
     </div>

@@ -220,6 +220,7 @@ export type PaginatedMeetings = {
 };
 
 export type PaginatedMeetingsDto = {
+  hasTodos?: InputMaybe<Scalars['Boolean']['input']>;
   pageNo: Scalars['Float']['input'];
   pageSize: Scalars['Float']['input'];
   search?: InputMaybe<Scalars['String']['input']>;
@@ -235,7 +236,6 @@ export type Provider =
 
 export type Query = {
   __typename?: 'Query';
-  findAll: Array<Meeting>;
   findById: Attendee;
   findMeeting: Meeting;
   findUserMeetings: PaginatedMeetings;
