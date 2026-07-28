@@ -63,25 +63,6 @@ export const fetchUserMeetingOptions = async () => {
   return data.getUserMeetings;
 };
 
-const FIND_ALL_MEETINGS = `
-  query FindAll {
-    findAll {
-      id
-      title
-      description
-      status
-      scheduledAt
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-export const fetchAllMeetings = async () => {
-  const data = await gqlRequest<Pick<Query, 'findAll'>>(FIND_ALL_MEETINGS);
-  return data.findAll;
-};
-
 const CREATE_MEETING = `
   mutation CreateMeeting($createMeetingInput: CreateMeetingDto!) {
     createMeeting(createMeetingInput: $createMeetingInput) {

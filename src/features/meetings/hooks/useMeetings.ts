@@ -62,6 +62,35 @@ export const useAddMeeting = () => {
   });
 };
 
+export const useCreateMeeting = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ meeting, attendees }: CreateNewMeetingInput) => {
+      const newMeeting = await createMeeting(meeting);
+
+      await Promise.all(
+        attendees.map((attendee) =>
+          addAttendee({
+            meetingId: newMeeting.id,
+            name: `${attendee.firstName} ${attendee.lastName}`.trim(),
+            email: attendee.email,
+            role: 'PARTICIPANT',
+            aiGenerated: false,
+          }),
+        ),
+      );
+
+      return newMeeting;
+    },
+    onSuccess: () => {
+      toast.success('Meeting created successfully!');
+      queryClient.invalidateQueries({ queryKey: meetingKeys.all });
+      queryClient.invalidateQueries({ queryKey: meetingKeys.options });
+    },
+  });
+};
+
 export const useDeleteMeeting = () => {
   const queryClient = useQueryClient();
   return useMutation({
