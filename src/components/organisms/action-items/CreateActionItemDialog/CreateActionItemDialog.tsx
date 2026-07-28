@@ -12,11 +12,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { FieldGroup } from '@/components/ui/field';
 import FormField from '@molecules/FormField/FormField';
 import FilterCombobox from '@molecules/FilterCombobox/FilterCombobox';
 import DatePicker from '@molecules/DatePicker/DatePicker';
 import { useAttendees } from '@/features/attendees/hooks/useAttendees';
 import { useCreateActionItem } from '@/features/action-items/hooks/useActionItemMutations';
+import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '@/constants/validation';
 import { createActionItemForm } from './createActionItemForm';
 
 type MeetingOption = {
@@ -91,89 +93,98 @@ const CreateActionItemDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <DialogContent className="max-h-[90vh] overflow-hidden md:min-w-md max-w-lg">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex max-h-[90vh] min-h-0 flex-col gap-4"
+        >
           <DialogHeader>
             <DialogTitle>Create action item</DialogTitle>
           </DialogHeader>
 
-          {!meetingId && (
-            <div className="flex flex-col gap-2">
-              <Label>Meeting *</Label>
-              <Controller
-                control={control}
-                name="meetingId"
-                render={({ field }) => (
-                  <FilterCombobox
-                    options={meetings ?? []}
-                    selectedValue={field.value || null}
-                    onSelect={(value) => field.onChange(value ?? '')}
-                    placeholder="Select a meeting"
-                    emptyMessage="No meetings found."
-                  />
+          <FieldGroup className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto scrollbar-subtle py-1">
+            {!meetingId && (
+              <div className="flex flex-col gap-2">
+                <Label>Meeting *</Label>
+                <Controller
+                  control={control}
+                  name="meetingId"
+                  render={({ field }) => (
+                    <FilterCombobox
+                      options={meetings ?? []}
+                      selectedValue={field.value || null}
+                      onSelect={(value) => field.onChange(value ?? '')}
+                      placeholder="Select a meeting"
+                      emptyMessage="No meetings found."
+                    />
+                  )}
+                />
+                {errors.meetingId && (
+                  <p className="text-xs italic text-left text-destructive">
+                    {errors.meetingId.message}
+                  </p>
                 )}
-              />
-              {errors.meetingId && (
-                <p className="text-xs italic text-left text-destructive">
-                  {errors.meetingId.message}
-                </p>
-              )}
+              </div>
+            )}
+
+            <FormField
+              id="title"
+              label="Title *"
+              register={register}
+              error={errors.title?.message}
+              hasError={!!errors.title}
+              maxLength={TITLE_MAX_LENGTH}
+              value={watch('title')}
+            />
+
+            <FormField
+              id="description"
+              label="Description"
+              as="textarea"
+              register={register}
+              error={errors.description?.message}
+              hasError={!!errors.description}
+              maxLength={DESCRIPTION_MAX_LENGTH}
+              value={watch('description')}
+            />
+
+            <div className="flex gap-4">
+              <div className="flex flex-1 flex-col gap-2">
+                <Controller
+                  control={control}
+                  name="deadline"
+                  render={({ field }) => (
+                    <DatePicker
+                      id="create-action-item-deadline"
+                      label="Deadline"
+                      date={field.value ? new Date(`${field.value}T00:00:00`) : undefined}
+                      setDate={(selected) =>
+                        field.onChange(selected ? format(selected, 'yyyy-MM-dd') : '')
+                      }
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="flex flex-1 flex-col gap-2">
+                <Label>Assignee</Label>
+                <Controller
+                  control={control}
+                  name="assigneeId"
+                  render={({ field }) => (
+                    <FilterCombobox
+                      options={assigneeItems}
+                      selectedValue={field.value || null}
+                      onSelect={(value) => field.onChange(value ?? '')}
+                      placeholder={selectedMeetingId ? 'Unassigned' : 'Select a meeting first'}
+                      emptyMessage="No attendees found."
+                      disabled={!selectedMeetingId}
+                    />
+                  )}
+                />
+              </div>
             </div>
-          )}
-
-          <FormField
-            id="title"
-            label="Title *"
-            register={register}
-            error={errors.title?.message}
-            hasError={!!errors.title}
-          />
-
-          <FormField
-            id="description"
-            label="Description"
-            as="textarea"
-            register={register}
-            error={errors.description?.message}
-            hasError={!!errors.description}
-          />
-
-          <div className="flex gap-4">
-            <div className="flex flex-1 flex-col gap-2">
-              <Controller
-                control={control}
-                name="deadline"
-                render={({ field }) => (
-                  <DatePicker
-                    id="create-action-item-deadline"
-                    label="Deadline"
-                    date={field.value ? new Date(`${field.value}T00:00:00`) : undefined}
-                    setDate={(selected) =>
-                      field.onChange(selected ? format(selected, 'yyyy-MM-dd') : '')
-                    }
-                  />
-                )}
-              />
-            </div>
-
-            <div className="flex flex-1 flex-col gap-2">
-              <Label>Assignee</Label>
-              <Controller
-                control={control}
-                name="assigneeId"
-                render={({ field }) => (
-                  <FilterCombobox
-                    options={assigneeItems}
-                    selectedValue={field.value || null}
-                    onSelect={(value) => field.onChange(value ?? '')}
-                    placeholder={selectedMeetingId ? 'Unassigned' : 'Select a meeting first'}
-                    emptyMessage="No attendees found."
-                    disabled={!selectedMeetingId}
-                  />
-                )}
-              />
-            </div>
-          </div>
+          </FieldGroup>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

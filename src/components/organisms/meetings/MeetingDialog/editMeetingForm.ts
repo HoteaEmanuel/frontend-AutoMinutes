@@ -1,8 +1,7 @@
 import { z } from 'zod';
 import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '@/constants/validation';
 
-export const createActionItemForm = z.object({
-  meetingId: z.string().min(1, 'Meeting is required.'),
+export const editMeetingForm = z.object({
   title: z
     .string()
     .trim()
@@ -12,6 +11,6 @@ export const createActionItemForm = z.object({
     .string()
     .max(DESCRIPTION_MAX_LENGTH, `Description must be at most ${DESCRIPTION_MAX_LENGTH} characters.`)
     .optional(),
-  deadline: z.string().optional(),
-  assigneeId: z.string().optional(),
+  date: z.string().min(1, 'Date is required.'),
+  time: z.string().min(1, 'Time is required.'),
 });

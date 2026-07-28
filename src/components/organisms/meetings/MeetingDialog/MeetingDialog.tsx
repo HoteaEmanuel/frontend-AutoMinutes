@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useGetMeeting } from '@/features/meetings/hooks/useMeetings';
 import MeetingStatusBadge from '@molecules/MeetingStatusBadge/MeetingStatusBadge';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import OverviewTab from './OverviewTab';
 import TranscriptTab from './TranscriptTab';
@@ -12,6 +12,7 @@ import AttendeesTab from './AttendeesTab';
 import AiResultsTab from './AiResultsTab';
 import TodosTab from './TodosTab';
 import MeetingDeleteAlert from './MeetingDeleteAlert';
+import EditMeetingDialog from './EditMeetingDialog';
 
 type MeetingDialogProps = {
   open: boolean;
@@ -30,6 +31,7 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) => {
   const { data, error, isPending, isError, refetch } = useGetMeeting(meetingId);
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -56,12 +58,18 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
               onDeleted={onOpenChange}
             />
 
+            <EditMeetingDialog meeting={data} open={editOpen} onOpenChange={setEditOpen} />
+
             <DialogHeader className="gap-3 border-b border-border/50 p-4 sm:p-6">
               <div className="flex flex-col gap-3 pr-10 sm:flex-row sm:items-center">
                 <MeetingStatusBadge status={data.status} />
                 <span className="text-sm text-muted-foreground">
                   {dateFormatter.format(new Date(data.scheduledAt))}
                 </span>
+                <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
+                  <Pencil />
+                  Edit meeting
+                </Button>
                 <Button
                   variant="destructive"
                   size="sm"
@@ -72,7 +80,9 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
                 </Button>
               </div>
 
-              <DialogTitle className="text-2xl font-bold">{data.title}</DialogTitle>
+              <DialogTitle className="min-w-0 wrap-break-word text-2xl font-bold leading-snug">
+                {data.title}
+              </DialogTitle>
             </DialogHeader>
 
             <Tabs defaultValue="overview" className="min-h-0 min-w-0">

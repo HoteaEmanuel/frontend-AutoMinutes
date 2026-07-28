@@ -31,7 +31,11 @@ const ActionItemDeleteAlert = ({ item, open, onOpenChange }: ActionItemDeleteAle
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete "{item.title}"?</AlertDialogTitle>
+          <AlertDialogTitle className="w-full min-w-0">
+            Delete "
+            <span className="inline-block max-w-[70%] truncate align-bottom">{item.title}</span>
+            "?
+          </AlertDialogTitle>
           <AlertDialogDescription>
             This action item will be permanently removed. This can&apos;t be undone.
           </AlertDialogDescription>

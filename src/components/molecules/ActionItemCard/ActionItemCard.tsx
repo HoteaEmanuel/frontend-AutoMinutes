@@ -31,32 +31,34 @@ const ActionItemCard = ({ item, hideMeetingTitle }: ActionItemCardProps) => {
     <Card className={cn('gap-3 border-l-4 px-4', columnBorderClass[columnStatus])}>
       <div className="flex items-start gap-2">
         <ActionItemStatusMenu item={item} className="mt-0.5" />
-        <div className="flex flex-1 flex-col gap-1">
+        <div className="flex min-w-0 flex-1 flex-col gap-1">
           <span
             className={cn(
-              'text-xs',
+              'wrap-break-word text-xs',
               done ? 'font-medium text-muted-foreground line-through' : 'font-medium text-foreground',
             )}
           >
             {item.title}
           </span>
           {!hideMeetingTitle && (
-            <span className="text-[11px] text-muted-foreground">{item.meetingTitle}</span>
+            <span className="truncate text-[11px] text-muted-foreground">{item.meetingTitle}</span>
           )}
         </div>
         <ActionItemActionsMenu onEdit={() => setIsEditOpen(true)} onDelete={() => setIsDeleteOpen(true)} />
       </div>
 
-      <div className="flex items-center justify-between pl-7">
+      <div className="flex items-center justify-between gap-2 pl-7">
         {item.assignee ? (
-          <div className="flex items-center gap-1.5">
+          <div className="flex min-w-0 items-center gap-1.5">
             <AssigneeAvatar name={item.assignee.name} />
-            <span className="text-[11px] font-medium text-foreground">{item.assignee.name}</span>
+            <span className="truncate text-[11px] font-medium text-foreground">
+              {item.assignee.name}
+            </span>
           </div>
         ) : (
           <span className="text-[11px] text-muted-foreground">Unassigned</span>
         )}
-        <ActionItemDueDate deadline={item.deadline} done={done} className="text-[11px]" />
+        <ActionItemDueDate deadline={item.deadline} done={done} className="shrink-0 text-[11px]" />
       </div>
 
       <ActionItemEditDialog item={item} open={isEditOpen} onOpenChange={setIsEditOpen} />

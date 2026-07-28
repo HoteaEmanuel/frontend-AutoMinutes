@@ -40,7 +40,11 @@ const MeetingDeleteAlert = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete "{meetingTitle}"?</AlertDialogTitle>
+          <AlertDialogTitle className="w-full min-w-0">
+            Delete "
+            <span className="inline-block max-w-[70%] truncate align-bottom">{meetingTitle}</span>
+            "?
+          </AlertDialogTitle>
           <AlertDialogDescription>
             This will permanently remove the meeting along with its transcript, AI results,
             attendees, and action items. This can&apos;t be undone.
