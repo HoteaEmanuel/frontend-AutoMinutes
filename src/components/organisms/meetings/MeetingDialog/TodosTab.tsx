@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ListChecks, Loader2, Plus } from 'lucide-react';
+import { ListChecks, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import EmptyState from '@molecules/EmptyState/EmptyState';
@@ -7,6 +7,7 @@ import ActionItemCard from '@molecules/ActionItemCard/ActionItemCard';
 import CreateActionItemDialog from '@organisms/action-items/CreateActionItemDialog/CreateActionItemDialog';
 import { useUserActionItems } from '@/features/action-items/hooks/useActionItems';
 import { attachMeetingTitles } from '@/features/action-items/utils';
+import TodosTabSkeleton from './TodosTabSkeleton';
 
 type TodosTabProps = {
   meetingId: string;
@@ -22,7 +23,7 @@ const TodosTab = ({ meetingId, meetingTitle }: TodosTabProps) => {
     [data, meetingId, meetingTitle],
   );
 
-  if (isPending) return <Loader2 className="animate-spin" />;
+  if (isPending) return <TodosTabSkeleton />;
   if (isError) return <ErrorRefetch errorMessage={error.message} refetch={refetch} />;
 
   return (

@@ -22,6 +22,7 @@ export const fetchUserMeetings = async (input: PaginatedMeetingsDto) => {
   const data = await gqlRequest<Pick<Query, 'findUserMeetings'>>(FIND_USER_MEETINGS, {
     input: input,
   });
+  await new Promise((promise) => setTimeout(promise, 500));
   return data.findUserMeetings;
 };
 
@@ -100,6 +101,18 @@ export const createMeeting = async (input: CreateMeetingDto) => {
     createMeetingInput: input,
   });
   return data.createMeeting;
+};
+
+const DELETE_MEETING = `
+mutation ($id: String!) {
+  deleteMeeting(id: $id) {
+    id
+  }
+}`;
+
+export const deleteMeeting = async (id: string) => {
+  const data = await gqlRequest<Pick<Mutation, 'deleteMeeting'>>(DELETE_MEETING, { id });
+  return data.deleteMeeting;
 };
 
 const FIND_TRANSCRIPT = `

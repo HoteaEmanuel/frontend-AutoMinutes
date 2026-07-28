@@ -1,10 +1,11 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { CalendarDays, CheckCircle2, ListChecks, Loader2 } from 'lucide-react';
+import { CalendarDays, CheckCircle2, ListChecks } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import FormField from '@/components/molecules/FormField/FormField';
 import { AvatarUploader } from '@/components/organisms/AvatarUploader/AvatarUploader';
 import { ChangePasswordCard } from '@/components/organisms/ChangePasswordCard/ChangePasswordCard';
@@ -13,6 +14,7 @@ import { useMe } from '@/features/user/hooks/useMe';
 import { useProfileStats } from '@/features/user/hooks/useProfileStats';
 import { useUpdateProfile } from '@/features/user/hooks/useUpdateProfile';
 import { profileSchema, type ProfileFormValues } from './profileSchema';
+import ProfileSkeleton from './ProfileSkeleton';
 
 const StatCard = ({
   icon: Icon,
@@ -31,7 +33,9 @@ const StatCard = ({
         <Icon className="size-5" />
       </div>
       <div>
-        <p className="text-2xl font-semibold leading-none">{loading ? '—' : value}</p>
+        <p className="text-2xl font-semibold leading-none">
+          {loading ? <Skeleton className="h-6 w-8" /> : value}
+        </p>
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>
     </CardContent>
@@ -56,11 +60,7 @@ const ProfileTemplate = () => {
   });
 
   if (isLoading || !me) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   const initials = `${me.firstName?.[0] ?? ''}${me.lastName?.[0] ?? ''}`.toUpperCase();

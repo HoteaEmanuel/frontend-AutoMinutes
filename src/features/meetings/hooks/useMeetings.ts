@@ -1,7 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   createMeeting,
-  fetchAllMeetings,
+  deleteMeeting,
   fetchMeeting,
   fetchUserMeetingOptions,
   fetchUserMeetings,
@@ -38,12 +38,6 @@ export const useMeetings = (input: PaginatedMeetingsDto) =>
     placeholderData: keepPreviousData,
   });
 
-export const useGetAllMeetings = () =>
-  useQuery({
-    queryKey: meetingKeys.all,
-    queryFn: fetchAllMeetings,
-  });
-
 export const useUserMeetingOptions = () =>
   useQuery({
     queryKey: meetingKeys.options,
@@ -58,45 +52,26 @@ export const useGetMeeting = (id: string) =>
 
 export const useAddMeeting = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationKey: meetingKeys.all,
     mutationFn: (input: CreateMeetingDto) => createMeeting(input),
     onSuccess: () => {
       toast.success('Meeting created successfully!');
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: meetingKeys.all });
-      queryClient.invalidateQueries({ queryKey: meetingKeys.options });
-    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: meetingKeys.all }),
   });
 };
 
-export const useCreateMeeting = () => {
+export const useDeleteMeeting = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: async ({ meeting, attendees }: CreateNewMeetingInput) => {
-      const newMeeting = await createMeeting(meeting);
-
-      await Promise.all(
-        attendees.map((attendee) =>
-          addAttendee({
-            meetingId: newMeeting.id,
-            name: `${attendee.firstName} ${attendee.lastName}`.trim(),
-            email: attendee.email,
-            role: 'PARTICIPANT',
-            aiGenerated: false,
-          }),
-        ),
-      );
-
-      return newMeeting;
-    },
+    mutationFn: (id: string) => deleteMeeting(id),
     onSuccess: () => {
-      toast.success('Meeting created successfully!');
+      toast.success('Meeting deleted successfully!');
       queryClient.invalidateQueries({ queryKey: meetingKeys.all });
-      queryClient.invalidateQueries({ queryKey: meetingKeys.options });
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 };

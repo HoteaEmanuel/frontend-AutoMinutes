@@ -36,6 +36,7 @@ export const useMeetingFilters = () => {
       scheduledFrom: searchParams.get('scheduledFrom') ?? undefined,
       scheduledTo: searchParams.get('scheduledTo') ?? undefined,
       sortDateOrder: searchParams.get('sortDateOrder') ?? undefined,
+      hasTodos: searchParams.get('hasTodos') === 'true' ? true : undefined,
     }),
     [searchParams],
   );
