@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { FieldGroup } from '@/components/ui/field';
 import FormField from '@molecules/FormField/FormField';
 import Selector from '@molecules/Selector/Selector';
 import DatePicker from '@molecules/DatePicker/DatePicker';
@@ -17,6 +18,7 @@ import { useAttendees } from '@/features/attendees/hooks/useAttendees';
 import { useUpdateActionItem } from '@/features/action-items/hooks/useActionItemMutations';
 import { BoardActionItem, resolveColumnStatus } from '@/features/action-items/utils';
 import { ACTION_ITEM_COLUMNS, ACTION_ITEM_COLUMN_LABELS } from '@/constants/actionItemStatus';
+import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '@/constants/validation';
 import { actionItemForm } from './actionItemForm';
 
 const UNASSIGNED = 'unassigned';
@@ -46,6 +48,7 @@ const ActionItemEditDialog = ({ item, open, onOpenChange }: ActionItemEditDialog
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors },
   } = useForm<ActionItemFormData>({
     resolver: zodResolver(actionItemForm),
@@ -75,81 +78,90 @@ const ActionItemEditDialog = ({ item, open, onOpenChange }: ActionItemEditDialog
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <DialogContent className="max-h-[90vh] overflow-hidden">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex max-h-[90vh] min-h-0 flex-col gap-4"
+        >
           <DialogHeader>
             <DialogTitle>Edit action item</DialogTitle>
           </DialogHeader>
 
-          <FormField
-            id="title"
-            label="Title *"
-            placeholder="Title"
-            register={register}
-            error={errors.title?.message}
-            hasError={!!errors.title}
-          />
+          <FieldGroup className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto scrollbar-subtle py-1">
+            <FormField
+              id="title"
+              label="Title *"
+              placeholder="Title"
+              register={register}
+              error={errors.title?.message}
+              hasError={!!errors.title}
+              maxLength={TITLE_MAX_LENGTH}
+              value={watch('title')}
+            />
 
-          <FormField
-            id="description"
-            label="Description"
-            as="textarea"
-            placeholder="Description..."
-            register={register}
-            error={errors.description?.message}
-            hasError={!!errors.description}
-          />
+            <FormField
+              id="description"
+              label="Description"
+              as="textarea"
+              placeholder="Description..."
+              register={register}
+              error={errors.description?.message}
+              hasError={!!errors.description}
+              maxLength={DESCRIPTION_MAX_LENGTH}
+              value={watch('description')}
+            />
 
-          <div className="flex gap-4">
-            <div className="flex flex-1 flex-col gap-2">
-              <Controller
-                control={control}
-                name="deadline"
-                render={({ field }) => (
-                  <DatePicker
-                    id="action-item-deadline"
-                    label="Deadline"
-                    date={field.value ? new Date(`${field.value}T00:00:00`) : undefined}
-                    setDate={(selected) =>
-                      field.onChange(selected ? format(selected, 'yyyy-MM-dd') : '')
-                    }
-                  />
-                )}
-              />
+            <div className="flex gap-4">
+              <div className="flex flex-1 flex-col gap-2">
+                <Controller
+                  control={control}
+                  name="deadline"
+                  render={({ field }) => (
+                    <DatePicker
+                      id="action-item-deadline"
+                      label="Deadline"
+                      date={field.value ? new Date(`${field.value}T00:00:00`) : undefined}
+                      setDate={(selected) =>
+                        field.onChange(selected ? format(selected, 'yyyy-MM-dd') : '')
+                      }
+                    />
+                  )}
+                />
+              </div>
+
+              <div className="flex flex-1 flex-col gap-2">
+                <Controller
+                  control={control}
+                  name="status"
+                  render={({ field }) => (
+                    <Selector
+                      label="Status"
+                      value={field.value}
+                      handleChange={(value) =>
+                        field.onChange((value ?? 'OPEN') as ActionItemFormData['status'])
+                      }
+                      items={STATUS_ITEMS}
+                    />
+                  )}
+                />
+              </div>
             </div>
 
-            <div className="flex flex-1 flex-col gap-2">
+            <div className="flex flex-col gap-2">
               <Controller
                 control={control}
-                name="status"
+                name="assigneeId"
                 render={({ field }) => (
                   <Selector
-                    label="Status"
-                    value={field.value}
-                    handleChange={(value) =>
-                      field.onChange((value ?? 'OPEN') as ActionItemFormData['status'])
-                    }
-                    items={STATUS_ITEMS}
+                    label="Assignee"
+                    value={field.value ?? UNASSIGNED}
+                    handleChange={(value) => field.onChange(value ?? UNASSIGNED)}
+                    items={[{ label: 'Unassigned', value: UNASSIGNED }, ...assigneeItems]}
                   />
                 )}
               />
             </div>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Controller
-              control={control}
-              name="assigneeId"
-              render={({ field }) => (
-                <Selector
-                  label="Assignee"
-                  value={field.value ?? UNASSIGNED}
-                  handleChange={(value) => field.onChange(value ?? UNASSIGNED)}
-                  items={[{ label: 'Unassigned', value: UNASSIGNED }, ...assigneeItems]}
-                />
-              )}
-            />
-          </div>
+          </FieldGroup>
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

@@ -1,10 +1,26 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useGetMeeting } from '@/features/meetings/hooks/useMeetings';
+import { useExportMeeting } from '@/features/export/hooks/useExportMeeting';
 import MeetingStatusBadge from '@molecules/MeetingStatusBadge/MeetingStatusBadge';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
-import { Loader2, Trash2 } from 'lucide-react';
+import {
+  Download,
+  FileCode,
+  FileJson,
+  FileText,
+  Loader2,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 import { useState } from 'react';
 import OverviewTab from './OverviewTab';
 import TranscriptTab from './TranscriptTab';
@@ -12,6 +28,7 @@ import AttendeesTab from './AttendeesTab';
 import AiResultsTab from './AiResultsTab';
 import TodosTab from './TodosTab';
 import MeetingDeleteAlert from './MeetingDeleteAlert';
+import EditMeetingDialog from './EditMeetingDialog';
 
 type MeetingDialogProps = {
   open: boolean;
@@ -29,7 +46,9 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 
 const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) => {
   const { data, error, isPending, isError, refetch } = useGetMeeting(meetingId);
+  const { exportMeeting, isExporting } = useExportMeeting(meetingId);
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -56,23 +75,72 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
               onDeleted={onOpenChange}
             />
 
+            <EditMeetingDialog meeting={data} open={editOpen} onOpenChange={setEditOpen} />
+
             <DialogHeader className="gap-3 border-b border-border/50 p-4 sm:p-6">
               <div className="flex flex-col gap-3 pr-10 sm:flex-row sm:items-center">
                 <MeetingStatusBadge status={data.status} />
                 <span className="text-sm text-muted-foreground">
                   {dateFormatter.format(new Date(data.scheduledAt))}
                 </span>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setDeleteAlertOpen(true)}
-                >
-                  <Trash2 />
-                  Delete meeting
-                </Button>
+                <DropdownMenu>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={<DropdownMenuTrigger />}
+                      className="export-btn export-btn--icon-only"
+                      aria-label="Export"
+                      disabled={isExporting}
+                    >
+                      {isExporting ? (
+                        <Loader2 className="export-btn-icon animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Download className="export-btn-icon" aria-hidden="true" />
+                      )}
+                    </TooltipTrigger>
+                    <TooltipContent>Export</TooltipContent>
+                  </Tooltip>
+                  <DropdownMenuContent align="start" className="min-w-44">
+                    <DropdownMenuItem onClick={() => exportMeeting('pdf')}>
+                      <FileText />
+                      Export as PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => exportMeeting('markdown')}>
+                      <FileCode />
+                      Export as Markdown
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => exportMeeting('json')}>
+                      <FileJson />
+                      Export as JSON
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={<Button variant="outline" size="icon-sm" onClick={() => setEditOpen(true)} />}
+                  >
+                    <Pencil />
+                  </TooltipTrigger>
+                  <TooltipContent>Edit meeting</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="destructive"
+                        size="icon-sm"
+                        onClick={() => setDeleteAlertOpen(true)}
+                      />
+                    }
+                  >
+                    <Trash2 />
+                  </TooltipTrigger>
+                  <TooltipContent>Delete meeting</TooltipContent>
+                </Tooltip>
               </div>
 
-              <DialogTitle className="text-2xl font-bold">{data.title}</DialogTitle>
+              <DialogTitle className="min-w-0 wrap-break-word text-2xl font-bold leading-snug">
+                {data.title}
+              </DialogTitle>
             </DialogHeader>
 
             <Tabs defaultValue="overview" className="min-h-0 min-w-0">

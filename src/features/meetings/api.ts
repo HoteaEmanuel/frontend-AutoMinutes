@@ -1,5 +1,12 @@
 import { gqlRequest } from '@/lib/graphql';
-import { CreateMeetingDto, Mutation, PaginatedMeetingsDto, Query, UploadTranscriptDto } from '@/gql/types';
+import {
+  CreateMeetingDto,
+  Mutation,
+  PaginatedMeetingsDto,
+  Query,
+  UpdateMeetingDto,
+  UploadTranscriptDto,
+} from '@/gql/types';
 
 const FIND_USER_MEETINGS = `
   query FindUserMeetings($input: PaginatedMeetingsDto!) {
@@ -63,6 +70,25 @@ export const fetchUserMeetingOptions = async () => {
   return data.getUserMeetings;
 };
 
+const GET_USER_MEETINGS_FOR_EXPORT = `
+  query GetUserMeetingsForExport {
+    getUserMeetings {
+      id
+      title
+      description
+      status
+      scheduledAt
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const fetchAllMeetingsForExport = async () => {
+  const data = await gqlRequest<Pick<Query, 'getUserMeetings'>>(GET_USER_MEETINGS_FOR_EXPORT);
+  return data.getUserMeetings;
+};
+
 const CREATE_MEETING = `
   mutation CreateMeeting($createMeetingInput: CreateMeetingDto!) {
     createMeeting(createMeetingInput: $createMeetingInput) {
@@ -82,6 +108,27 @@ export const createMeeting = async (input: CreateMeetingDto) => {
     createMeetingInput: input,
   });
   return data.createMeeting;
+};
+
+const UPDATE_MEETING = `
+  mutation UpdateMeeting($updateMeetingInput: UpdateMeetingDto!) {
+    updateMeeting(updateMeetingInput: $updateMeetingInput) {
+      id
+      title
+      description
+      status
+      scheduledAt
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const updateMeeting = async (input: UpdateMeetingDto) => {
+  const data = await gqlRequest<Pick<Mutation, 'updateMeeting'>>(UPDATE_MEETING, {
+    updateMeetingInput: input,
+  });
+  return data.updateMeeting;
 };
 
 const DELETE_MEETING = `

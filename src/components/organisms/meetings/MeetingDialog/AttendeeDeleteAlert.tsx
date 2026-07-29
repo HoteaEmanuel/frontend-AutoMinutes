@@ -28,7 +28,11 @@ const AttendeeDeleteAlert = ({ attendee, open, onOpenChange }: AttendeeDeleteAle
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Remove "{attendee.name}"?</AlertDialogTitle>
+          <AlertDialogTitle className="w-full min-w-0">
+            Remove "
+            <span className="inline-block max-w-[70%] truncate align-bottom">{attendee.name}</span>
+            "?
+          </AlertDialogTitle>
           <AlertDialogDescription>
             This attendee will be permanently removed from the meeting. This can&apos;t be undone.
           </AlertDialogDescription>

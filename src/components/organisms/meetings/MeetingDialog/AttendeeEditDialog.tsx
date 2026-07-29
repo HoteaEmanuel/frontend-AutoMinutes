@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useUpdateAttendee } from '@/features/attendees/hooks/useAttendeeMutations';
+import { NAME_MAX_LENGTH } from '@/constants/validation';
 import { Attendee } from '@/gql/types';
 import FormField from '@molecules/FormField/FormField';
 import Selector from '@molecules/Selector/Selector';
@@ -30,6 +31,7 @@ const AttendeeEditDialog = ({ attendee, open, onOpenChange }: AttendeeEditDialog
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors },
   } = useForm<AttendeeFormData>({
     resolver: zodResolver(attendeeForm),
@@ -66,6 +68,8 @@ const AttendeeEditDialog = ({ attendee, open, onOpenChange }: AttendeeEditDialog
             register={register}
             error={errors.name?.message}
             hasError={!!errors.name}
+            maxLength={NAME_MAX_LENGTH}
+            value={watch('name')}
           />
 
           <FormField

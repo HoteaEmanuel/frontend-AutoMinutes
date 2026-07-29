@@ -9,8 +9,8 @@ import { Card } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { useCreateMeeting } from '@/features/meetings/hooks/useMeetings';
+import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '@/constants/validation';
 import { extractTextFromFile } from '@/lib/utils';
 import { getErrorMessage } from '@/lib/errors';
 import AssigneeAvatar from '@molecules/AssigneeAvatar/AssigneeAvatar';
@@ -44,11 +44,13 @@ const attendeeFields: Array<{
   {
     key: 'email',
     id: 'attendee-email',
-    label: 'Email *',
-    placeholder: 'participant@example.com',
+    label: 'Email',
+    placeholder: 'participant@example.com (optional)',
     type: 'email',
   },
 ];
+
+const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 const getCurrentDateAndTime = () => {
   const now = new Date();
@@ -67,7 +69,6 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
   const [step, setStep] = useState(1);
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [attendee, setAttendee] = useState<Attendee>({ firstName: '', lastName: '', email: '' });
-  const [attendeeError, setAttendeeError] = useState('');
   const [meetingError, setMeetingError] = useState('');
   const createMeeting = useCreateMeeting();
 
@@ -93,6 +94,15 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
   const date = watch('date');
   const time = watch('time');
   const selectedFile = watch('transcriptFile');
+  const title = watch('title');
+  const description = watch('description');
+
+  const isStep1Valid =
+    !!title?.trim() &&
+    title.trim().length <= TITLE_MAX_LENGTH &&
+    !!date &&
+    !!time &&
+    (description?.length ?? 0) <= DESCRIPTION_MAX_LENGTH;
 
   useEffect(() => {
     if (isOpen) {
@@ -107,7 +117,6 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
       setStep(1);
       setAttendees([]);
       setAttendee({ firstName: '', lastName: '', email: '' });
-      setAttendeeError('');
       setMeetingError('');
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
@@ -123,20 +132,16 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
     if (isValid) setStep(3);
   };
 
-  const addAttendee = () => {
-    if (!attendee.firstName.trim() || !attendee.lastName.trim() || !attendee.email.trim()) {
-      setAttendeeError('First name, last name and email are required.');
-      return;
-    }
+  const canAddAttendee =
+    !!attendee.firstName.trim() &&
+    !!attendee.lastName.trim() &&
+    (!attendee.email.trim() || isValidEmail(attendee.email.trim()));
 
-    if (!attendee.email.includes('@')) {
-      setAttendeeError('Add a valid email address.');
-      return;
-    }
+  const addAttendee = () => {
+    if (!canAddAttendee) return;
 
     setAttendees((currentAttendees) => [...currentAttendees, attendee]);
     setAttendee({ firstName: '', lastName: '', email: '' });
-    setAttendeeError('');
   };
 
   const addAttendeeOnEnter = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -146,9 +151,9 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
     }
   };
 
-  const removeAttendee = (email: string) => {
+  const removeAttendee = (index: number) => {
     setAttendees((currentAttendees) =>
-      currentAttendees.filter((currentAttendee) => currentAttendee.email !== email),
+      currentAttendees.filter((_, currentIndex) => currentIndex !== index),
     );
   };
 
@@ -177,7 +182,7 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-hidden sm:max-w-xl">
-        <form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[80vh] min-h-0 flex-col">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex max-h-[90vh] min-h-0 flex-col">
           <DialogHeader className="border-b pb-4">
             <DialogTitle className="sr-only">New meeting</DialogTitle>
             <div className="flex items-center justify-center gap-3">
@@ -198,9 +203,9 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
             </div>
           </DialogHeader>
 
-          <div className="min-h-0 flex-1 overflow-y-auto py-5">
+          <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto scrollbar-subtle py-5">
             {step === 1 && (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
                 <div>
                   <h3 className="text-lg font-semibold">Add the title, date and time</h3>
                   <p className="text-sm text-muted-foreground">
@@ -216,6 +221,8 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
                     register={register}
                     error={errors.title?.message}
                     hasError={!!errors.title}
+                    maxLength={TITLE_MAX_LENGTH}
+                    value={title}
                   />
 
                   <Field data-invalid={!!(errors.date || errors.time)}>
@@ -237,15 +244,17 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
                     />
                   </Field>
 
-                  <Field>
-                    <FieldLabel htmlFor="meeting-description">Description</FieldLabel>
-                    <Textarea
-                      id="meeting-description"
-                      placeholder="What is this meeting about?"
-                      className="min-h-24 flex-1 resize-none"
-                      {...register('description')}
-                    />
-                  </Field>
+                  <FormField
+                    id="description"
+                    label="Description"
+                    as="textarea"
+                    placeholder="What is this meeting about?"
+                    register={register}
+                    error={errors.description?.message}
+                    hasError={!!errors.description}
+                    maxLength={DESCRIPTION_MAX_LENGTH}
+                    value={description}
+                  />
                 </FieldGroup>
               </div>
             )}
@@ -321,9 +330,13 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
                   ))}
                 </FieldGroup>
 
-                <FieldError className="text-xs italic">{attendeeError}</FieldError>
-
-                <Button type="button" variant="outline" onClick={addAttendee} className="w-fit">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addAttendee}
+                  disabled={!canAddAttendee}
+                  className="w-fit"
+                >
                   <Plus />
                   Add attendee
                 </Button>
@@ -338,9 +351,9 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
                   />
                 ) : (
                   <div className="scrollbar-subtle max-h-52 space-y-1.5 overflow-y-auto">
-                    {attendees.map((currentAttendee) => (
+                    {attendees.map((currentAttendee, index) => (
                       <Card
-                        key={currentAttendee.email}
+                        key={index}
                         className="flex-row items-center gap-3 bg-muted/50 px-4 py-3 ring-0"
                       >
                         <AssigneeAvatar
@@ -351,16 +364,18 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
                           <p className="truncate font-medium">
                             {currentAttendee.firstName} {currentAttendee.lastName}
                           </p>
-                          <p className="truncate text-sm text-muted-foreground">
-                            {currentAttendee.email}
-                          </p>
+                          {currentAttendee.email && (
+                            <p className="truncate text-sm text-muted-foreground">
+                              {currentAttendee.email}
+                            </p>
+                          )}
                         </div>
                         <Button
                           type="button"
                           variant="destructive"
                           size="icon"
                           aria-label="Remove attendee"
-                          onClick={() => removeAttendee(currentAttendee.email)}
+                          onClick={() => removeAttendee(index)}
                         >
                           <Trash2 />
                         </Button>
@@ -382,7 +397,7 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
             )}
 
             {step === 1 && (
-              <Button type="button" onClick={goToTranscriptStep}>
+              <Button type="button" onClick={goToTranscriptStep} disabled={!isStep1Valid}>
                 Next
               </Button>
             )}

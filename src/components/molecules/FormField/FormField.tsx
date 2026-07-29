@@ -15,6 +15,8 @@ interface FormFieldProps {
   hasError: boolean;
   placeholder?: string;
   hidden?: boolean;
+  maxLength?: number;
+  value?: string;
 }
 
 const FormField = ({
@@ -27,19 +29,34 @@ const FormField = ({
   hasError,
   placeholder = '',
   hidden,
+  maxLength,
+  value,
 }: FormFieldProps) => {
   const [showPassword, setShowPassword] = useState(false);
+  const charCount = value?.length ?? 0;
   return (
     <div className="flex min-w-0 flex-col gap-2">
-      <Label htmlFor={id}>{label}</Label>
+      <div className="flex items-center justify-between gap-2">
+        <Label htmlFor={id}>{label}</Label>
+        {maxLength !== undefined && (
+          <span
+            className={`text-xs tabular-nums ${
+              charCount >= maxLength ? 'text-destructive' : 'text-muted-foreground'
+            }`}
+          >
+            {charCount}/{maxLength}
+          </span>
+        )}
+      </div>
 
-      <div className="relative">
+      <div className="relative min-w-0">
         {as === 'textarea' ? (
           <Textarea
             id={id}
             placeholder={placeholder}
             aria-invalid={hasError}
-            className={`max-w-sm wrap-break-word max-h-[50vh] ${
+            maxLength={maxLength}
+            className={`min-w-0 w-full max-w-full wrap-break-word max-h-[40vh] resize-none overflow-y-auto scrollbar-subtle ${
               hasError ? 'border-destructive focus-visible:ring-destructive' : ''
             }`}
             hidden={hidden}
@@ -58,6 +75,7 @@ const FormField = ({
             type={type === 'password' && showPassword ? 'text' : type}
             placeholder={placeholder}
             aria-invalid={hasError}
+            maxLength={maxLength}
             className={`${type === 'password' ? 'pr-8' : ''} ${
               hasError ? 'border-destructive focus-visible:ring-destructive' : ''
             }`}

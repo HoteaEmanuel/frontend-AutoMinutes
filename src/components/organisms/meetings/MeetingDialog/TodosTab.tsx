@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react';
 import { ListChecks, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import DownloadButton from '@atoms/DownloadButton/DownloadButton';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import EmptyState from '@molecules/EmptyState/EmptyState';
 import ActionItemCard from '@molecules/ActionItemCard/ActionItemCard';
 import CreateActionItemDialog from '@organisms/action-items/CreateActionItemDialog/CreateActionItemDialog';
 import { useUserActionItems } from '@/features/action-items/hooks/useActionItems';
 import { attachMeetingTitles } from '@/features/action-items/utils';
+import { exportMeetingActionItemsCsv } from '@/features/export/exportActionItems';
 import TodosTabSkeleton from './TodosTabSkeleton';
 
 type TodosTabProps = {
@@ -28,10 +30,17 @@ const TodosTab = ({ meetingId, meetingTitle }: TodosTabProps) => {
 
   return (
     <div className="flex flex-col gap-3">
-      <Button type="button" size="sm" className="self-end" onClick={() => setIsCreateOpen(true)}>
-        <Plus data-icon="inline-start" />
-        Create Todo
-      </Button>
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <DownloadButton
+          label="Export CSV"
+          disabled={items.length === 0}
+          onClick={() => exportMeetingActionItemsCsv(data ?? [], meetingTitle)}
+        />
+        <Button type="button" size="sm" onClick={() => setIsCreateOpen(true)}>
+          <Plus data-icon="inline-start" />
+          Create Todo
+        </Button>
+      </div>
 
       {items.length === 0 ? (
         <EmptyState

@@ -15,7 +15,7 @@ const setMeetingStatusInCache = (
     meeting ? { ...meeting, status } : meeting,
   );
   queryClient.setQueriesData<PaginatedMeetings>({ queryKey: meetingKeys.all }, (page) =>
-    page
+    page && Array.isArray(page.meetings)
       ? {
           ...page,
           meetings: page.meetings.map((meeting) =>

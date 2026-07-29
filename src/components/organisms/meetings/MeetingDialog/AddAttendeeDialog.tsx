@@ -11,6 +11,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useAddAttendee } from '@/features/attendees/hooks/useAttendeeMutations';
+import { NAME_MAX_LENGTH } from '@/constants/validation';
 import FormField from '@molecules/FormField/FormField';
 import Selector from '@molecules/Selector/Selector';
 import { attendeeForm, attendeeRoleItems } from './attendeeForm';
@@ -31,6 +32,7 @@ const AddAttendeeDialog = ({ meetingId, open, onOpenChange }: AddAttendeeDialogP
     handleSubmit,
     control,
     reset,
+    watch,
     formState: { errors },
   } = useForm<AttendeeFormData>({
     resolver: zodResolver(attendeeForm),
@@ -69,6 +71,8 @@ const AddAttendeeDialog = ({ meetingId, open, onOpenChange }: AddAttendeeDialogP
             register={register}
             error={errors.name?.message}
             hasError={!!errors.name}
+            maxLength={NAME_MAX_LENGTH}
+            value={watch('name')}
           />
 
           <FormField

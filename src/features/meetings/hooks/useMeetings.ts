@@ -5,9 +5,10 @@ import {
   fetchMeeting,
   fetchUserMeetingOptions,
   fetchUserMeetings,
+  updateMeeting,
 } from '../api';
 import { addAttendee } from '@/features/attendees/api';
-import { CreateMeetingDto, PaginatedMeetingsDto } from '@/gql/types';
+import { CreateMeetingDto, PaginatedMeetingsDto, UpdateMeetingDto } from '@/gql/types';
 import { toast } from 'sonner';
 
 type NewMeetingAttendee = {
@@ -25,6 +26,7 @@ export const meetingKeys = {
   all: ['meetings'] as const,
   detail: (id: string) => ['meetings', id] as const,
   options: ['meetings', 'options'] as const,
+  exportAll: ['meetings', 'export-all'] as const,
 };
 
 export const meetingsQueryOptions = (input: PaginatedMeetingsDto) => ({
@@ -74,7 +76,7 @@ export const useCreateMeeting = () => {
           addAttendee({
             meetingId: newMeeting.id,
             name: `${attendee.firstName} ${attendee.lastName}`.trim(),
-            email: attendee.email,
+            email: attendee.email.trim() || undefined,
             role: 'PARTICIPANT',
             aiGenerated: false,
           }),
@@ -87,6 +89,22 @@ export const useCreateMeeting = () => {
       toast.success('Meeting created successfully!');
       queryClient.invalidateQueries({ queryKey: meetingKeys.all });
       queryClient.invalidateQueries({ queryKey: meetingKeys.options });
+    },
+  });
+};
+
+export const useUpdateMeeting = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: UpdateMeetingDto) => updateMeeting(input),
+    onSuccess: (meeting) => {
+      toast.success('Meeting updated successfully!');
+      queryClient.invalidateQueries({ queryKey: meetingKeys.detail(meeting.id) });
+      queryClient.invalidateQueries({ queryKey: meetingKeys.all });
+      queryClient.invalidateQueries({ queryKey: meetingKeys.options });
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
 };

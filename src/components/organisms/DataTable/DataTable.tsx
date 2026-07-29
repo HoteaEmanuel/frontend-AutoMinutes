@@ -20,6 +20,7 @@ import { Meeting } from '@/gql/types';
 import MeetingDialog from '@organisms/meetings/MeetingDialog/MeetingDialog';
 import EmptyState from '@molecules/EmptyState/EmptyState';
 import { useMeetingFilters } from '@/features/meetings/hooks/useMeetingFilters';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 type DataTableProps = {
   data: any;
@@ -84,7 +85,12 @@ export function DataTable({ data, columns, totalCount }: DataTableProps) {
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <Tooltip>
+                      <TooltipTrigger render={<span className="block" />}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TooltipTrigger>
+                      <TooltipContent>View meeting details</TooltipContent>
+                    </Tooltip>
                   </TableCell>
                 ))}
               </TableRow>

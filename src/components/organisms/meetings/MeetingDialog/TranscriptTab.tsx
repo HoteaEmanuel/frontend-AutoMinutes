@@ -109,7 +109,7 @@ const TranscriptTab = ({ meetingId }: { meetingId: string }) => {
       </div>
 
       {content ? (
-        <div className="scrollbar-subtle max-h-[45vh] min-w-0 space-y-2 overflow-y-auto rounded-lg border bg-muted/50 p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap wrap-break-word text-foreground">
+        <div className="min-w-0 space-y-2 rounded-lg border bg-muted/50 p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap wrap-break-word text-foreground">
           {content
             .split(/\r?\n/)
             .filter((line) => line.trim().length > 0)

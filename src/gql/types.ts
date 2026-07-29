@@ -137,6 +137,7 @@ export type Mutation = {
   setPassword: Scalars['Boolean']['output'];
   updateActionItem: ActionItem;
   updateAttendee: Attendee;
+  updateMeeting: Meeting;
   updateProfile: User;
   uploadTranscript: Transcript;
 };
@@ -202,6 +203,11 @@ export type MutationUpdateAttendeeArgs = {
 };
 
 
+export type MutationUpdateMeetingArgs = {
+  updateMeetingInput: UpdateMeetingDto;
+};
+
+
 export type MutationUpdateProfileArgs = {
   input: UpdateProfileInput;
 };
@@ -223,9 +229,9 @@ export type PaginatedMeetingsDto = {
   hasTodos?: InputMaybe<Scalars['Boolean']['input']>;
   pageNo: Scalars['Float']['input'];
   pageSize: Scalars['Float']['input'];
-  search?: InputMaybe<Scalars['String']['input']>;
   scheduledFrom?: InputMaybe<Scalars['DateTime']['input']>;
   scheduledTo?: InputMaybe<Scalars['DateTime']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
   sortDateOrder?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<MeetingStatus>;
 };
@@ -309,6 +315,13 @@ export type UpdateActionItemDto = {
   description?: InputMaybe<Scalars['String']['input']>;
   meetingId: Scalars['String']['input'];
   status?: InputMaybe<ActionItemStatus>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateMeetingDto = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  meetingId: Scalars['String']['input'];
+  scheduledAt?: InputMaybe<Scalars['DateTime']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
 

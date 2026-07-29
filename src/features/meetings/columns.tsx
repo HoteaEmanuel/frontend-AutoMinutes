@@ -12,8 +12,10 @@ export const columns: ColumnDef<Meeting>[] = [
     accessorKey: 'title',
     header: 'Title',
     cell: ({ row }) => (
-      <div className="flex flex-col gap-0.5">
-        <span className="font-medium text-foreground">{row.original.title}</span>
+      <div className="flex min-w-0 flex-col gap-0.5">
+        <span className="max-w-100 truncate font-medium text-foreground">
+          {row.original.title}
+        </span>
         {row.original.description && (
           <span className="max-w-100 truncate text-xs text-muted-foreground">
             {row.original.description}

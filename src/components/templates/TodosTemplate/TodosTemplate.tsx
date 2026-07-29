@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { ListChecks, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import DownloadButton from '@atoms/DownloadButton/DownloadButton';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import EmptyState from '@molecules/EmptyState/EmptyState';
 import ActionItemsFilters from '@organisms/action-items/ActionItemsFilters/ActionItemsFilters';
@@ -11,6 +12,7 @@ import CreateActionItemDialog from '@organisms/action-items/CreateActionItemDial
 import { useUserActionItemAssignees, useUserActionItems } from '@/features/action-items/hooks/useActionItems';
 import { useUserMeetingOptions } from '@/features/meetings/hooks/useMeetings';
 import { attachMeetingTitles } from '@/features/action-items/utils';
+import { exportBoardActionItemsCsv } from '@/features/export/exportActionItems';
 
 const TodosTemplate = () => {
   const [selectedAssigneeId, setSelectedAssigneeId] = useState<string | null>(null);
@@ -98,6 +100,13 @@ const TodosTemplate = () => {
             onSearchChange={setSearch}
             onlyMine={onlyMine}
             onToggleOnlyMine={setOnlyMine}
+          />
+
+          <DownloadButton
+            label="Export CSV"
+            disabled={items.length === 0}
+            onClick={() => exportBoardActionItemsCsv(items, selectedMeetingTitle)}
+            className="self-end"
           />
 
           <Button type="button" onClick={() => setIsCreateOpen(true)} className="self-end">
