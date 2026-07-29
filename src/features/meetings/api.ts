@@ -175,3 +175,42 @@ export const uploadTranscript = async (input: UploadTranscriptDto) => {
 
   return data.uploadTranscript;
 };
+
+const GET_TRANSCRIPT_VERSIONS = `
+  query GetTranscriptVersions($meetingId: String!) {
+    getTranscriptVersions(meetingId: $meetingId) {
+      id
+      content
+      isActive
+      createdAt
+    }
+  }
+`;
+
+export const findTranscriptVersions = async (meetingId: string) => {
+  const data = await gqlRequest<Pick<Query, 'getTranscriptVersions'>>(GET_TRANSCRIPT_VERSIONS, {
+    meetingId,
+  });
+
+  return data.getTranscriptVersions;
+};
+
+const SELECT_TRANSCRIPT_VERSION = `
+  mutation SelectTranscriptVersion($transcriptId: String!) {
+    selectTranscriptVersion(transcriptId: $transcriptId) {
+      id
+      content
+      isActive
+      createdAt
+    }
+  }
+`;
+
+export const selectTranscriptVersion = async (transcriptId: string) => {
+  const data = await gqlRequest<Pick<Mutation, 'selectTranscriptVersion'>>(
+    SELECT_TRANSCRIPT_VERSION,
+    { transcriptId },
+  );
+
+  return data.selectTranscriptVersion;
+};

@@ -11,7 +11,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Input } from '@/components/ui/input';
 import { useCreateMeeting } from '@/features/meetings/hooks/useMeetings';
 import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from '@/constants/validation';
-import { extractTextFromFile } from '@/lib/utils';
+import { extractTextFromFile, guessAttendeesFromTranscript } from '@/lib/utils';
 import { getErrorMessage } from '@/lib/errors';
 import AssigneeAvatar from '@molecules/AssigneeAvatar/AssigneeAvatar';
 import { DatePickerTime } from '@molecules/DatePickerTime/DatePickerTime';
@@ -66,6 +66,8 @@ const getCurrentDateAndTime = () => {
 const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
   const currentDateAndTime = getCurrentDateAndTime();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const extractedTranscriptRef = useRef<{ file: File; text: string } | null>(null);
+  const suggestedAttendeesForFileRef = useRef<File | null>(null);
   const [step, setStep] = useState(1);
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [attendee, setAttendee] = useState<Attendee>({ firstName: '', lastName: '', email: '' });
@@ -119,6 +121,8 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
       setAttendee({ firstName: '', lastName: '', email: '' });
       setMeetingError('');
       if (fileInputRef.current) fileInputRef.current.value = '';
+      extractedTranscriptRef.current = null;
+      suggestedAttendeesForFileRef.current = null;
     }
   }, [isOpen, reset]);
 
@@ -127,9 +131,39 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
     if (isValid) setStep(2);
   };
 
+  const extractSelectedTranscript = async (file: File) => {
+    if (extractedTranscriptRef.current?.file === file) return extractedTranscriptRef.current.text;
+
+    const text = await extractTextFromFile(file);
+    extractedTranscriptRef.current = { file, text };
+    return text;
+  };
+
   const goToAttendeesStep = async () => {
     const isValid = await trigger('transcriptFile');
-    if (isValid) setStep(3);
+    if (!isValid) return;
+
+    if (selectedFile && suggestedAttendeesForFileRef.current !== selectedFile) {
+      suggestedAttendeesForFileRef.current = selectedFile;
+      try {
+        const text = await extractSelectedTranscript(selectedFile);
+        const suggestions = guessAttendeesFromTranscript(text);
+        setAttendees((currentAttendees) => {
+          const existingNames = new Set(
+            currentAttendees.map(
+              (currentAttendee) => `${currentAttendee.firstName} ${currentAttendee.lastName}`,
+            ),
+          );
+          const newSuggestions = suggestions.filter(
+            (suggestion) => !existingNames.has(`${suggestion.firstName} ${suggestion.lastName}`),
+          );
+          return [...currentAttendees, ...newSuggestions];
+        });
+      } catch {
+      }
+    }
+
+    setStep(3);
   };
 
   const canAddAttendee =
@@ -161,7 +195,7 @@ const NewMeetingModal = ({ isOpen, onClose }: NewMeetingModalProps) => {
     setMeetingError('');
 
     try {
-      const transcript = selectedFile ? await extractTextFromFile(selectedFile) : undefined;
+      const transcript = selectedFile ? await extractSelectedTranscript(selectedFile) : undefined;
 
       await createMeeting.mutateAsync({
         meeting: {
