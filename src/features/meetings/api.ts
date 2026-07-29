@@ -70,6 +70,25 @@ export const fetchUserMeetingOptions = async () => {
   return data.getUserMeetings;
 };
 
+const GET_USER_MEETINGS_FOR_EXPORT = `
+  query GetUserMeetingsForExport {
+    getUserMeetings {
+      id
+      title
+      description
+      status
+      scheduledAt
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const fetchAllMeetingsForExport = async () => {
+  const data = await gqlRequest<Pick<Query, 'getUserMeetings'>>(GET_USER_MEETINGS_FOR_EXPORT);
+  return data.getUserMeetings;
+};
+
 const CREATE_MEETING = `
   mutation CreateMeeting($createMeetingInput: CreateMeetingDto!) {
     createMeeting(createMeetingInput: $createMeetingInput) {

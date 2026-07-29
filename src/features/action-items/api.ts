@@ -15,6 +15,7 @@ const ACTION_ITEM_FIELDS = `
   status
   deadline
   meetingId
+  aiGenerated
   assignee {
     id
     name

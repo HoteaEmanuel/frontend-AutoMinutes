@@ -26,6 +26,7 @@ export const meetingKeys = {
   all: ['meetings'] as const,
   detail: (id: string) => ['meetings', id] as const,
   options: ['meetings', 'options'] as const,
+  exportAll: ['meetings', 'export-all'] as const,
 };
 
 export const meetingsQueryOptions = (input: PaginatedMeetingsDto) => ({

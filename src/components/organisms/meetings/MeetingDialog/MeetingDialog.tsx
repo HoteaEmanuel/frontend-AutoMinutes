@@ -1,10 +1,26 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useGetMeeting } from '@/features/meetings/hooks/useMeetings';
+import { useExportMeeting } from '@/features/export/hooks/useExportMeeting';
 import MeetingStatusBadge from '@molecules/MeetingStatusBadge/MeetingStatusBadge';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
+import {
+  Download,
+  FileCode,
+  FileJson,
+  FileText,
+  Loader2,
+  Pencil,
+  Trash2,
+} from 'lucide-react';
 import { useState } from 'react';
 import OverviewTab from './OverviewTab';
 import TranscriptTab from './TranscriptTab';
@@ -30,6 +46,7 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 
 const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) => {
   const { data, error, isPending, isError, refetch } = useGetMeeting(meetingId);
+  const { exportMeeting, isExporting } = useExportMeeting(meetingId);
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
 
@@ -66,18 +83,59 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
                 <span className="text-sm text-muted-foreground">
                   {dateFormatter.format(new Date(data.scheduledAt))}
                 </span>
-                <Button variant="outline" size="sm" onClick={() => setEditOpen(true)}>
-                  <Pencil />
-                  Edit meeting
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => setDeleteAlertOpen(true)}
-                >
-                  <Trash2 />
-                  Delete meeting
-                </Button>
+                <DropdownMenu>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={<DropdownMenuTrigger />}
+                      className="export-btn export-btn--icon-only"
+                      aria-label="Export"
+                      disabled={isExporting}
+                    >
+                      {isExporting ? (
+                        <Loader2 className="export-btn-icon animate-spin" aria-hidden="true" />
+                      ) : (
+                        <Download className="export-btn-icon" aria-hidden="true" />
+                      )}
+                    </TooltipTrigger>
+                    <TooltipContent>Export</TooltipContent>
+                  </Tooltip>
+                  <DropdownMenuContent align="start" className="min-w-44">
+                    <DropdownMenuItem onClick={() => exportMeeting('pdf')}>
+                      <FileText />
+                      Export as PDF
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => exportMeeting('markdown')}>
+                      <FileCode />
+                      Export as Markdown
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => exportMeeting('json')}>
+                      <FileJson />
+                      Export as JSON
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={<Button variant="outline" size="icon-sm" onClick={() => setEditOpen(true)} />}
+                  >
+                    <Pencil />
+                  </TooltipTrigger>
+                  <TooltipContent>Edit meeting</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="destructive"
+                        size="icon-sm"
+                        onClick={() => setDeleteAlertOpen(true)}
+                      />
+                    }
+                  >
+                    <Trash2 />
+                  </TooltipTrigger>
+                  <TooltipContent>Delete meeting</TooltipContent>
+                </Tooltip>
               </div>
 
               <DialogTitle className="min-w-0 wrap-break-word text-2xl font-bold leading-snug">

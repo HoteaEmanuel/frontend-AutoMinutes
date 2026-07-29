@@ -4,15 +4,25 @@ import { STATUS_OPTIONS } from '@/constants/status';
 import { columns } from '@/features/meetings/columns';
 import { useMeetingFilters } from '@/features/meetings/hooks/useMeetingFilters';
 import { meetingsQueryOptions, useMeetings } from '@/features/meetings/hooks/useMeetings';
+import { useExportMeetings } from '@/features/export/hooks/useExportMeetings';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import { DataTable } from '@organisms/DataTable/DataTable';
 import { DataTableSkeleton } from '@organisms/DataTable/DataTableSkeleton';
 import MeetingFilters from '@organisms/meetings/MeetingFilters/MeetingFilters';
+import DownloadButton from '@atoms/DownloadButton/DownloadButton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { FileJson, FileSpreadsheet } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 
 const MeetingsTemplate = () => {
   const queryClient = useQueryClient();
+  const { exportMeetings, isExporting } = useExportMeetings();
 
   const { filters, setFilters } = useMeetingFilters();
   const { pageNo, pageSize, scheduledFrom, scheduledTo, search, sortDateOrder, status, hasTodos } =
@@ -86,7 +96,23 @@ const MeetingsTemplate = () => {
 
   return (
     <div className="flex flex-col items-center gap-1 w-full p-2">
-      <h1 className="text-left text-2xl font-bold mr-auto">Meetings</h1>
+      <div className="flex w-full items-center justify-between">
+        <h1 className="text-left text-2xl font-bold">Meetings</h1>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger render={<DownloadButton label="Export" loading={isExporting} />} />
+          <DropdownMenuContent align="end" className="min-w-40">
+            <DropdownMenuItem onClick={() => exportMeetings('csv')}>
+              <FileSpreadsheet />
+              Export as CSV
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => exportMeetings('json')}>
+              <FileJson />
+              Export as JSON
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       <MeetingFilters />
       {showSkeleton ? (
