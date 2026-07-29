@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarDays, CheckCircle2, ListChecks } from 'lucide-react';
+import { CountUp } from '@/lib/countup';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -27,17 +28,15 @@ const StatCard = ({
   value: number;
   loading: boolean;
 }) => (
-  <Card>
-    <CardContent className="flex items-center gap-3">
-      <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-        <Icon className="size-5" />
+  <Card size="sm">
+    <CardContent className="flex flex-col items-center gap-1 text-center">
+      <div className="text-xl font-semibold leading-none sm:text-2xl">
+        {loading ? <Skeleton className="h-6 w-8" /> : <CountUp end={value} duration={1.2} />}
       </div>
-      <div>
-        <p className="text-2xl font-semibold leading-none">
-          {loading ? <Skeleton className="h-6 w-8" /> : value}
-        </p>
-        <p className="text-xs text-muted-foreground">{label}</p>
-      </div>
+      <p className="flex items-center gap-1 text-xs text-muted-foreground">
+        <Icon className="size-3.5 shrink-0" />
+        {label}
+      </p>
     </CardContent>
   </Card>
 );
@@ -93,7 +92,7 @@ const ProfileTemplate = () => {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
         <StatCard
           icon={CalendarDays}
           label="Meetings"

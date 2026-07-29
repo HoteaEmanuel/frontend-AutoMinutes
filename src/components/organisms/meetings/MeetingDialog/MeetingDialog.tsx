@@ -17,9 +17,14 @@ import {
   FileCode,
   FileJson,
   FileText,
+  LayoutDashboard,
+  ListChecks,
   Loader2,
+  MoreVertical,
   Pencil,
+  Sparkles,
   Trash2,
+  Users,
 } from 'lucide-react';
 import { useState } from 'react';
 import OverviewTab from './OverviewTab';
@@ -77,65 +82,103 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
 
             <EditMeetingDialog meeting={data} open={editOpen} onOpenChange={setEditOpen} />
 
-            <DialogHeader className="gap-3 border-b border-border/50 p-4 sm:p-6">
-              <div className="flex flex-col gap-3 pr-10 sm:flex-row sm:items-center">
-                <MeetingStatusBadge status={data.status} />
-                <span className="text-sm text-muted-foreground">
-                  {dateFormatter.format(new Date(data.scheduledAt))}
-                </span>
-                <DropdownMenu>
+            <DialogHeader className="min-w-0 gap-3 border-b border-border/50 p-4 sm:p-6">
+              <div className="flex items-center gap-2 pt-8 sm:gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                  <MeetingStatusBadge status={data.status} />
+                  <span className="truncate text-xs text-muted-foreground sm:text-sm">
+                    {dateFormatter.format(new Date(data.scheduledAt))}
+                  </span>
+                </div>
+
+                <div className="hidden shrink-0 items-center gap-2 sm:flex">
+                  <DropdownMenu>
+                    <Tooltip>
+                      <TooltipTrigger
+                        render={<DropdownMenuTrigger />}
+                        className="export-btn export-btn--icon-only"
+                        aria-label="Export meeting"
+                        disabled={isExporting}
+                      >
+                        {isExporting ? (
+                          <Loader2 className="export-btn-icon animate-spin" aria-hidden="true" />
+                        ) : (
+                          <Download className="export-btn-icon" aria-hidden="true" />
+                        )}
+                      </TooltipTrigger>
+                      <TooltipContent>Export</TooltipContent>
+                    </Tooltip>
+                    <DropdownMenuContent align="end" className="min-w-44">
+                      <DropdownMenuItem onClick={() => exportMeeting('pdf')}>
+                        <FileText />
+                        Export as PDF
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => exportMeeting('markdown')}>
+                        <FileCode />
+                        Export as Markdown
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => exportMeeting('json')}>
+                        <FileJson />
+                        Export as JSON
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                   <Tooltip>
                     <TooltipTrigger
-                      render={<DropdownMenuTrigger />}
-                      className="export-btn export-btn--icon-only"
-                      aria-label="Export"
-                      disabled={isExporting}
+                      render={<Button variant="outline" size="icon-sm" onClick={() => setEditOpen(true)} />}
                     >
-                      {isExporting ? (
-                        <Loader2 className="export-btn-icon animate-spin" aria-hidden="true" />
-                      ) : (
-                        <Download className="export-btn-icon" aria-hidden="true" />
-                      )}
+                      <Pencil />
                     </TooltipTrigger>
-                    <TooltipContent>Export</TooltipContent>
+                    <TooltipContent>Edit meeting</TooltipContent>
                   </Tooltip>
-                  <DropdownMenuContent align="start" className="min-w-44">
-                    <DropdownMenuItem onClick={() => exportMeeting('pdf')}>
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <Button
+                          variant="destructive"
+                          size="icon-sm"
+                          onClick={() => setDeleteAlertOpen(true)}
+                        />
+                      }
+                    >
+                      <Trash2 />
+                    </TooltipTrigger>
+                    <TooltipContent>Delete meeting</TooltipContent>
+                  </Tooltip>
+                </div>
+
+                <DropdownMenu>
+                  <div className="-mr-2 shrink-0 sm:hidden">
+                    <DropdownMenuTrigger
+                      render={<Button variant="ghost" size="icon-sm" />}
+                      aria-label="Meeting actions"
+                    >
+                      <MoreVertical />
+                    </DropdownMenuTrigger>
+                  </div>
+                  <DropdownMenuContent align="end" className="min-w-44">
+                    <DropdownMenuItem onClick={() => exportMeeting('pdf')} disabled={isExporting}>
                       <FileText />
                       Export as PDF
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => exportMeeting('markdown')}>
+                    <DropdownMenuItem onClick={() => exportMeeting('markdown')} disabled={isExporting}>
                       <FileCode />
                       Export as Markdown
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => exportMeeting('json')}>
+                    <DropdownMenuItem onClick={() => exportMeeting('json')} disabled={isExporting}>
                       <FileJson />
                       Export as JSON
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                      <Pencil />
+                      Edit meeting
+                    </DropdownMenuItem>
+                    <DropdownMenuItem variant="destructive" onClick={() => setDeleteAlertOpen(true)}>
+                      <Trash2 />
+                      Delete meeting
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Tooltip>
-                  <TooltipTrigger
-                    render={<Button variant="outline" size="icon-sm" onClick={() => setEditOpen(true)} />}
-                  >
-                    <Pencil />
-                  </TooltipTrigger>
-                  <TooltipContent>Edit meeting</TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger
-                    render={
-                      <Button
-                        variant="destructive"
-                        size="icon-sm"
-                        onClick={() => setDeleteAlertOpen(true)}
-                      />
-                    }
-                  >
-                    <Trash2 />
-                  </TooltipTrigger>
-                  <TooltipContent>Delete meeting</TooltipContent>
-                </Tooltip>
               </div>
 
               <DialogTitle className="min-w-0 wrap-break-word text-2xl font-bold leading-snug">
@@ -146,22 +189,27 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
             <Tabs defaultValue="overview" className="min-h-0 min-w-0">
               <TabsList
                 variant="line"
-                className="w-full justify-start overflow-x-auto overflow-y-hidden border-b border-border/50 px-4 sm:px-6"
+                className="w-full border-b border-border/50 px-4 sm:px-6"
               >
-                <TabsTrigger value="overview" className={tabTriggerClassName}>
-                  Overview
+                <TabsTrigger value="overview" className={tabTriggerClassName} aria-label="Overview">
+                  <LayoutDashboard className="size-4" />
+                  <span className="hidden sm:inline">Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="transcript" className={tabTriggerClassName}>
-                  Transcript
+                <TabsTrigger value="transcript" className={tabTriggerClassName} aria-label="Transcript">
+                  <FileText className="size-4" />
+                  <span className="hidden sm:inline">Transcript</span>
                 </TabsTrigger>
-                <TabsTrigger value="ai-results" className={tabTriggerClassName}>
-                  AI Results
+                <TabsTrigger value="ai-results" className={tabTriggerClassName} aria-label="AI Results">
+                  <Sparkles className="size-4" />
+                  <span className="hidden sm:inline">AI Results</span>
                 </TabsTrigger>
-                <TabsTrigger value="attendees" className={tabTriggerClassName}>
-                  Attendees
+                <TabsTrigger value="attendees" className={tabTriggerClassName} aria-label="Attendees">
+                  <Users className="size-4" />
+                  <span className="hidden sm:inline">Attendees</span>
                 </TabsTrigger>
-                <TabsTrigger value="todos" className={tabTriggerClassName}>
-                  Todos
+                <TabsTrigger value="todos" className={tabTriggerClassName} aria-label="Todos">
+                  <ListChecks className="size-4" />
+                  <span className="hidden sm:inline">Todos</span>
                 </TabsTrigger>
               </TabsList>
 

@@ -33,6 +33,7 @@ const TodosTab = ({ meetingId, meetingTitle }: TodosTabProps) => {
       <div className="flex flex-wrap items-center justify-end gap-2">
         <DownloadButton
           label="Export CSV"
+          size="sm"
           disabled={items.length === 0}
           onClick={() => exportMeetingActionItemsCsv(data ?? [], meetingTitle)}
         />

@@ -1,5 +1,6 @@
 import { FileText, ListChecks, Users } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { CountUp } from '@/lib/countup';
 import { cn } from '@/lib/utils';
 import { useAttendees } from '@/features/attendees/hooks/useAttendees';
 import { useGetMeeting } from '@/features/meetings/hooks/useMeetings';
@@ -36,7 +37,7 @@ const StatCard = ({
       </div>
       <div className="flex flex-col gap-0.5">
         <p className="text-2xl font-semibold leading-none tabular-nums">
-          {value !== undefined ? value.toLocaleString() : '—'}
+          {value !== undefined ? <CountUp end={value} duration={1.2} separator="," /> : '—'}
         </p>
         <p className="text-xs text-muted-foreground">{label}</p>
       </div>

@@ -2,7 +2,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { Meeting } from '@/gql/types';
 import MeetingStatusBadge from '../../components/molecules/MeetingStatusBadge/MeetingStatusBadge';
 
-const dateFormatter = new Intl.DateTimeFormat(undefined, {
+export const dateFormatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: 'medium',
   timeStyle: 'short',
 });
