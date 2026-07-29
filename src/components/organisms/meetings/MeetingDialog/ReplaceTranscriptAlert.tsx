@@ -29,8 +29,9 @@ const ReplaceTranscriptAlert = ({
       <AlertDialogHeader>
         <AlertDialogTitle>Replace transcript?</AlertDialogTitle>
         <AlertDialogDescription>
-          A meeting can only have one transcript, so the current one will be permanently replaced
-          with "{fileName}". Regenerate the AI results afterwards to reflect the new transcript.
+          "{fileName}" will become the active transcript used for AI generation. The current one
+          isn't deleted — find it anytime in the version history. Regenerate the AI results
+          afterwards to reflect the new transcript.
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>

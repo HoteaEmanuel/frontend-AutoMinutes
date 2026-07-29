@@ -134,6 +134,7 @@ export type Mutation = {
   deleteAttendee: Attendee;
   deleteMeeting: Meeting;
   generateAIResults: AiResults;
+  selectTranscriptVersion: Transcript;
   setPassword: Scalars['Boolean']['output'];
   updateActionItem: ActionItem;
   updateAttendee: Attendee;
@@ -185,6 +186,11 @@ export type MutationDeleteMeetingArgs = {
 
 export type MutationGenerateAiResultsArgs = {
   aiInput: AiResultsDto;
+};
+
+
+export type MutationSelectTranscriptVersionArgs = {
+  transcriptId: Scalars['String']['input'];
 };
 
 
@@ -249,6 +255,7 @@ export type Query = {
   getActionItems: Array<ActionItem>;
   getAttendees: Array<Attendee>;
   getTranscript?: Maybe<Transcript>;
+  getTranscriptVersions: Array<Transcript>;
   getUserActionItemAssignees: Array<Attendee>;
   getUserActionItems: Array<ActionItem>;
   getUserMeetings: Array<Meeting>;
@@ -293,6 +300,11 @@ export type QueryGetTranscriptArgs = {
 };
 
 
+export type QueryGetTranscriptVersionsArgs = {
+  meetingId: Scalars['String']['input'];
+};
+
+
 export type QueryGetUserActionItemsArgs = {
   filter?: InputMaybe<ActionItemsFilterDto>;
 };
@@ -304,7 +316,9 @@ export type SetPasswordInput = {
 export type Transcript = {
   __typename?: 'Transcript';
   content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
+  isActive: Scalars['Boolean']['output'];
   meetingId: Scalars['ID']['output'];
 };
 
