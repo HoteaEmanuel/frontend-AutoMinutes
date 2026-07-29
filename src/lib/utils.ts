@@ -58,6 +58,59 @@ export async function extractTextFromFile(file: File) {
   }
 }
 
+type GuessedAttendee = { firstName: string; lastName: string; email: string }
+
+function namesFromAttendeesSection(lines: string[]): string[] {
+  const headingIndex = lines.findIndex((line) => line.trim().toLowerCase() === "attendees")
+  if (headingIndex === -1) return []
+
+  const names: string[] = []
+  for (let i = headingIndex + 1; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (line === "") {
+      if (names.length > 0) break
+      continue
+    }
+    if (/^transcript$/i.test(line)) break
+    const cleaned = line.replace(/^[•\-*]\s*/, "").trim()
+    if (cleaned) names.push(cleaned)
+    if (names.length >= 50) break
+  }
+  return names
+}
+
+function namesFromSpeakerLabels(lines: string[]): string[] {
+  const speakerLine =
+    /^([A-Z][\p{L}'.-]*(?:\s+[A-Z][\p{L}'.-]*){0,3})\s*\(\d{1,2}:\d{2}(?::\d{2})?\)$/u
+  const seen = new Set<string>()
+  const names: string[] = []
+
+  for (const rawLine of lines) {
+    const match = speakerLine.exec(rawLine.trim())
+    if (!match) continue
+    const name = match[1].trim()
+    if (!seen.has(name)) {
+      seen.add(name)
+      names.push(name)
+    }
+  }
+
+  // Bail if fewer than 2 distinct matches - not confident enough this is a Meet-style transcript.
+  return names.length >= 2 ? names : []
+}
+
+export function guessAttendeesFromTranscript(text: string): GuessedAttendee[] {
+  const lines = text.split(/\r?\n/)
+  const fromAttendeesSection = namesFromAttendeesSection(lines)
+  const names = fromAttendeesSection.length > 0 ? fromAttendeesSection : namesFromSpeakerLabels(lines)
+
+  return names.slice(0, 30).map((name) => {
+    const parts = name.split(/\s+/)
+    const lastName = parts.length > 1 ? parts.pop()! : ""
+    return { firstName: parts.join(" "), lastName, email: "" }
+  })
+}
+
 export function downloadFile(content: string | Blob, filename: string, mimeType: string) {
   const blob = content instanceof Blob ? content : new Blob([content], { type: mimeType })
   const url = URL.createObjectURL(blob)
