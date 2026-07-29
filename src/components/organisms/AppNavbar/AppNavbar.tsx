@@ -5,6 +5,7 @@ import { useTheme } from '@/features/theme/useTheme';
 import { Moon, Plus, Sun } from 'lucide-react';
 import { Link } from 'react-router';
 import AppNavActions from '@molecules/AppNavActions/AppNavActions';
+import MobileNavDrawer from '@molecules/MobileNavDrawer/MobileNavDrawer';
 import NewMeetingModal from '@organisms/meetings/NewMeetingModal/NewMeetingModal';
 import { ProfileMenu } from '@organisms/ProfileMenu/ProfileMenu';
 
@@ -17,9 +18,12 @@ const AppNavbar = () => {
     <>
       <header className="sticky top-0 z-40 w-full border-b border-border backdrop-blur">
         <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <Link to="/meetings" className="text-xl font-bold text-foreground">
-            AutoMinutes
-          </Link>
+          <div className="flex items-center gap-2">
+            <MobileNavDrawer />
+            <Link to="/meetings" className="text-xl font-bold text-foreground">
+              AutoMinutes
+            </Link>
+          </div>
 
           <AppNavActions />
           <div className="flex items-center gap-2">
@@ -30,16 +34,20 @@ const AppNavbar = () => {
               </Button>
             )}
 
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Toggle theme"
-              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-            >
-              {theme === 'dark' ? <Moon className="text-primary" /> : <Sun />}
-            </Button>
+            <div className="hidden sm:block">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Toggle theme"
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+              >
+                {theme === 'dark' ? <Moon className="text-primary" /> : <Sun />}
+              </Button>
+            </div>
 
-            <ProfileMenu />
+            <div className="hidden sm:block">
+              <ProfileMenu />
+            </div>
           </div>
         </nav>
       </header>

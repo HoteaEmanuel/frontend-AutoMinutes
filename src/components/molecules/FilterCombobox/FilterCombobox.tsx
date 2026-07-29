@@ -19,6 +19,7 @@ type FilterComboboxProps = {
   placeholder: string;
   emptyMessage: string;
   disabled?: boolean;
+  className?: string;
 };
 
 const FilterCombobox = ({
@@ -28,6 +29,7 @@ const FilterCombobox = ({
   placeholder,
   emptyMessage,
   disabled = false,
+  className,
 }: FilterComboboxProps) => {
   const selectedItem = options.find((option) => option.value === selectedValue) ?? null;
 
@@ -39,6 +41,7 @@ const FilterCombobox = ({
       disabled={disabled}
     >
       <ComboboxInput
+        className={className}
         placeholder={placeholder}
         showClear={selectedItem !== null}
         disabled={disabled}

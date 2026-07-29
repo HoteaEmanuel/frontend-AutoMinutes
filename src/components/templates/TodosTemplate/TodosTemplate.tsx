@@ -10,23 +10,35 @@ import ActionItemsBoard from '@organisms/action-items/ActionItemsBoard/ActionIte
 import ActionItemsBoardSkeleton from '@organisms/action-items/ActionItemsBoard/ActionItemsBoardSkeleton';
 import CreateActionItemDialog from '@organisms/action-items/CreateActionItemDialog/CreateActionItemDialog';
 import { useUserActionItemAssignees, useUserActionItems } from '@/features/action-items/hooks/useActionItems';
+import { useActionItemsFilters } from '@/features/action-items/hooks/useActionItemsFilters';
 import { useUserMeetingOptions } from '@/features/meetings/hooks/useMeetings';
 import { attachMeetingTitles } from '@/features/action-items/utils';
 import { exportBoardActionItemsCsv } from '@/features/export/exportActionItems';
+import { getYearScheduleRange, YEAR_FILTER_ALL_TIME } from '@/constants/period';
 
 const TodosTemplate = () => {
-  const [selectedAssigneeId, setSelectedAssigneeId] = useState<string | null>(null);
-  const [selectedMeetingId, setSelectedMeetingId] = useState<string | null>(null);
-  const [search, setSearch] = useState('');
-  const [onlyMine, setOnlyMine] = useState(false);
+  const { filters, setFilters } = useActionItemsFilters();
+  const {
+    search,
+    meetingId: selectedMeetingId,
+    assigneeId: selectedAssigneeId,
+    onlyMine,
+    year: selectedYear,
+  } = filters;
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const meetingsQuery = useUserMeetingOptions();
   const assigneesQuery = useUserActionItemAssignees();
+  const { scheduledFrom, scheduledTo } = useMemo(
+    () => getYearScheduleRange(selectedYear),
+    [selectedYear],
+  );
   const itemsQuery = useUserActionItems({
     meetingId: selectedMeetingId ?? undefined,
     assigneeId: onlyMine ? undefined : selectedAssigneeId ?? undefined,
     search: search || undefined,
     onlyMine: onlyMine || undefined,
+    scheduledFrom,
+    scheduledTo,
   });
 
   const meetings = useMemo(
@@ -68,12 +80,13 @@ const TodosTemplate = () => {
   if (isPending)
     return (
       <div className="flex flex-col gap-2 w-full p-2">
-        <div className="flex flex-wrap items-end justify-between gap-2 mb-5">
+        <div className="flex items-center justify-between gap-2">
           <Skeleton className="h-7 w-56" />
-          <div className="flex flex-wrap items-start gap-4">
-            <Skeleton className="h-9 w-72" />
-            <Skeleton className="h-9 w-32" />
-          </div>
+          <Skeleton className="h-9 w-9 rounded-full" />
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
+          <Skeleton className="h-9 w-72" />
+          <Skeleton className="h-9 w-32" />
         </div>
 
         <ActionItemsBoardSkeleton />
@@ -82,38 +95,43 @@ const TodosTemplate = () => {
 
   return (
     <div className="flex flex-col gap-2 w-full p-2">
-      <div className="flex flex-wrap items-end justify-between gap-2 mb-5">
+      <div className="flex items-center justify-between gap-2">
         <h1 className="text-lg font-bold">
           {items.length} todo{items.length === 1 ? '' : 's'}{' '}
-          {selectedMeetingTitle ? `in "${selectedMeetingTitle}"` : 'across all meetings'}
+          {selectedMeetingTitle
+            ? `in "${selectedMeetingTitle}"`
+            : selectedYear !== YEAR_FILTER_ALL_TIME
+              ? `in ${selectedYear}`
+              : 'across all meetings'}
         </h1>
 
-        <div className="flex flex-wrap items-start gap-6">
-          <ActionItemsFilters
-            assignees={assignees}
-            selectedAssigneeId={selectedAssigneeId}
-            onSelectAssignee={setSelectedAssigneeId}
-            meetings={meetings}
-            selectedMeetingId={selectedMeetingId}
-            onSelectMeeting={setSelectedMeetingId}
-            search={search}
-            onSearchChange={setSearch}
-            onlyMine={onlyMine}
-            onToggleOnlyMine={setOnlyMine}
-          />
+        <DownloadButton
+          label="Export CSV"
+          disabled={items.length === 0}
+          onClick={() => exportBoardActionItemsCsv(items, selectedMeetingTitle)}
+        />
+      </div>
 
-          <DownloadButton
-            label="Export CSV"
-            disabled={items.length === 0}
-            onClick={() => exportBoardActionItemsCsv(items, selectedMeetingTitle)}
-            className="self-end"
-          />
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-5">
+        <ActionItemsFilters
+          assignees={assignees}
+          selectedAssigneeId={selectedAssigneeId}
+          onSelectAssignee={(assigneeId) => setFilters({ assigneeId })}
+          meetings={meetings}
+          selectedMeetingId={selectedMeetingId}
+          onSelectMeeting={(meetingId) => setFilters({ meetingId })}
+          search={search}
+          onSearchChange={(value) => setFilters({ search: value })}
+          onlyMine={onlyMine}
+          onToggleOnlyMine={(value) => setFilters({ onlyMine: value })}
+          selectedYear={selectedYear}
+          onSelectYear={(year) => setFilters({ year })}
+        />
 
-          <Button type="button" onClick={() => setIsCreateOpen(true)} className="self-end">
-            <Plus data-icon="inline-start" />
-            Create Todo
-          </Button>
-        </div>
+        <Button type="button" onClick={() => setIsCreateOpen(true)}>
+          <Plus data-icon="inline-start" />
+          Create Todo
+        </Button>
       </div>
 
       {items.length === 0 ? (
@@ -121,9 +139,11 @@ const TodosTemplate = () => {
           icon={ListChecks}
           title="No todos found"
           description={
-            selectedMeetingId || selectedAssigneeId || search
+            selectedMeetingId || selectedAssigneeId || search || onlyMine
               ? 'Try adjusting your filters to see more todos.'
-              : 'Create a todo to start tracking follow-ups.'
+              : selectedYear !== YEAR_FILTER_ALL_TIME
+                ? `No todos found for ${selectedYear}. Switch the period to "All time" to see older todos.`
+                : 'Create a todo to start tracking follow-ups.'
           }
           accent="amber"
           className="rounded-xl border border-border bg-card py-16"

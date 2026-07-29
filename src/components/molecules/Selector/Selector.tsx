@@ -13,15 +13,16 @@ type SelectorProps<T> = {
   handleChange: (value: T | null) => void;
   items: { label: string; value: T }[];
   label: string;
+  className?: string;
 };
 
-const Selector = ({ items, handleChange, value, label }: SelectorProps<string>) => {
+const Selector = ({ items, handleChange, value, label, className }: SelectorProps<string>) => {
   if (!items) return null;
   return (
     <>
       <Label>{label}</Label>
       <Select value={value} onValueChange={(value) => handleChange(value)} items={items}>
-        <SelectTrigger>
+        <SelectTrigger className={className}>
           <SelectValue placeholder={`Select ${label}`} />
         </SelectTrigger>
         <SelectContent>

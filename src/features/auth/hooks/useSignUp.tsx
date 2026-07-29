@@ -8,7 +8,7 @@ export const useSignUp = () => {
   return useMutation({
     mutationFn: signup,
     onSuccess: ({ data }) => {
-      toast.success('Account created - check your email for the code');
+      toast.success("If this email isn't already registered, we've sent it a verification code.");
       navigate(`/auth/verify-email?email=${encodeURIComponent(data.email)}&sent=1`, {
         replace: true,
       });

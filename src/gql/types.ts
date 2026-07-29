@@ -44,6 +44,8 @@ export type ActionItemsFilterDto = {
   assigneeId?: InputMaybe<Scalars['String']['input']>;
   meetingId?: InputMaybe<Scalars['String']['input']>;
   onlyMine?: InputMaybe<Scalars['Boolean']['input']>;
+  scheduledFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  scheduledTo?: InputMaybe<Scalars['DateTime']['input']>;
   search?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -85,13 +87,6 @@ export type CreateMeetingDto = {
   transcript?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type CreateUserDto = {
-  email: Scalars['String']['input'];
-  firstName: Scalars['String']['input'];
-  lastName: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-};
-
 export type DeleteActionItemDto = {
   actionItemId: Scalars['String']['input'];
   meetingId: Scalars['String']['input'];
@@ -128,7 +123,6 @@ export type Mutation = {
   changePassword: Scalars['Boolean']['output'];
   createMeeting: Meeting;
   createNewActionItem: ActionItem;
-  createUser: User;
   deleteAccount: Scalars['Boolean']['output'];
   deleteActionItem: ActionItem;
   deleteAttendee: Attendee;
@@ -161,11 +155,6 @@ export type MutationCreateMeetingArgs = {
 
 export type MutationCreateNewActionItemArgs = {
   createActionItem: CreateActionItemDto;
-};
-
-
-export type MutationCreateUserArgs = {
-  createUserDto: CreateUserDto;
 };
 
 
