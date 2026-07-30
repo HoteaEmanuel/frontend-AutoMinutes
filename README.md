@@ -2,7 +2,7 @@
 
 AutoMinutes turns raw meeting transcripts into structured, actionable minutes. Upload a transcript, let AI extract the summary, decisions, and action items, then track everything through to done.
 
-This is the web client — a React SPA that talks to the [AutoMinutes backend](../backend) over GraphQL.
+This is the web client — a React SPA that talks to the [AutoMinutes backend](https://github.com/HoteaEmanuel/backend-AutoMinutes) over GraphQL.
 
 ## What it does
 
