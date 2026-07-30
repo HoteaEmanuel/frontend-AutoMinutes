@@ -12,7 +12,7 @@ import CreateActionItemDialog from '@organisms/action-items/CreateActionItemDial
 import { useUserActionItemAssignees, useUserActionItems } from '@/features/action-items/hooks/useActionItems';
 import { useActionItemsFilters } from '@/features/action-items/hooks/useActionItemsFilters';
 import { useUserMeetingOptions } from '@/features/meetings/hooks/useMeetings';
-import { attachMeetingTitles } from '@/features/action-items/utils';
+import { attachMeetingTitles, isActionItemOverdue } from '@/features/action-items/utils';
 import { exportBoardActionItemsCsv } from '@/features/export/exportActionItems';
 import { getYearScheduleRange, YEAR_FILTER_ALL_TIME } from '@/constants/period';
 
@@ -23,6 +23,7 @@ const TodosTemplate = () => {
     meetingId: selectedMeetingId,
     assigneeId: selectedAssigneeId,
     onlyMine,
+    overdueOnly,
     year: selectedYear,
   } = filters;
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -55,10 +56,10 @@ const TodosTemplate = () => {
         .sort((a, b) => a.label.localeCompare(b.label)),
     [assigneesQuery.data],
   );
-  const items = useMemo(
-    () => attachMeetingTitles(itemsQuery.data ?? [], meetingsQuery.data ?? []),
-    [itemsQuery.data, meetingsQuery.data],
-  );
+  const items = useMemo(() => {
+    const withTitles = attachMeetingTitles(itemsQuery.data ?? [], meetingsQuery.data ?? []);
+    return overdueOnly ? withTitles.filter(isActionItemOverdue) : withTitles;
+  }, [itemsQuery.data, meetingsQuery.data, overdueOnly]);
   const selectedMeetingTitle = meetings.find((meeting) => meeting.value === selectedMeetingId)
     ?.label;
 
@@ -124,6 +125,8 @@ const TodosTemplate = () => {
           onSearchChange={(value) => setFilters({ search: value })}
           onlyMine={onlyMine}
           onToggleOnlyMine={(value) => setFilters({ onlyMine: value })}
+          overdueOnly={overdueOnly}
+          onToggleOverdueOnly={(value) => setFilters({ overdueOnly: value })}
           selectedYear={selectedYear}
           onSelectYear={(year) => setFilters({ year })}
         />
@@ -139,7 +142,7 @@ const TodosTemplate = () => {
           icon={ListChecks}
           title="No todos found"
           description={
-            selectedMeetingId || selectedAssigneeId || search || onlyMine
+            selectedMeetingId || selectedAssigneeId || search || onlyMine || overdueOnly
               ? 'Try adjusting your filters to see more todos.'
               : selectedYear !== YEAR_FILTER_ALL_TIME
                 ? `No todos found for ${selectedYear}. Switch the period to "All time" to see older todos.`

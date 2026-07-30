@@ -6,6 +6,7 @@ export type ActionItemsFilterState = {
   meetingId: string | null;
   assigneeId: string | null;
   onlyMine: boolean;
+  overdueOnly: boolean;
   year: string;
 };
 
@@ -18,6 +19,7 @@ export const useActionItemsFilters = () => {
       meetingId: searchParams.get('meetingId'),
       assigneeId: searchParams.get('assigneeId'),
       onlyMine: searchParams.get('onlyMine') === 'true',
+      overdueOnly: searchParams.get('overdueOnly') === 'true',
       year: searchParams.get('year') ?? String(new Date().getFullYear()),
     }),
     [searchParams],
