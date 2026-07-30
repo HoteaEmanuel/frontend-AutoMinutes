@@ -15,9 +15,13 @@ export type AiResults = {
   __typename?: 'AIResults';
   actionItems: Array<ActionItem>;
   attendees: Array<Attendee>;
+  createdAt: Scalars['DateTime']['output'];
   decisions?: Maybe<Array<Scalars['String']['output']>>;
   detailedNotes?: Maybe<Scalars['String']['output']>;
   followUpNotes?: Maybe<Scalars['String']['output']>;
+  generatedActionItems: Array<GeneratedActionItemSnapshot>;
+  generatedAttendees: Array<GeneratedAttendeeSnapshot>;
+  id: Scalars['ID']['output'];
   meetingId: Scalars['ID']['output'];
   summary: Scalars['String']['output'];
 };
@@ -90,6 +94,21 @@ export type CreateMeetingDto = {
 export type DeleteActionItemDto = {
   actionItemId: Scalars['String']['input'];
   meetingId: Scalars['String']['input'];
+};
+
+export type GeneratedActionItemSnapshot = {
+  __typename?: 'GeneratedActionItemSnapshot';
+  assignee?: Maybe<Scalars['String']['output']>;
+  deadline?: Maybe<Scalars['String']['output']>;
+  description: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+};
+
+export type GeneratedAttendeeSnapshot = {
+  __typename?: 'GeneratedAttendeeSnapshot';
+  email?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  role: Scalars['String']['output'];
 };
 
 export type Meeting = {
@@ -241,6 +260,7 @@ export type Query = {
   findMeeting: Meeting;
   findUserMeetings: PaginatedMeetings;
   getAIResults?: Maybe<AiResults>;
+  getAIResultsHistory: Array<AiResults>;
   getActionItems: Array<ActionItem>;
   getAttendees: Array<Attendee>;
   getTranscript?: Maybe<Transcript>;
@@ -269,6 +289,11 @@ export type QueryFindUserMeetingsArgs = {
 
 
 export type QueryGetAiResultsArgs = {
+  meetingId: Scalars['String']['input'];
+};
+
+
+export type QueryGetAiResultsHistoryArgs = {
   meetingId: Scalars['String']['input'];
 };
 
