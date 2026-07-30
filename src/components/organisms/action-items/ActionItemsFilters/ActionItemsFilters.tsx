@@ -33,6 +33,8 @@ type ActionItemsFiltersProps = {
   onSearchChange: (search: string) => void;
   onlyMine: boolean;
   onToggleOnlyMine: (onlyMine: boolean) => void;
+  overdueOnly: boolean;
+  onToggleOverdueOnly: (overdueOnly: boolean) => void;
   selectedYear: string;
   onSelectYear: (year: string) => void;
 };
@@ -50,6 +52,8 @@ const ActionItemsFilters = ({
   onSearchChange,
   onlyMine,
   onToggleOnlyMine,
+  overdueOnly,
+  onToggleOverdueOnly,
   selectedYear,
   onSelectYear,
 }: ActionItemsFiltersProps) => {
@@ -61,8 +65,8 @@ const ActionItemsFilters = ({
     onSearchChange(debouncedSearch);
   }, [debouncedSearch]);
 
-  const searchInput = (
-    <InputGroup>
+  const searchInput = (className?: string) => (
+    <InputGroup className={className}>
       <InputGroupInput
         placeholder="Search by title, description..."
         value={localSearch}
@@ -101,6 +105,10 @@ const ActionItemsFilters = ({
     <Checkbox id="only-mine-filter" checked={onlyMine} onCheckedChange={onToggleOnlyMine} />
   );
 
+  const overdueOnlyCheckbox = (
+    <Checkbox id="overdue-only-filter" checked={overdueOnly} onCheckedChange={onToggleOverdueOnly} />
+  );
+
   const yearSelector = (className?: string) => (
     <Selector
       className={className}
@@ -113,29 +121,37 @@ const ActionItemsFilters = ({
 
   return (
     <>
-      <div className="hidden flex-wrap items-start gap-4 md:flex">
-        <div className="flex flex-col gap-1.5">{yearSelector()}</div>
+      <div className="hidden items-start gap-3 md:flex">
+        <div className="flex flex-none flex-col gap-1.5">{yearSelector()}</div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex min-w-24 flex-1 flex-col gap-1.5">
           <span className="text-xs font-medium text-muted-foreground">Search</span>
-          {searchInput}
+          {searchInput('w-full')}
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex min-w-20 flex-1 flex-col gap-1.5">
           <span className="text-xs font-medium text-muted-foreground">Meeting</span>
-          {meetingCombobox()}
+          {meetingCombobox('w-full')}
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex min-w-20 flex-1 flex-col gap-1.5">
           <span className="text-xs font-medium text-muted-foreground">Assignee</span>
-          {assigneeCombobox()}
+          {assigneeCombobox('w-full')}
         </div>
 
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-none flex-col gap-1.5">
           <span className="invisible text-xs font-medium text-muted-foreground">Only mine</span>
-          <Label htmlFor="only-mine-filter" className="h-8 cursor-pointer">
+          <Label htmlFor="only-mine-filter" className="h-8 cursor-pointer whitespace-nowrap">
             {onlyMineCheckbox}
             Only my tasks
+          </Label>
+        </div>
+
+        <div className="flex flex-none flex-col gap-1.5">
+          <span className="invisible text-xs font-medium text-muted-foreground">Overdue only</span>
+          <Label htmlFor="overdue-only-filter" className="h-8 cursor-pointer whitespace-nowrap">
+            {overdueOnlyCheckbox}
+            Overdue only
           </Label>
         </div>
       </div>
@@ -161,7 +177,7 @@ const ActionItemsFilters = ({
 
             <div className="flex flex-col gap-2">
               <Label>Search</Label>
-              {searchInput}
+              {searchInput('w-full')}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -181,6 +197,15 @@ const ActionItemsFilters = ({
                 onCheckedChange={onToggleOnlyMine}
               />
               Only my tasks
+            </Label>
+
+            <Label htmlFor="overdue-only-filter-modal" className="flex items-center gap-2">
+              <Checkbox
+                id="overdue-only-filter-modal"
+                checked={overdueOnly}
+                onCheckedChange={onToggleOverdueOnly}
+              />
+              Overdue only
             </Label>
           </div>
           <DialogFooter>

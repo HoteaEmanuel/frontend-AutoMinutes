@@ -20,6 +20,9 @@ export const attachMeetingTitles = (
 export const resolveColumnStatus = (status: ActionItemStatus): ActionItemColumnStatus =>
   status === 'UNKNOWN' ? 'OPEN' : status;
 
+export const isActionItemOverdue = (item: Pick<ActionItem, 'deadline' | 'status'>): boolean =>
+  !!item.deadline && item.status !== 'DONE' && new Date(item.deadline).getTime() < Date.now();
+
 export const sortActionItems = <T extends BoardActionItem>(
   items: T[],
   sort: ActionItemSortOption | null,

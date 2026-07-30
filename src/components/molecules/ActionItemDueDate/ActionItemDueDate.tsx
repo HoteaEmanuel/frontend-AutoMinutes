@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { isActionItemOverdue } from '@/features/action-items/utils';
 
 const dateFormatter = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' });
 
@@ -12,7 +13,7 @@ const ActionItemDueDate = ({ deadline, done, className }: ActionItemDueDateProps
   if (!deadline) return null;
 
   const date = new Date(deadline);
-  const isOverdue = !done && date.getTime() < Date.now();
+  const isOverdue = isActionItemOverdue({ deadline, status: done ? 'DONE' : 'OPEN' });
 
   if (isOverdue) {
     return (
