@@ -344,6 +344,7 @@ export type User = {
   createdAt: Scalars['DateTime']['output'];
   email?: Maybe<Scalars['String']['output']>;
   firstName?: Maybe<Scalars['String']['output']>;
+  hasPassword: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   lastName?: Maybe<Scalars['String']['output']>;
   provider?: Maybe<Provider>;
