@@ -21,6 +21,7 @@ const ChangePasswordForm = () => {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<ChangePasswordFormValues>({
     resolver: zodResolver(changePasswordSchema),
@@ -39,7 +40,9 @@ const ChangePasswordForm = () => {
       });
       reset();
     } catch (error) {
-      toast.error(getErrorMessage(error));
+      const message = getErrorMessage(error);
+      setError('currentPassword', { type: 'server', message });
+      toast.error(message);
     }
   };
 
@@ -138,15 +141,15 @@ const SetPasswordForm = () => {
 };
 
 type ChangePasswordCardProps = {
-  isGoogle: boolean;
+  hasPassword: boolean;
 };
 
-export const ChangePasswordCard = ({ isGoogle }: ChangePasswordCardProps) => {
+export const ChangePasswordCard = ({ hasPassword }: ChangePasswordCardProps) => {
   return (
     <Card>
       <CardContent className="flex flex-col gap-4">
         <h2 className="text-base font-medium">Security</h2>
-        {isGoogle ? <SetPasswordForm /> : <ChangePasswordForm />}
+        {hasPassword ? <ChangePasswordForm /> : <SetPasswordForm />}
       </CardContent>
     </Card>
   );

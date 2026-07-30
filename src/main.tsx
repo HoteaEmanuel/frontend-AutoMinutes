@@ -7,6 +7,11 @@ import { toast } from 'sonner';
 import { getErrorMessage } from './lib/errors';
 // Pentru fiecare onError voi afisa un toast cu eroarea
 const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,
+    },
+  },
   mutationCache: new MutationCache({
     onError: (error) => {
       toast.error(getErrorMessage(error));

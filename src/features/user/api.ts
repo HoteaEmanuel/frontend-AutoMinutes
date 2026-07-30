@@ -15,6 +15,7 @@ const USER_FIELDS = `
   email
   avatar
   provider
+  hasPassword
   createdAt
 `;
 

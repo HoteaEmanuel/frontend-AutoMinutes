@@ -1,15 +1,29 @@
 import { api } from './axios';
 import { useAuthStore } from '@/features/auth/stores/auth.store';
 
+interface GraphQLError {
+  message: string;
+  extensions?: { code?: string; originalError?: { message?: string | string[] } };
+}
+
 interface GraphQLResponse<TData> {
   data?: TData;
-  errors?: { message: string; extensions?: { code?: string } }[];
+  errors?: GraphQLError[];
 }
 
 const isAuthError = <TData>(body: GraphQLResponse<TData>) =>
   body.errors?.some(
     (error) => error.message === 'Unauthorized' || error.extensions?.code === 'UNAUTHENTICATED',
   );
+
+// Nest wraps class-validator failures in a generic "Bad Request Exception"
+// top-level message, the real per-field message(s) end up in extensions.originalError.
+const getGraphQLErrorMessage = (error: GraphQLError): string => {
+  const originalMessage = error.extensions?.originalError?.message;
+  if (Array.isArray(originalMessage) && originalMessage.length > 0) return originalMessage[0];
+  if (typeof originalMessage === 'string') return originalMessage;
+  return error.message;
+};
 
 export const gqlRequest = async <TData, TVariables extends object = object>(
   query: string,
@@ -30,7 +44,7 @@ export const gqlRequest = async <TData, TVariables extends object = object>(
         variables,
       });
 
-      if (retryBody.errors?.length) throw new Error(retryBody.errors[0].message);
+      if (retryBody.errors?.length) throw new Error(getGraphQLErrorMessage(retryBody.errors[0]));
       if (!retryBody.data) throw new Error('Something went wrong');
 
       return retryBody.data;
@@ -40,7 +54,7 @@ export const gqlRequest = async <TData, TVariables extends object = object>(
     }
   }
 
-  if (body.errors?.length) throw new Error(body.errors[0].message);
+  if (body.errors?.length) throw new Error(getGraphQLErrorMessage(body.errors[0]));
   if (!body.data) throw new Error('Something went wrong');
 
   return body.data;
