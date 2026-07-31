@@ -29,7 +29,6 @@ export const fetchUserMeetings = async (input: PaginatedMeetingsDto) => {
   const data = await gqlRequest<Pick<Query, 'findUserMeetings'>>(FIND_USER_MEETINGS, {
     input: input,
   });
-  await new Promise((promise) => setTimeout(promise, 500));
   return data.findUserMeetings;
 };
 

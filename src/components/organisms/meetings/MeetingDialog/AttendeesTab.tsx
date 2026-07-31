@@ -3,15 +3,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useAttendees } from '@/features/attendees/hooks/useAttendees';
+import { useDeleteAttendee } from '@/features/attendees/hooks/useAttendeeMutations';
 import { Attendee } from '@/gql/types';
 import AssigneeAvatar from '@molecules/AssigneeAvatar/AssigneeAvatar';
 import AttendeeActionsMenu from '@molecules/AttendeeActionsMenu/AttendeeActionsMenu';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import EmptyState from '@molecules/EmptyState/EmptyState';
+import ConfirmAlertDialog from '@molecules/ConfirmAlertDialog/ConfirmAlertDialog';
 import { Plus, Users } from 'lucide-react';
 import AttendeesTabSkeleton from './AttendeesTabSkeleton';
 import AddAttendeeDialog from './AddAttendeeDialog';
-import AttendeeDeleteAlert from './AttendeeDeleteAlert';
 import AttendeeEditDialog from './AttendeeEditDialog';
 
 const roleLabels: Record<string, string> = {
@@ -22,9 +23,18 @@ const roleLabels: Record<string, string> = {
 
 const AttendeesTab = ({ meetingId }: { meetingId: string }) => {
   const { data: attendees, isError, isPending, refetch, error } = useAttendees(meetingId);
+  const { mutate: deleteAttendee, isPending: isDeleting } = useDeleteAttendee();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingAttendee, setEditingAttendee] = useState<Attendee | null>(null);
   const [deletingAttendee, setDeletingAttendee] = useState<Attendee | null>(null);
+
+  const handleDeleteAttendee = () => {
+    if (!deletingAttendee) return;
+    deleteAttendee(
+      { attendeeId: deletingAttendee.id },
+      { onSuccess: () => setDeletingAttendee(null) },
+    );
+  };
 
   if (isPending) return <AttendeesTabSkeleton />;
   if (isError) return <ErrorRefetch errorMessage={error.message} refetch={refetch} />;
@@ -80,13 +90,24 @@ const AttendeesTab = ({ meetingId }: { meetingId: string }) => {
         />
       )}
 
-      {deletingAttendee && (
-        <AttendeeDeleteAlert
-          attendee={deletingAttendee}
-          open={!!deletingAttendee}
-          onOpenChange={(open) => !open && setDeletingAttendee(null)}
-        />
-      )}
+      <ConfirmAlertDialog
+        open={!!deletingAttendee}
+        onOpenChange={(open) => !open && setDeletingAttendee(null)}
+        title={
+          <>
+            Remove "
+            <span className="inline-block max-w-[70%] truncate align-bottom">
+              {deletingAttendee?.name}
+            </span>
+            "?
+          </>
+        }
+        description="This attendee will be permanently removed from the meeting. This can't be undone."
+        confirmLabel="Remove"
+        pendingLabel="Removing..."
+        isPending={isDeleting}
+        onConfirm={handleDeleteAttendee}
+      />
     </div>
   );
 };

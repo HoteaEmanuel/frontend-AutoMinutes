@@ -14,15 +14,13 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import Pagination from '@organisms/PaginationSection/Pagination';
-import { useState } from 'react';
 import { CalendarSearch } from 'lucide-react';
 import { Meeting } from '@/gql/types';
-import MeetingDialog from '@organisms/meetings/MeetingDialog/MeetingDialog';
 import EmptyState from '@molecules/EmptyState/EmptyState';
 import MeetingStatusIcon from '@molecules/MeetingStatusDot/MeetingStatusIcon';
 import { useMeetingFilters } from '@/features/meetings/hooks/useMeetingFilters';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { dateFormatter } from '@/features/meetings/columns';
+import { Link, useNavigate } from 'react-router';
 
 type DataTableProps = {
   data: any;
@@ -30,6 +28,7 @@ type DataTableProps = {
   totalCount: number;
 };
 export function DataTable({ data, columns, totalCount }: DataTableProps) {
+  const navigate = useNavigate();
   const { filters, setFilters } = useMeetingFilters();
   const table = useReactTable({
     data: data,
@@ -52,8 +51,6 @@ export function DataTable({ data, columns, totalCount }: DataTableProps) {
       setFilters({ pageNo: next.pageIndex + 1, pageSize: next.pageSize });
     },
   });
-
-  const [meetingSelected, setMeetingSelected] = useState<string | null>(null);
 
   return (
     <div className="flex flex-col max-h-[70vh] rounded-lg border border-border bg-card text-card-foreground shadow-sm w-full">
@@ -79,25 +76,35 @@ export function DataTable({ data, columns, totalCount }: DataTableProps) {
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row, index) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && 'selected'}
-                  className={`h-16 cursor-pointer ${index % 2 ? 'bg-table-row-odd' : ''}`}
-                  onClick={() => setMeetingSelected((row.original as Meeting).id)}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      <Tooltip>
-                        <TooltipTrigger render={<span className="block" />}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TooltipTrigger>
-                        <TooltipContent>View meeting details</TooltipContent>
-                      </Tooltip>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              table.getRowModel().rows.map((row, index) => {
+                const meetingHref = `/meetings/${(row.original as Meeting).id}`;
+                return (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && 'selected'}
+                    className={`h-16 cursor-pointer ${index % 2 ? 'bg-table-row-odd' : ''}`}
+                    onClick={() => navigate(meetingHref)}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {cell.column.id === 'title' ? (
+                          // Real anchor on the title so middle-click, cmd-click and
+                          // keyboard focus all work - the row onClick stays for convenience.
+                          <Link
+                            to={meetingHref}
+                            className="block rounded-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                            onClick={(event) => event.stopPropagation()}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </Link>
+                        ) : (
+                          flexRender(cell.column.columnDef.cell, cell.getContext())
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={columns.length} className="h-64">
@@ -119,10 +126,10 @@ export function DataTable({ data, columns, totalCount }: DataTableProps) {
           table.getRowModel().rows.map((row, index) => {
             const meeting = row.original as Meeting;
             return (
-              <div
+              <Link
                 key={row.id}
+                to={`/meetings/${meeting.id}`}
                 className={`flex cursor-pointer items-center justify-between gap-3 border-b border-b-table-row-border px-4 py-3 last:border-b-0 ${index % 2 ? 'bg-table-row-odd' : ''}`}
-                onClick={() => setMeetingSelected(meeting.id)}
               >
                 <div className="flex min-w-0 flex-1 flex-col gap-0.5 text-left">
                   <span className="truncate font-medium text-foreground">{meeting.title}</span>
@@ -136,7 +143,7 @@ export function DataTable({ data, columns, totalCount }: DataTableProps) {
                   </span>
                 </div>
                 <MeetingStatusIcon status={meeting.status} />
-              </div>
+              </Link>
             );
           })
         ) : (
@@ -151,13 +158,6 @@ export function DataTable({ data, columns, totalCount }: DataTableProps) {
       </div>
 
       <Pagination table={table} />
-      {meetingSelected && (
-        <MeetingDialog
-          meetingId={meetingSelected}
-          open={true}
-          onOpenChange={() => setMeetingSelected(null)}
-        />
-      )}
     </div>
   );
 }

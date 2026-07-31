@@ -5,13 +5,13 @@ import { useGetMeeting } from '@/features/meetings/hooks/useMeetings';
 import { useGetTranscript } from '@/features/meetings/hooks/useTranscript';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import EmptyState from '@molecules/EmptyState/EmptyState';
+import ConfirmAlertDialog from '@molecules/ConfirmAlertDialog/ConfirmAlertDialog';
 import AiScanningLoader from '@atoms/AiScanningLoader/AiScanningLoader';
 import { cn } from '@/lib/utils';
 import { Check, Copy, Loader2, RefreshCw, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import AiResultsTabSkeleton from './AiResultsTabSkeleton';
-import RegenerateAIResultsAlert from './RegenerateAIResultsAlert';
 
 const statusLabels: Record<string, string> = {
   OPEN: 'Open',
@@ -189,10 +189,14 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
         </div>
       )}
 
-      <RegenerateAIResultsAlert
+      <ConfirmAlertDialog
         open={confirmOpen}
-        isPending={isBusy}
         onOpenChange={setConfirmOpen}
+        title="Regenerate AI results?"
+        description="The current summary, along with every attendee and action item the AI generated for this meeting, will be replaced. Anything you added or edited by hand is kept."
+        confirmLabel="Regenerate"
+        pendingLabel="Regenerating..."
+        isPending={isBusy}
         onConfirm={handleRegenerate}
       />
     </div>

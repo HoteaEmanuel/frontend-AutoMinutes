@@ -1,10 +1,10 @@
-
-import { Home, ListTodo, User } from 'lucide-react';
+import { CalendarDays, LayoutDashboard, ListTodo, User } from 'lucide-react';
 import { NavLink } from 'react-router';
 export const navLinks = [
-  { label: 'Home', to: '/meetings', icon: Home },
-  { label: 'Profile', to: '/profile', icon: User },
+  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard },
+  { label: 'Meetings', to: '/meetings', icon: CalendarDays },
   { label: 'Todos', to: '/todos', icon: ListTodo },
+  { label: 'Profile', to: '/profile', icon: User },
 ];
 const AppNavActions = () => {
   return (

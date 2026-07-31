@@ -5,8 +5,9 @@ import ActionItemStatusMenu from '@molecules/ActionItemStatusMenu/ActionItemStat
 import ActionItemActionsMenu from '@molecules/ActionItemActionsMenu/ActionItemActionsMenu';
 import AssigneeAvatar from '@molecules/AssigneeAvatar/AssigneeAvatar';
 import ActionItemDueDate from '@molecules/ActionItemDueDate/ActionItemDueDate';
+import ConfirmAlertDialog from '@molecules/ConfirmAlertDialog/ConfirmAlertDialog';
 import ActionItemEditDialog from '@organisms/action-items/ActionItemEditDialog/ActionItemEditDialog';
-import ActionItemDeleteAlert from '@organisms/action-items/ActionItemDeleteAlert/ActionItemDeleteAlert';
+import { useDeleteActionItem } from '@/features/action-items/hooks/useActionItemMutations';
 import { BoardActionItem, resolveColumnStatus } from '@/features/action-items/utils';
 import { ActionItemColumnStatus } from '@/constants/actionItemStatus';
 
@@ -26,6 +27,14 @@ const ActionItemCard = ({ item, hideMeetingTitle }: ActionItemCardProps) => {
   const columnStatus = resolveColumnStatus(item.status);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const { mutate: deleteActionItem, isPending: isDeleting } = useDeleteActionItem();
+
+  const handleDelete = () => {
+    deleteActionItem(
+      { meetingId: item.meetingId, actionItemId: item.id },
+      { onSuccess: () => setIsDeleteOpen(false) },
+    );
+  };
 
   return (
     <Card className={cn('gap-3 border-l-4 px-4', columnBorderClass[columnStatus])}>
@@ -35,7 +44,9 @@ const ActionItemCard = ({ item, hideMeetingTitle }: ActionItemCardProps) => {
           <span
             className={cn(
               'wrap-break-word text-xs',
-              done ? 'font-medium text-muted-foreground line-through' : 'font-medium text-foreground',
+              done
+                ? 'font-medium text-muted-foreground line-through'
+                : 'font-medium text-foreground',
             )}
           >
             {item.title}
@@ -44,7 +55,10 @@ const ActionItemCard = ({ item, hideMeetingTitle }: ActionItemCardProps) => {
             <span className="truncate text-[11px] text-muted-foreground">{item.meetingTitle}</span>
           )}
         </div>
-        <ActionItemActionsMenu onEdit={() => setIsEditOpen(true)} onDelete={() => setIsDeleteOpen(true)} />
+        <ActionItemActionsMenu
+          onEdit={() => setIsEditOpen(true)}
+          onDelete={() => setIsDeleteOpen(true)}
+        />
       </div>
 
       <div className="flex items-center justify-between gap-2 pl-7">
@@ -62,7 +76,21 @@ const ActionItemCard = ({ item, hideMeetingTitle }: ActionItemCardProps) => {
       </div>
 
       <ActionItemEditDialog item={item} open={isEditOpen} onOpenChange={setIsEditOpen} />
-      <ActionItemDeleteAlert item={item} open={isDeleteOpen} onOpenChange={setIsDeleteOpen} />
+      <ConfirmAlertDialog
+        open={isDeleteOpen}
+        onOpenChange={setIsDeleteOpen}
+        title={
+          <>
+            Delete "
+            <span className="inline-block max-w-[70%] truncate align-bottom">{item.title}</span>"?
+          </>
+        }
+        description="This action item will be permanently removed. This can't be undone."
+        confirmLabel="Delete"
+        pendingLabel="Deleting..."
+        isPending={isDeleting}
+        onConfirm={handleDelete}
+      />
     </Card>
   );
 };

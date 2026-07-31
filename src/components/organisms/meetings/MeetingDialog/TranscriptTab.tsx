@@ -7,10 +7,10 @@ import { downloadFile, extractTextFromFile } from '@/lib/utils';
 import { getErrorMessage } from '@/lib/errors';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import EmptyState from '@molecules/EmptyState/EmptyState';
+import ConfirmAlertDialog from '@molecules/ConfirmAlertDialog/ConfirmAlertDialog';
 import { Check, Copy, Download, FileText, History, Loader2, Upload } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import ReplaceTranscriptAlert from './ReplaceTranscriptAlert';
 import TranscriptTabSkeleton from './TranscriptTabSkeleton';
 import TranscriptVersionHistory from './TranscriptVersionHistory';
 
@@ -157,11 +157,14 @@ const TranscriptTab = ({ meetingId }: { meetingId: string }) => {
         />
       )}
 
-      <ReplaceTranscriptAlert
-        fileName={pendingUpload?.name ?? ''}
+      <ConfirmAlertDialog
         open={Boolean(pendingUpload)}
-        isPending={isUploading}
         onOpenChange={(open) => !open && setPendingUpload(null)}
+        title="Replace transcript?"
+        description={`"${pendingUpload?.name ?? ''}" will become the active transcript used for AI generation. The current one isn't deleted — find it anytime in the version history. Regenerate the AI results afterwards to reflect the new transcript.`}
+        confirmLabel="Replace"
+        pendingLabel="Replacing..."
+        isPending={isUploading}
         onConfirm={handleConfirmReplace}
       />
 

@@ -19,6 +19,8 @@ import AppLayout from '@templates/AppLayout/AppLayout';
 import ProfilePage from '@pages/ProfilePage/ProfilePage';
 import TodosPage from '@pages/Todos/TodosPage';
 import MeetingsPage from '@pages/MeetingsPage/MeetingsPage';
+import MeetingDetailPage from '@pages/MeetingDetailPage/MeetingDetailPage';
+import DashboardPage from '@pages/DashboardPage/DashboardPage';
 import PageNotFound from '@pages/NotFound/PageNotFound';
 function App() {
   useInitAuth();
@@ -53,7 +55,9 @@ function App() {
 
             <Route element={<ProtectedRoute />}>
               <Route element={<AppLayout />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/meetings" element={<MeetingsPage />} />
+                <Route path="/meetings/:meetingId" element={<MeetingDetailPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/todos" element={<TodosPage />} />
               </Route>
