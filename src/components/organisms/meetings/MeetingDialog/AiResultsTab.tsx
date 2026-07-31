@@ -7,9 +7,10 @@ import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
 import EmptyState from '@molecules/EmptyState/EmptyState';
 import AiScanningLoader from '@atoms/AiScanningLoader/AiScanningLoader';
 import { cn } from '@/lib/utils';
-import { Check, Copy, Loader2, RefreshCw, Sparkles } from 'lucide-react';
+import { Check, Copy, History, Loader2, RefreshCw, Sparkles } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import AiResultsHistory from './AiResultsHistory';
 import AiResultsTabSkeleton from './AiResultsTabSkeleton';
 import RegenerateAIResultsAlert from './RegenerateAIResultsAlert';
 
@@ -33,6 +34,7 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
   const { data: transcript } = useGetTranscript(meetingId);
   const { mutate, isPending: isGenerating } = useGenerateAIResults(meetingId);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [summaryCopied, setSummaryCopied] = useState(false);
   const summaryCopyTimeout = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
@@ -71,6 +73,13 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
           <p className="mr-auto text-xs text-muted-foreground">
             Add a transcript to this meeting before generating results.
           </p>
+        )}
+
+        {data && (
+          <Button variant="outline" size="sm" onClick={() => setHistoryOpen(true)}>
+            <History />
+            History
+          </Button>
         )}
 
         <Button
@@ -194,6 +203,13 @@ const AiResultsTab = ({ meetingId }: { meetingId: string }) => {
         isPending={isBusy}
         onOpenChange={setConfirmOpen}
         onConfirm={handleRegenerate}
+      />
+
+      <AiResultsHistory
+        meetingId={meetingId}
+        meetingTitle={meeting?.title ?? 'meeting'}
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
       />
     </div>
   );

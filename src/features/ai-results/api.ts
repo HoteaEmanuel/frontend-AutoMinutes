@@ -31,6 +31,30 @@ const GENERATE_AI_RESULTS = `
   }
 `;
 
+const FIND_AI_RESULTS_HISTORY = `
+  query FindAIResultsHistory($meetingId: String!) {
+    getAIResultsHistory(meetingId: $meetingId) {
+      id
+      createdAt
+      summary
+      decisions
+      detailedNotes
+      followUpNotes
+      generatedActionItems {
+        description
+        assignee
+        deadline
+        status
+      }
+      generatedAttendees {
+        name
+        email
+        role
+      }
+    }
+  }
+`;
+
 export const findAIMeetingResults = async (meetingId: string) => {
   const data = await gqlRequest<Pick<Query, 'getAIResults'>>(FIND_AI_RESULTS, {
     meetingId: meetingId,
@@ -43,4 +67,11 @@ export const generateAIResults = async (meetingId: string) => {
     meetingId,
   });
   return data.generateAIResults;
+};
+
+export const findAIResultsHistory = async (meetingId: string) => {
+  const data = await gqlRequest<Pick<Query, 'getAIResultsHistory'>>(FIND_AI_RESULTS_HISTORY, {
+    meetingId,
+  });
+  return data.getAIResultsHistory;
 };
