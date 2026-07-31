@@ -15,7 +15,7 @@ const useLogin = () => {
     onSuccess: ({ data }) => {
       setSession({ accessToken: data.accessToken, user: data.user });
       toast.success('Logged in successfully');
-      navigate('/meetings');
+      navigate('/dashboard');
     },
     onError: (error) => {
       if (!axios.isAxiosError(error)) return;

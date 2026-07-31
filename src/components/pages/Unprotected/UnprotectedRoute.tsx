@@ -3,7 +3,7 @@ import { Navigate, Outlet } from 'react-router';
 
 const UnprotectedRoute = () => {
   const accessToken = useAuthStore((s) => s.accessToken);
-  return accessToken ? <Navigate to={'/meetings'} /> : <Outlet />;
+  return accessToken ? <Navigate to={'/dashboard'} /> : <Outlet />;
 };
 
 export default UnprotectedRoute;

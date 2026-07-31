@@ -14,7 +14,7 @@ export const useVerifyEmail = () => {
     onSuccess: ({ data }) => {
       setSession({ accessToken: data.accessToken, user: data.user });
       toast.success('Email verified');
-      navigate('/meetings');
+      navigate('/dashboard');
     },
   });
 };

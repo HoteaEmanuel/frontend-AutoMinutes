@@ -16,7 +16,7 @@ const AuthNavBar = () => {
             'text-lg sm:text-2xl font-bold',
             isLandingPage ? 'text-white/80 ' : 'text-foreground',
           )}
-          to={user ? '/meetings' : '/'}
+          to={user ? '/dashboard' : '/'}
         >
           AutoMinutes
         </Link>
@@ -35,7 +35,7 @@ const AuthNavBar = () => {
             </>
           ) : (
             <Button>
-              <Link to={'/meetings'}>Home</Link>
+              <Link to={'/dashboard'}>Home</Link>
             </Button>
           )}
         </div>

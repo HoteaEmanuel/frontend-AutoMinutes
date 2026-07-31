@@ -8,10 +8,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { useGetMeeting } from '@/features/meetings/hooks/useMeetings';
+import { useDeleteMeeting, useGetMeeting } from '@/features/meetings/hooks/useMeetings';
 import { useExportMeeting } from '@/features/export/hooks/useExportMeeting';
 import MeetingStatusBadge from '@molecules/MeetingStatusBadge/MeetingStatusBadge';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
+import ConfirmAlertDialog from '@molecules/ConfirmAlertDialog/ConfirmAlertDialog';
 import {
   Download,
   FileCode,
@@ -32,7 +33,6 @@ import TranscriptTab from './TranscriptTab';
 import AttendeesTab from './AttendeesTab';
 import AiResultsTab from './AiResultsTab';
 import TodosTab from './TodosTab';
-import MeetingDeleteAlert from './MeetingDeleteAlert';
 import EditMeetingDialog from './EditMeetingDialog';
 
 type MeetingDialogProps = {
@@ -52,8 +52,19 @@ const dateFormatter = new Intl.DateTimeFormat(undefined, {
 const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) => {
   const { data, error, isPending, isError, refetch } = useGetMeeting(meetingId);
   const { exportMeeting, isExporting } = useExportMeeting(meetingId);
+  const { mutate: deleteMeeting, isPending: isDeleting } = useDeleteMeeting();
   const [deleteAlertOpen, setDeleteAlertOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+
+  const handleDelete = () => {
+    if (!data) return;
+    deleteMeeting(data.id, {
+      onSuccess: () => {
+        setDeleteAlertOpen(false);
+        onOpenChange();
+      },
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -72,12 +83,23 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
 
         {data && (
           <>
-            <MeetingDeleteAlert
-              meetingId={meetingId}
-              meetingTitle={data.title}
+            <ConfirmAlertDialog
               open={deleteAlertOpen}
               onOpenChange={setDeleteAlertOpen}
-              onDeleted={onOpenChange}
+              title={
+                <>
+                  Delete "
+                  <span className="inline-block max-w-[70%] truncate align-bottom">
+                    {data.title}
+                  </span>
+                  "?
+                </>
+              }
+              description="This will permanently remove the meeting along with its transcript, AI results, attendees, and action items. This can't be undone."
+              confirmLabel="Delete"
+              pendingLabel="Deleting..."
+              isPending={isDeleting}
+              onConfirm={handleDelete}
             />
 
             <EditMeetingDialog meeting={data} open={editOpen} onOpenChange={setEditOpen} />
@@ -125,7 +147,13 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
                   </DropdownMenu>
                   <Tooltip>
                     <TooltipTrigger
-                      render={<Button variant="outline" size="icon-sm" onClick={() => setEditOpen(true)} />}
+                      render={
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
+                          onClick={() => setEditOpen(true)}
+                        />
+                      }
                     >
                       <Pencil />
                     </TooltipTrigger>
@@ -161,7 +189,10 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
                       <FileText />
                       Export as PDF
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => exportMeeting('markdown')} disabled={isExporting}>
+                    <DropdownMenuItem
+                      onClick={() => exportMeeting('markdown')}
+                      disabled={isExporting}
+                    >
                       <FileCode />
                       Export as Markdown
                     </DropdownMenuItem>
@@ -173,7 +204,10 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
                       <Pencil />
                       Edit meeting
                     </DropdownMenuItem>
-                    <DropdownMenuItem variant="destructive" onClick={() => setDeleteAlertOpen(true)}>
+                    <DropdownMenuItem
+                      variant="destructive"
+                      onClick={() => setDeleteAlertOpen(true)}
+                    >
                       <Trash2 />
                       Delete meeting
                     </DropdownMenuItem>
@@ -187,23 +221,32 @@ const MeetingDialog = ({ meetingId, open, onOpenChange }: MeetingDialogProps) =>
             </DialogHeader>
 
             <Tabs defaultValue="overview" className="min-h-0 min-w-0">
-              <TabsList
-                variant="line"
-                className="w-full border-b border-border/50 px-4 sm:px-6"
-              >
+              <TabsList variant="line" className="w-full border-b border-border/50 px-4 sm:px-6">
                 <TabsTrigger value="overview" className={tabTriggerClassName} aria-label="Overview">
                   <LayoutDashboard className="size-4" />
                   <span className="hidden sm:inline">Overview</span>
                 </TabsTrigger>
-                <TabsTrigger value="transcript" className={tabTriggerClassName} aria-label="Transcript">
+                <TabsTrigger
+                  value="transcript"
+                  className={tabTriggerClassName}
+                  aria-label="Transcript"
+                >
                   <FileText className="size-4" />
                   <span className="hidden sm:inline">Transcript</span>
                 </TabsTrigger>
-                <TabsTrigger value="ai-results" className={tabTriggerClassName} aria-label="AI Results">
+                <TabsTrigger
+                  value="ai-results"
+                  className={tabTriggerClassName}
+                  aria-label="AI Results"
+                >
                   <Sparkles className="size-4" />
                   <span className="hidden sm:inline">AI Results</span>
                 </TabsTrigger>
-                <TabsTrigger value="attendees" className={tabTriggerClassName} aria-label="Attendees">
+                <TabsTrigger
+                  value="attendees"
+                  className={tabTriggerClassName}
+                  aria-label="Attendees"
+                >
                   <Users className="size-4" />
                   <span className="hidden sm:inline">Attendees</span>
                 </TabsTrigger>

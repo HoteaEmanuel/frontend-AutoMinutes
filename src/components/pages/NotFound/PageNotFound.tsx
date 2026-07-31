@@ -10,7 +10,7 @@ const PageNotFound = () => {
         <p className="text-xl">Oops! This page was not found!</p>
         <div className="flex justify-center items-center gap-4">
           <Button variant={'link'}>
-            <Link to={'/meetings'}>Home</Link>
+            <Link to={'/dashboard'}>Home</Link>
           </Button>
 
           <Button onClick={() => navigate(-1)}>Go back</Button>

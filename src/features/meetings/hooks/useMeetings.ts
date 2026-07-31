@@ -50,6 +50,7 @@ export const useGetMeeting = (id: string) =>
   useQuery({
     queryKey: meetingKeys.detail(id),
     queryFn: () => fetchMeeting(id),
+    retry: false,
   });
 
 export const useAddMeeting = () => {

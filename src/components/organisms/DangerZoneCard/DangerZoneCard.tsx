@@ -2,16 +2,7 @@ import { useState } from 'react';
 import { TriangleAlert } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import ConfirmAlertDialog from '@molecules/ConfirmAlertDialog/ConfirmAlertDialog';
 import { useDeleteAccount } from '@/features/user/hooks/useDeleteAccount';
 import { getErrorMessage } from '@/lib/errors';
 import { toast } from 'sonner';
@@ -49,24 +40,22 @@ export const DangerZoneCard = () => {
         </div>
       </CardContent>
 
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete your account?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will <span className="font-bold">PERMANENTLY </span> delete your account along
-              with all your meetings, transcripts, action items, and attendees.{' '}
-              <span className="font-bold">This action cannot be undone.</span>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" disabled={isPending} onClick={handleDelete}>
-              {isPending ? 'Deleting...' : 'Delete account'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmAlertDialog
+        open={open}
+        onOpenChange={setOpen}
+        title="Delete your account?"
+        description={
+          <>
+            This will <span className="font-bold">PERMANENTLY </span> delete your account along with
+            all your meetings, transcripts, action items, and attendees.{' '}
+            <span className="font-bold">This action cannot be undone.</span>
+          </>
+        }
+        confirmLabel="Delete account"
+        pendingLabel="Deleting..."
+        isPending={isPending}
+        onConfirm={handleDelete}
+      />
     </Card>
   );
 };

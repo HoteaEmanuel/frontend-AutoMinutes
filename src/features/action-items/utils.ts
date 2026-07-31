@@ -1,3 +1,4 @@
+import { differenceInCalendarDays } from 'date-fns';
 import { ActionItem, ActionItemStatus, Meeting } from '@/gql/types';
 import { ActionItemColumnStatus } from '@/constants/actionItemStatus';
 import { ActionItemSortOption } from '@/constants/actionItemSort';
@@ -22,6 +23,20 @@ export const resolveColumnStatus = (status: ActionItemStatus): ActionItemColumnS
 
 export const isActionItemOverdue = (item: Pick<ActionItem, 'deadline' | 'status'>): boolean =>
   !!item.deadline && item.status !== 'DONE' && new Date(item.deadline).getTime() < Date.now();
+
+export type ActionItemUrgency = 'overdue' | 'today' | 'week';
+
+export const getActionItemUrgency = (
+  item: Pick<ActionItem, 'deadline' | 'status'>,
+  now: Date,
+): ActionItemUrgency | null => {
+  if (!item.deadline || item.status === 'DONE') return null;
+
+  const days = differenceInCalendarDays(new Date(item.deadline), now);
+  if (days < 0) return 'overdue';
+  if (days === 0) return 'today';
+  return days <= 7 ? 'week' : null;
+};
 
 export const sortActionItems = <T extends BoardActionItem>(
   items: T[],
