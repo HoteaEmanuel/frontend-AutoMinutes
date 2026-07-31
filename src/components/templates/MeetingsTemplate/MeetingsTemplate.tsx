@@ -6,8 +6,8 @@ import { useMeetingFilters } from '@/features/meetings/hooks/useMeetingFilters';
 import { meetingsQueryOptions, useMeetings } from '@/features/meetings/hooks/useMeetings';
 import { useExportMeetings } from '@/features/export/hooks/useExportMeetings';
 import ErrorRefetch from '@molecules/ErrorRefetch/ErrorRefetch';
-import { DataTable } from '@organisms/DataTable/DataTable';
-import { DataTableSkeleton } from '@organisms/DataTable/DataTableSkeleton';
+import { MeetingsList } from '@organisms/MeetingsList/MeetingsList';
+import { MeetingsListSkeleton } from '@organisms/MeetingsList/MeetingsListSkeleton';
 import MeetingFilters from '@organisms/meetings/MeetingFilters/MeetingFilters';
 import DownloadButton from '@atoms/DownloadButton/DownloadButton';
 import {
@@ -95,9 +95,15 @@ const MeetingsTemplate = () => {
     isPending || exceedesMaxPage || pageNo < 1 || !validStatus || !validSort;
 
   return (
-    <div className="flex flex-col items-center gap-1 w-full p-2">
-      <div className="flex w-full items-center justify-between">
-        <h1 className="text-left text-2xl font-bold">Meetings</h1>
+    <div className="flex w-full flex-col gap-4 p-2">
+      <div className="flex w-full items-start justify-between gap-4">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-left text-2xl font-bold">Meetings</h1>
+          <p className="text-sm text-muted-foreground">
+            Browse and filter every meeting you've recorded — open one to see its transcript, AI
+            summary, and action items.
+          </p>
+        </div>
 
         <DropdownMenu>
           <DropdownMenuTrigger render={<DownloadButton label="Export" loading={isExporting} />} />
@@ -114,12 +120,22 @@ const MeetingsTemplate = () => {
         </DropdownMenu>
       </div>
 
-      <MeetingFilters />
-      {showSkeleton ? (
-        <DataTableSkeleton />
-      ) : (
-        <DataTable columns={columns} data={data?.meetings} totalCount={data?.totalCount!} />
-      )}
+      <div className="flex w-full flex-col gap-4 lg:flex-row lg:items-start lg:gap-6">
+        <aside className="hidden shrink-0 lg:sticky lg:top-4 lg:block lg:w-64">
+          <MeetingFilters variant="sidebar" />
+        </aside>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-3">
+          <div className="lg:hidden">
+            <MeetingFilters variant="mobile" />
+          </div>
+          {showSkeleton ? (
+            <MeetingsListSkeleton />
+          ) : (
+            <MeetingsList columns={columns} data={data?.meetings} totalCount={data?.totalCount!} />
+          )}
+        </div>
+      </div>
     </div>
   );
 };

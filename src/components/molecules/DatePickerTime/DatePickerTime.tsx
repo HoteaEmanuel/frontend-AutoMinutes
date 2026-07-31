@@ -17,6 +17,7 @@ type DatePickerTimeProps = {
   setTime: (time: string | undefined) => void;
   id?: string;
   disabled?: React.ComponentProps<typeof Calendar>['disabled'];
+  orientation?: 'horizontal' | 'vertical';
 };
 export function DatePickerTime({
   date,
@@ -25,13 +26,15 @@ export function DatePickerTime({
   setTime,
   id = 'date-picker',
   disabled,
+  orientation = 'horizontal',
 }: DatePickerTimeProps) {
   const [open, setOpen] = React.useState(false);
   const dateFieldId = `${id}-date`;
   const timeFieldId = `${id}-time`;
+  const fieldWidth = orientation === 'horizontal' ? 'w-32' : 'w-full';
 
   return (
-    <FieldGroup className="flex-row">
+    <FieldGroup className={orientation === 'horizontal' ? 'flex-row' : 'flex-col'}>
       <Field>
         <FieldLabel htmlFor={dateFieldId}>Date</FieldLabel>
         <Popover open={open} onOpenChange={setOpen}>
@@ -40,7 +43,7 @@ export function DatePickerTime({
               <Button
                 variant="outline"
                 id={dateFieldId}
-                className="w-32 justify-between font-normal"
+                className={`${fieldWidth} justify-between font-normal`}
               >
                 {date ? format(date, 'PPP') : 'Select date'}
                 <ChevronDownIcon data-icon="inline-end" />
@@ -63,7 +66,7 @@ export function DatePickerTime({
           </PopoverContent>
         </Popover>
       </Field>
-      <Field className="w-32">
+      <Field className={fieldWidth}>
         <FieldLabel htmlFor={timeFieldId}>Time</FieldLabel>
         <Input
           type="time"

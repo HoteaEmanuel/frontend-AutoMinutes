@@ -37,7 +37,7 @@ const ActionRequiredCard = ({ items }: ActionRequiredCardProps) => {
   return (
     <Card
       className={cn(
-        'relative overflow-hidden shadow-sm transition-shadow hover:shadow-md dark:border-transparent dark:bg-linear-to-br dark:via-card dark:to-card',
+        'relative h-full overflow-hidden shadow-sm transition-shadow hover:shadow-md dark:border-transparent dark:bg-linear-to-br dark:via-card dark:to-card',
         wash,
       )}
     >
@@ -50,7 +50,7 @@ const ActionRequiredCard = ({ items }: ActionRequiredCardProps) => {
         )}
       />
 
-      <CardContent className="relative flex flex-col gap-3">
+      <CardContent className="relative flex flex-1 flex-col gap-3">
         <div className="flex items-center justify-between gap-2">
           <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
             Needs your attention
@@ -70,13 +70,14 @@ const ActionRequiredCard = ({ items }: ActionRequiredCardProps) => {
         </div>
 
         {items.length === 0 ? (
-          <EmptyState
-            icon={CheckCircle2}
-            title="You're all caught up"
-            description="No overdue or upcoming-due tasks right now."
-            accent="emerald"
-            className="py-8"
-          />
+          <div className="flex flex-1 items-center justify-center">
+            <EmptyState
+              icon={CheckCircle2}
+              title="You're all caught up"
+              description="No overdue or upcoming-due tasks right now."
+              accent="emerald"
+            />
+          </div>
         ) : (
           <div className="flex flex-col gap-4">
             {groups.map((group) => (

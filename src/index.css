@@ -320,6 +320,10 @@ layer base {
   }
 }
 
+@utility page-container {
+  @apply mx-auto flex w-full max-w-7xl flex-col gap-4;
+}
+
 .text-gradient {
   background: var(--gradient-brand);
   background-clip: text;
