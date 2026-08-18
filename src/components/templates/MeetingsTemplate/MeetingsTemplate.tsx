@@ -95,7 +95,7 @@ const MeetingsTemplate = () => {
     isPending || exceedesMaxPage || pageNo < 1 || !validStatus || !validSort;
 
   return (
-    <div className="flex w-full flex-col gap-4 p-2">
+    <div className="flex w-full flex-col gap-3 p-2">
       <div className="flex w-full items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="text-left text-2xl font-bold">Meetings</h1>

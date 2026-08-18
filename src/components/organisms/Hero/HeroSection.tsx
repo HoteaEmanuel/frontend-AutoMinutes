@@ -8,7 +8,7 @@ const HeroSection = () => {
     <div className="relative flex h-screen flex-col items-center justify-center overflow-hidden bg-[radial-gradient(600px_300px_at_80%_-10%,color-mix(in_srgb,var(--primary)_35%,transparent),transparent),radial-gradient(500px_280px_at_10%_110%,color-mix(in_srgb,var(--primary-400)_22%,transparent),transparent),linear-gradient(160deg,var(--primary-800),var(--primary-900)_70%)] px-4 text-center">
     
 
-      <h1 className="mt-6 max-w-4xl text-6xl leading-[1.05] font-bold tracking-tight text-white md:text-7xl">
+      <h1 className="mt-6 mb-8 max-w-4xl text-6xl leading-[1.05] font-bold tracking-tight text-white md:text-7xl">
         Meeting transcripts in.
         <br />
         <span className="bg-(image:--gradient-brand) bg-clip-text text-transparent">
