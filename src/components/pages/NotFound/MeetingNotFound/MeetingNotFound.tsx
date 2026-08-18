@@ -4,8 +4,10 @@ import { useRedirect } from '@/hooks/useRedirectAfterDelay';
 import { ArrowLeft, CalendarSearch, Home } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 import { DELAY_MS } from '@/constants/delay';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const MeetingNotFound = () => {
+  usePageTitle('Meeting not found');
   const navigate = useNavigate();
 
   useRedirect(DELAY_MS);

@@ -8,8 +8,10 @@ import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useVerifyEmail } from '@/features/auth/hooks/useVerifyEmail';
 import { useResendVerification } from '@/features/auth/hooks/useResendVerification';
 import { getErrorMessage } from '@/lib/errors';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const VerifyEmailPage = () => {
+  usePageTitle('Verify your email');
   const [searchParams] = useSearchParams();
   const email = searchParams.get('email');
   const sent = searchParams.get('sent') === '1';

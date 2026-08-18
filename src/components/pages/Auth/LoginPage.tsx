@@ -10,10 +10,12 @@ import { Link } from 'react-router';
 import { Card } from '@/components/ui/card';
 import useLogin from '@/features/auth/hooks/useLogin';
 import { getErrorMessage } from '@/lib/errors';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
+  usePageTitle('Log in');
   const {
     register,
     handleSubmit,

@@ -2,7 +2,9 @@ import { Button } from '@/components/ui/button';
 import { useRedirect } from '@/hooks/useRedirectAfterDelay';
 import { Link, useNavigate } from 'react-router';
 import { DELAY_MS } from '@/constants/delay';
+import { usePageTitle } from '@/hooks/usePageTitle';
 const PageNotFound = () => {
+  usePageTitle('Page not found');
   const navigate = useNavigate();
   useRedirect(DELAY_MS);
   return (

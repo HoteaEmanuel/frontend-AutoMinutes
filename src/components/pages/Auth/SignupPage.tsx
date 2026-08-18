@@ -10,8 +10,10 @@ import z from 'zod';
 import { useSignUp } from '@/features/auth/hooks/useSignUp';
 import { Card } from '@/components/ui/card';
 import { getErrorMessage } from '@/lib/errors';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const SignupPage = () => {
+  usePageTitle('Sign up');
   const {
     register,
     handleSubmit,

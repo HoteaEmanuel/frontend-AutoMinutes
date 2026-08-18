@@ -8,10 +8,12 @@ import { Link, Navigate, useSearchParams } from 'react-router';
 import { Card } from '@/components/ui/card';
 import { useResetPassword } from '@/features/auth/hooks/useResetPassword';
 import { getErrorMessage } from '@/lib/errors';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 const ResetPasswordPage = () => {
+  usePageTitle('Reset password');
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
 
