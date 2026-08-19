@@ -8,10 +8,12 @@ import { Link } from 'react-router';
 import { Card } from '@/components/ui/card';
 import { useForgotPassword } from '@/features/auth/hooks/useForgotPassword';
 import { getErrorMessage } from '@/lib/errors';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 const ForgotPasswordPage = () => {
+  usePageTitle('Forgot password');
   const {
     register,
     handleSubmit,

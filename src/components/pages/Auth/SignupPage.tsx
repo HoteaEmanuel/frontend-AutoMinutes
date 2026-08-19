@@ -10,8 +10,10 @@ import z from 'zod';
 import { useSignUp } from '@/features/auth/hooks/useSignUp';
 import { Card } from '@/components/ui/card';
 import { getErrorMessage } from '@/lib/errors';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const SignupPage = () => {
+  usePageTitle('Sign up');
   const {
     register,
     handleSubmit,
@@ -37,14 +39,12 @@ const SignupPage = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-2">
-      <Card className="shadow-md">
+      <Card className="min-w-sm max-w-md shadow-md">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex w-full max-w-md flex-col gap-4 rounded-lg p-6 "
+          className="flex w-full max-w-md flex-col gap-3 rounded-lg p-5"
         >
-          <div>
-            <h2 className="text-gradient text-4xl text-center font-bold">Sign up</h2>
-          </div>
+          <h2 className="text-gradient text-center text-3xl font-bold">Sign up</h2>
           {error && <p className="text-red-500 font-semibold">{getErrorMessage(error)}</p>}
           <div className="grid grid-cols-2 gap-3">
             <FormField
@@ -74,24 +74,27 @@ const SignupPage = () => {
             error={errors.email?.message}
             hasError={!!errors.email?.message || !!error}
           />
-          <FormField
-            label="Password"
-            id="password"
-            type="password"
-            register={register}
-            placeholder="Password"
-            error={errors.password?.message}
-            hasError={!!errors.password?.message || !!error}
-          />
-          <FormField
-            label="Confirm Password"
-            id="confirmPassword"
-            type="password"
-            placeholder="Confirm Password"
-            register={register}
-            error={errors.confirmPassword?.message}
-            hasError={!!errors.confirmPassword?.message || !!error}
-          />
+
+          <div className="grid grid-cols-2 gap-3">
+            <FormField
+              label="Password"
+              id="password"
+              type="password"
+              register={register}
+              placeholder="Password"
+              error={errors.password?.message}
+              hasError={!!errors.password?.message || !!error}
+            />
+            <FormField
+              label="Confirm Password"
+              id="confirmPassword"
+              type="password"
+              placeholder="Confirm Password"
+              register={register}
+              error={errors.confirmPassword?.message}
+              hasError={!!errors.confirmPassword?.message || !!error}
+            />
+          </div>
           <Button type="submit" disabled={isPending}>
             {isPending ? 'Creating account...' : 'Sign up'}
           </Button>

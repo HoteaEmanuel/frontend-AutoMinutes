@@ -5,8 +5,10 @@ import { GoogleIcon } from '@atoms/icons/GoogleIcon';
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const Oauth = () => {
+  usePageTitle('Signing in…');
   const user = useAuthStore((s) => s.user);
   const { mutate, status } = useRefresh();
   const navigate = useNavigate();

@@ -1,3 +1,4 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
@@ -20,7 +21,11 @@ import Selector from '@molecules/Selector/Selector';
 import { Funnel, SearchIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-const MeetingFilters = () => {
+type MeetingFiltersProps = {
+  variant: 'sidebar' | 'mobile';
+};
+
+const MeetingFilters = ({ variant }: MeetingFiltersProps) => {
   const { filters, setFilters, scheduledAt, timeAt, setScheduledAt, setScheduledTime } =
     useMeetingFilters();
 
@@ -76,87 +81,88 @@ const MeetingFilters = () => {
     />
   );
 
-  return (
-    <div className="mb-5 w-full">
-      <div className="flex w-full flex-wrap items-center gap-4">
-        <div className="hidden min-w-0 max-w-sm flex-1 flex-col justify-center gap-4 md:flex">
-          <Label>Search</Label>
-          {searchInput}
-        </div>
-        <div className="hidden shrink-0 items-center md:flex md:w-72">
+  if (variant === 'sidebar') {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Funnel className="size-4" />
+            Filters
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label>Search</Label>
+            {searchInput}
+          </div>
+
+          <div className="flex flex-col gap-2">{statusSelector('w-full')}</div>
+          <div className="flex flex-col gap-2">{sortSelector('w-full')}</div>
+
           <DatePickerTime
-            id="desktop-meeting-date"
+            id="sidebar-meeting-date"
+            date={scheduledAt}
+            time={timeAt}
+            setDate={setScheduledAt}
+            setTime={setScheduledTime}
+            orientation="vertical"
+          />
+
+          <div className="flex items-center gap-2">
+            {hasTodosCheckbox}
+            <Label>Has todos</Label>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger
+        render={
+          <Button variant="outline" className="gap-2">
+            <Funnel className="size-4" />
+            Filters
+          </Button>
+        }
+      />
+
+      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>Filters</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label>Search</Label>
+            {searchInput}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col gap-2">{statusSelector('w-full')}</div>
+            <div className="flex flex-col gap-2">{sortSelector('w-full')}</div>
+          </div>
+
+          <DatePickerTime
+            id="modal-meeting-date"
             date={scheduledAt}
             time={timeAt}
             setDate={setScheduledAt}
             setTime={setScheduledTime}
           />
-        </div>
-        <div className="hidden flex-col justify-center gap-4 md:flex">
-          <Label>Has todos</Label>
-          {hasTodosCheckbox}
-        </div>
 
-        <Dialog open={open} onOpenChange={setOpen}>
-          <div className="md:hidden">
-            <DialogTrigger
-              render={
-                <Button variant="outline" className="gap-2">
-                  <Funnel className="size-4" />
-                  Filters
-                </Button>
-              }
-            />
+          <div className="flex items-center gap-2">
+            {hasTodosCheckbox}
+            <Label>Has todos</Label>
           </div>
-          <div className="hidden flex-col gap-4 md:ml-auto md:flex">
-            <Label className="invisible">Filters</Label>
-            <DialogTrigger
-              render={
-                <Button variant="outline" className="gap-2">
-                  <Funnel className="size-4" />
-                  Filters
-                </Button>
-              }
-            />
-          </div>
-
-          <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Filters</DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col gap-2">
-                <Label>Search</Label>
-                {searchInput}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-2">{statusSelector('w-full')}</div>
-                <div className="flex flex-col gap-2">{sortSelector('w-full')}</div>
-              </div>
-
-              <DatePickerTime
-                id="modal-meeting-date"
-                date={scheduledAt}
-                time={timeAt}
-                setDate={setScheduledAt}
-                setTime={setScheduledTime}
-              />
-
-              <div className="flex items-center gap-2">
-                {hasTodosCheckbox}
-                <Label>Has todos</Label>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button className="w-full" onClick={() => setOpen(false)}>
-                Apply
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-    </div>
+        </div>
+        <DialogFooter>
+          <Button className="w-full" onClick={() => setOpen(false)}>
+            Apply
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

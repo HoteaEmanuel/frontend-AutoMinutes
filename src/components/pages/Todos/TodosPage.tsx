@@ -1,8 +1,10 @@
 import TodosTemplate from '@templates/TodosTemplate/TodosTemplate';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const TodosPage = () => {
+  usePageTitle('To-dos');
   return (
-    <div className="mx-auto w-full max-w-7xl flex flex-col gap-4">
+    <div className="page-container">
       <TodosTemplate />
     </div>
   );

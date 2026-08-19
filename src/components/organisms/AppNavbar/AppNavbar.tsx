@@ -17,7 +17,7 @@ const AppNavbar = () => {
   return (
     <>
       <header className="sticky top-0 z-40 w-full border-b border-border backdrop-blur">
-        <nav className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
+        <nav className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <MobileNavDrawer />
             <Link to="/dashboard" className="text-xl font-bold text-foreground">

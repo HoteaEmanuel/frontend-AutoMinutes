@@ -1,8 +1,10 @@
 import MeetingsTemplate from '@templates/MeetingsTemplate/MeetingsTemplate';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 const MeetingsPage = () => {
+  usePageTitle('Meetings');
   return (
-    <div className="mx-auto w-full max-w-6xl flex flex-col gap-4">
+    <div className="page-container">
       <MeetingsTemplate />
     </div>
   );
